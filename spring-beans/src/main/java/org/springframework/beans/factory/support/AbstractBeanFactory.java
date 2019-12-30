@@ -125,7 +125,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	/** 已经创建的bean名称集合 */
 	private final Set<String> alreadyCreated = Collections.newSetFromMap(new ConcurrentHashMap<>(256));
 
-	/** Names of beans that are currently in creation */
+	/** 当前正在创建的bean的名称 */
 	private final ThreadLocal<Object> prototypesCurrentlyInCreation =
 			new NamedThreadLocal<>("Prototype beans currently in creation");
 
@@ -194,13 +194,16 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	@SuppressWarnings("unchecked")
 	protected <T> T doGetBean(final String name, @Nullable final Class<T> requiredType,
 			@Nullable final Object[] args, boolean typeCheckOnly) throws BeansException {
-
+		// tofix 一般情况下，bean的定义都会指定id，如<bean id=""/>，name就是id的值，除非没有指定id，但是一般都指定id，所以不指定id的场景暂时不细讲
+		// beanName 代表<bean id=""/>中的id值
 		final String beanName = transformedBeanName(name);
-		Object bean;
 
-		// Eagerly check singleton cache for manually registered singletons.
+
+		// 根据 beanName 获取bean工厂中保存的单例bean实例
 		Object sharedInstance = getSingleton(beanName);
-		if (sharedInstance != null && args == null) {
+		Object bean;
+		// 如果beanName代表的bean实例已经被创建过了，就直接获取，正常场景，在这之前没有创建过，所以不走本分支
+		if (sharedInstance != null && args == null) {// tofix 当前Demo逻辑中，args为空，暂时不细讲
 			if (logger.isDebugEnabled()) {
 				if (isSingletonCurrentlyInCreation(beanName)) {
 					logger.debug("Returning eagerly cached instance of singleton bean '" + beanName +
@@ -212,10 +215,11 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 			}
 			bean = getObjectForBeanInstance(sharedInstance, name, beanName, null);
 		}
-
+		/**走本分支*/
 		else {
 			// Fail if we're already creating this bean instance:
 			// We're assumably within a circular reference.
+			// tofix 如果正在创建的beanName中有当前beanName，则抛出异常；循环引用
 			if (isPrototypeCurrentlyInCreation(beanName)) {
 				throw new BeanCurrentlyInCreationException(beanName);
 			}
@@ -784,7 +788,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 
 	@Override
 	public void addEmbeddedValueResolver(StringValueResolver valueResolver) {
-		Assert.notNull(valueResolver, "StringValueResolver must not be null");
+		Assert.notNull(valueResolver, "StringValueResolver must not be null");// valueResolver ClassPathXmlApplicationContext
 		this.embeddedValueResolvers.add(valueResolver);
 	}
 
@@ -1079,6 +1083,8 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	/**
 	 * Return the bean name, stripping out the factory dereference prefix if necessary,
 	 * and resolving aliases to canonical names.
+	 * 译文：返回bean名称，必要时去掉工厂取消引用前缀，并将别名解析为规范名称。
+	 *
 	 * @param name the user-specified name
 	 * @return the transformed bean name
 	 */
@@ -1160,6 +1166,10 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	/**
 	 * Return a merged RootBeanDefinition, traversing the parent bean definition
 	 * if the specified bean corresponds to a child bean definition.
+	 * 译文：
+	 * 返回一个合并的RootBeanDefinition，遍历父bean定义
+	 * 如果指定的bean对应于子bean定义。
+	 *
 	 * @param beanName the name of the bean to retrieve the merged definition for
 	 * @return a (potentially merged) RootBeanDefinition for the given bean
 	 * @throws NoSuchBeanDefinitionException if there is no bean with the given name
@@ -1504,6 +1514,11 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	 * Mark the specified bean as already created (or about to be created).
 	 * <p>This allows the bean factory to optimize its caching for repeated
 	 * creation of the specified bean.
+	 *
+	 * 译文：
+	 * 将指定的bean标记为已经创建(或即将创建)。
+	 * 这允许bean工厂为重复创建指定的bean优化缓存。
+	 *
 	 * @param beanName the name of the bean
 	 */
 	protected void markBeanAsCreated(String beanName) {

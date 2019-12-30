@@ -691,8 +691,12 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 
 		// Trigger initialization of all non-lazy singleton beans...
 		for (String beanName : beanNames) {
+			// tofix 合并父 Bean 中的配置，例：<bean parent="" /> 不常用，在本Demo中，无逻辑执行，暂不细讲
 			RootBeanDefinition bd = getMergedLocalBeanDefinition(beanName);
+			// 如果xml文件的bean定义没有配置"abstract=true"、并且bean是单例，非懒加载的
 			if (!bd.isAbstract() && bd.isSingleton() && !bd.isLazyInit()) {
+				// tofix 不常用，在本Demo中不涉及，暂不细讲 ==分割线start==
+				// 如果是通过FactoryBean的方式创建的
 				if (isFactoryBean(beanName)) {
 					Object bean = getBean(FACTORY_BEAN_PREFIX + beanName);
 					if (bean instanceof FactoryBean) {
@@ -712,6 +716,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 						}
 					}
 				}
+				// tofix ==分割线end==
 				else {
 					getBean(beanName);
 				}

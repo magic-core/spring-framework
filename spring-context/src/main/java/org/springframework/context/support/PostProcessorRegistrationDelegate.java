@@ -170,10 +170,18 @@ final class PostProcessorRegistrationDelegate {
 		// modified the original metadata, e.g. replacing placeholders in values...
 		beanFactory.clearMetadataCache();
 	}
-// tofix 属性赋值，用处不知
+
+	/**
+	 * 向bean工厂注册实现 BeanPostProcessor 接口的类
+	 *
+	 * @param beanFactory
+	 * @param applicationContext
+	 */
 	public static void registerBeanPostProcessors(
 			ConfigurableListableBeanFactory beanFactory, AbstractApplicationContext applicationContext) {
 
+		// tofix
+		// 获得xml中类型是 BeanPostProcessor 的bean定义
 		String[] postProcessorNames = beanFactory.getBeanNamesForType(BeanPostProcessor.class, true, false);
 
 		// Register BeanPostProcessorChecker that logs an info message when
@@ -210,10 +218,12 @@ final class PostProcessorRegistrationDelegate {
 		}
 
 		// First, register the BeanPostProcessors that implement PriorityOrdered.
+		// 译文：首先，注册实现priorityor的beanpostprocessor。
 		sortPostProcessors(priorityOrderedPostProcessors, beanFactory);
 		registerBeanPostProcessors(beanFactory, priorityOrderedPostProcessors);
 
 		// Next, register the BeanPostProcessors that implement Ordered.
+		// 译文：接下来，注册实现Ordered的beanpostprocessor。
 		List<BeanPostProcessor> orderedPostProcessors = new ArrayList<>();
 		for (String ppName : orderedPostProcessorNames) {
 			BeanPostProcessor pp = beanFactory.getBean(ppName, BeanPostProcessor.class);
@@ -226,6 +236,7 @@ final class PostProcessorRegistrationDelegate {
 		registerBeanPostProcessors(beanFactory, orderedPostProcessors);
 
 		// Now, register all regular BeanPostProcessors.
+		// 译文：现在，注册所有常规的beanpostprocessor。
 		List<BeanPostProcessor> nonOrderedPostProcessors = new ArrayList<>();
 		for (String ppName : nonOrderedPostProcessorNames) {
 			BeanPostProcessor pp = beanFactory.getBean(ppName, BeanPostProcessor.class);
@@ -237,6 +248,7 @@ final class PostProcessorRegistrationDelegate {
 		registerBeanPostProcessors(beanFactory, nonOrderedPostProcessors);
 
 		// Finally, re-register all internal BeanPostProcessors.
+		// 译文：最后，重新注册所有的内部beanpostprocessor。
 		sortPostProcessors(internalPostProcessors, beanFactory);
 		registerBeanPostProcessors(beanFactory, internalPostProcessors);
 
