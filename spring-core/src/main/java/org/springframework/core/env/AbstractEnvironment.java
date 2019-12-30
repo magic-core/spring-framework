@@ -16,22 +16,17 @@
 
 package org.springframework.core.env;
 
-import java.security.AccessControlException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.springframework.core.SpringProperties;
 import org.springframework.core.convert.support.ConfigurableConversionService;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
+
+import java.security.AccessControlException;
+import java.util.*;
 
 /**
  * Abstract base class for {@link Environment} implementations. Supports the notion of
@@ -516,6 +511,8 @@ public abstract class AbstractEnvironment implements ConfigurableEnvironment {
 
 	@Override
 	public void validateRequiredProperties() throws MissingRequiredPropertiesException {
+		// propertyResolver 代表 PropertySourcesPropertyResolver 实例
+		// validateRequiredProperties 调用的是从 AbstractPropertyResolver 继承来的
 		this.propertyResolver.validateRequiredProperties();
 	}
 
@@ -568,6 +565,9 @@ public abstract class AbstractEnvironment implements ConfigurableEnvironment {
 
 	@Override
 	public String resolveRequiredPlaceholders(String text) throws IllegalArgumentException {
+		// 替换占位符操作 例如: "${user.dir}"
+		// propertyResolver 代表PropertySourcesPropertyResolver 实例
+		// 调用 AbstractPropertyResolver 的 resolveRequiredPlaceholders 方法
 		return this.propertyResolver.resolveRequiredPlaceholders(text);
 	}
 

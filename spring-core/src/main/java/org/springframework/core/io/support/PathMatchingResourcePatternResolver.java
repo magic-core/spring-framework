@@ -16,43 +16,22 @@
 
 package org.springframework.core.io.support;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.springframework.core.io.*;
+import org.springframework.lang.Nullable;
+import org.springframework.util.*;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
-import java.net.JarURLConnection;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.net.URLConnection;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.net.*;
+import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.zip.ZipException;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import org.springframework.core.io.DefaultResourceLoader;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.ResourceLoader;
-import org.springframework.core.io.UrlResource;
-import org.springframework.core.io.VfsResource;
-import org.springframework.lang.Nullable;
-import org.springframework.util.AntPathMatcher;
-import org.springframework.util.Assert;
-import org.springframework.util.ClassUtils;
-import org.springframework.util.PathMatcher;
-import org.springframework.util.ReflectionUtils;
-import org.springframework.util.ResourceUtils;
-import org.springframework.util.StringUtils;
 
 /**
  * A {@link ResourcePatternResolver} implementation that is able to resolve a
@@ -247,6 +226,8 @@ public class PathMatchingResourcePatternResolver implements ResourcePatternResol
 	@Override
 	@Nullable
 	public ClassLoader getClassLoader() {
+		// getResourceLoader()返回resourceLoader变量（ClassPathXmlApplicationContext实例）
+		// getClassLoader()方法的实现在 DefaultResourceLoader 里(ClassPathXmlApplicationContext继承了DefaultResourceLoader)
 		return getResourceLoader().getClassLoader();
 	}
 
@@ -262,8 +243,10 @@ public class PathMatchingResourcePatternResolver implements ResourcePatternResol
 
 	/**
 	 * Return the PathMatcher that this resource pattern resolver uses.
+	 * 返回此资源模式解析器使用的路径匹配器。
 	 */
 	public PathMatcher getPathMatcher() {
+		// 返回 AntPathMatcher 实例
 		return this.pathMatcher;
 	}
 
@@ -273,20 +256,35 @@ public class PathMatchingResourcePatternResolver implements ResourcePatternResol
 		return getResourceLoader().getResource(location);
 	}
 
+	/**
+	 * 根据给定的xml文件路径locationPattern，解析配置文件，返回资源实例，一个Resource代表一个文件
+	 *
+	 * @param locationPattern the location pattern to resolve
+	 * @return
+	 * @throws IOException
+	 */
 	@Override
 	public Resource[] getResources(String locationPattern) throws IOException {
 		Assert.notNull(locationPattern, "Location pattern must not be null");
+		// 如果locationPattern以"classpath*:"开头
 		if (locationPattern.startsWith(CLASSPATH_ALL_URL_PREFIX)) {
-			// a class path resource (multiple resources for same name possible)
+			// tofix 不常用，本Demo不涉及，暂不细讲
+			// 截取"classpath*:applicationContext.xml"的"classpath*:"后的部分
+			// 如果包含"*"或者"？"
+			// getPathMatcher()方法返回 AntPathMatcher 实例
 			if (getPathMatcher().isPattern(locationPattern.substring(CLASSPATH_ALL_URL_PREFIX.length()))) {
-				// a class path resource pattern
 				return findPathMatchingResources(locationPattern);
 			}
+			/**当前Demo 走本分支*/
+			// 截取"classpath*:applicationContext.xml"的"classpath*:"后的部分
+			// 如果不包含"*"或者"？"
 			else {
-				// all class path resources with the given name
+				// 读取解析xml文件，返回Resource文件资源数组
 				return findAllClassPathResources(locationPattern.substring(CLASSPATH_ALL_URL_PREFIX.length()));
 			}
 		}
+		// tofix 不常用，本Demo不涉及，暂不细讲
+		// 如果locationPattern不以"classpath*:"开头
 		else {
 			// Generally only look for a pattern after a prefix here,
 			// and on Tomcat only after the "*/" separator for its "war:" protocol.
@@ -304,8 +302,8 @@ public class PathMatchingResourcePatternResolver implements ResourcePatternResol
 	}
 
 	/**
-	 * Find all class location resources with the given location via the ClassLoader.
-	 * Delegates to {@link #doFindAllClassPathResources(String)}.
+	 * 读取解析location下的配置文件，返回数组，一个Resource代表一个文件
+	 *
 	 * @param location the absolute path within the classpath
 	 * @return the result as Resource array
 	 * @throws IOException in case of I/O errors
@@ -314,34 +312,40 @@ public class PathMatchingResourcePatternResolver implements ResourcePatternResol
 	 */
 	protected Resource[] findAllClassPathResources(String location) throws IOException {
 		String path = location;
+		// 如果path以“/”开头，则取“/”后面的部分
 		if (path.startsWith("/")) {
 			path = path.substring(1);
 		}
+		// 读取路径下配置文件的方法，一个Resource代表一个文件
 		Set<Resource> result = doFindAllClassPathResources(path);
 		if (logger.isDebugEnabled()) {
 			logger.debug("Resolved classpath location [" + location + "] to resources " + result);
 		}
+		// 最后装载到数组里，并返回
 		return result.toArray(new Resource[0]);
 	}
 
 	/**
-	 * Find all class location resources with the given path via the ClassLoader.
-	 * Called by {@link #findAllClassPathResources(String)}.
+	 * 调用classloader的方法，解析path下的配置文件，一个Resource代表一个文件
+	 *
 	 * @param path the absolute path within the classpath (never a leading slash)
 	 * @return a mutable Set of matching Resource instances
 	 * @since 4.1.1
 	 */
 	protected Set<Resource> doFindAllClassPathResources(String path) throws IOException {
+		// result 代表资源set集合，一个Resource代表一个文件
 		Set<Resource> result = new LinkedHashSet<>(16);
+		// 获得当前线程的类加载器
 		ClassLoader cl = getClassLoader();
+		// 根据类加载器获得path路径的资源实例Enumeration
 		Enumeration<URL> resourceUrls = (cl != null ? cl.getResources(path) : ClassLoader.getSystemResources(path));
 		while (resourceUrls.hasMoreElements()) {
+			// 获得url实例，封装成 UrlResource，添加到result
 			URL url = resourceUrls.nextElement();
 			result.add(convertClassLoaderURL(url));
 		}
+		// 如果路径为""
 		if ("".equals(path)) {
-			// The above result is likely to be incomplete, i.e. only containing file system references.
-			// We need to have pointers to each of the jar files on the classpath as well...
 			addAllClassLoaderJarRoots(cl, result);
 		}
 		return result;

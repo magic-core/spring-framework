@@ -65,9 +65,11 @@ import java.io.IOException;
 public abstract class AbstractRefreshableApplicationContext extends AbstractApplicationContext {
 
 	@Nullable
+	/** 表示xml中相同beanId的bean定义允许覆盖*/
 	private Boolean allowBeanDefinitionOverriding;
 
 	@Nullable
+	/** 表示允许循环引用*/
 	private Boolean allowCircularReferences;
 
 	/** Bean factory for this context */
@@ -116,22 +118,32 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 
 
 	/**
-	 * This implementation performs an actual refresh of this context's underlying
-	 * bean factory, shutting down the previous bean factory (if any) and
-	 * initializing a fresh bean factory for the next phase of the context's lifecycle.
+	 * 1.如果已经存在bean工厂，则调用销毁方法，将旧bean工厂销毁
+	 * 2.然后再根据配置文件中的标签解析为bean定义，创建新的beanfactory bean工厂（以map的方式放到beanfactory实例中）
 	 */
 	@Override
 	protected final void refreshBeanFactory() throws BeansException {
-		// 默认不存在bean工厂
+		// 如果存在bean工厂，则销毁原bean工厂，然后重新创建
 		if (hasBeanFactory()) {
 			destroyBeans();
 			closeBeanFactory();
 		}
 		try {
+			// 创建 DefaultListableBeanFactory bean工厂
 			DefaultListableBeanFactory beanFactory = createBeanFactory();
+
+			// getId() 例：org.springframework.context.support.ClassPathXmlApplicationContext@402c4085
+			// 对bean工厂的 SerializationId 赋值
 			beanFactory.setSerializationId(getId());
+
+			// 对beanFactory 的 AllowCircularReferences 和 AllowBeanDefinitionOverriding 属性赋值
+			// allowCircularReferences 表示允许循环引用
+			// allowBeanDefinitionOverriding 表示xml中相同beanId的bean定义允许覆盖
 			customizeBeanFactory(beanFactory);
+
+			// 执行从 AbstractXmlApplicationContext 继承的 loadBeanDefinitions 方法
 			loadBeanDefinitions(beanFactory);
+
 			synchronized (this.beanFactoryMonitor) {
 				this.beanFactory = beanFactory;
 			}
@@ -209,13 +221,10 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 	}
 
 	/**
-	 * Customize the internal bean factory used by this context.
-	 * Called for each {@link #refresh()} attempt.
-	 * <p>The default implementation applies this context's
-	 * {@linkplain #setAllowBeanDefinitionOverriding "allowBeanDefinitionOverriding"}
-	 * and {@linkplain #setAllowCircularReferences "allowCircularReferences"} settings,
-	 * if specified. Can be overridden in subclasses to customize any of
-	 * {@link DefaultListableBeanFactory}'s settings.
+	 * 对 allowBeanDefinitionOverriding 和 allowCircularReferences 赋值
+	 * allowCircularReferences 表示允许循环引用
+	 * allowBeanDefinitionOverriding 表示xml中相同beanId的bean定义允许覆盖
+	 *
 	 * @param beanFactory the newly created bean factory for this context
 	 * @see DefaultListableBeanFactory#setAllowBeanDefinitionOverriding
 	 * @see DefaultListableBeanFactory#setAllowCircularReferences
@@ -223,9 +232,13 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 	 * @see DefaultListableBeanFactory#setAllowEagerClassLoading
 	 */
 	protected void customizeBeanFactory(DefaultListableBeanFactory beanFactory) {
+		// 对 allowBeanDefinitionOverriding 进行赋值，allowBeanDefinitionOverriding默认为true
+		// allowBeanDefinitionOverriding 表示xml中相同beanId的bean定义允许覆盖
 		if (this.allowBeanDefinitionOverriding != null) {
 			beanFactory.setAllowBeanDefinitionOverriding(this.allowBeanDefinitionOverriding);
 		}
+		// 对 allowCircularReferences 进行赋值，allowCircularReferences
+		// allowCircularReferences 表示允许循环引用
 		if (this.allowCircularReferences != null) {
 			beanFactory.setAllowCircularReferences(this.allowCircularReferences);
 		}

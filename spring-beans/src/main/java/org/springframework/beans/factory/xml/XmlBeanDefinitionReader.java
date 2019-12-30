@@ -16,27 +16,9 @@
 
 package org.springframework.beans.factory.xml;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.HashSet;
-import java.util.Set;
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.w3c.dom.Document;
-import org.xml.sax.EntityResolver;
-import org.xml.sax.ErrorHandler;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
-
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.BeanDefinitionStoreException;
-import org.springframework.beans.factory.parsing.EmptyReaderEventListener;
-import org.springframework.beans.factory.parsing.FailFastProblemReporter;
-import org.springframework.beans.factory.parsing.NullSourceExtractor;
-import org.springframework.beans.factory.parsing.ProblemReporter;
-import org.springframework.beans.factory.parsing.ReaderEventListener;
-import org.springframework.beans.factory.parsing.SourceExtractor;
+import org.springframework.beans.factory.parsing.*;
 import org.springframework.beans.factory.support.AbstractBeanDefinitionReader;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.core.Constants;
@@ -49,6 +31,14 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.xml.SimpleSaxErrorHandler;
 import org.springframework.util.xml.XmlValidationModeDetector;
+import org.w3c.dom.Document;
+import org.xml.sax.*;
+
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Bean definition reader for XML bean definitions.
@@ -126,6 +116,7 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 
 	private final XmlValidationModeDetector validationModeDetector = new XmlValidationModeDetector();
 
+	// 保存加载过的XML文件
 	private final ThreadLocal<Set<EncodedResource>> resourcesCurrentlyBeingLoaded =
 			new NamedThreadLocal<>("XML bean definition resources currently being loaded");
 
@@ -294,7 +285,8 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 
 
 	/**
-	 * Load bean definitions from the specified XML file.
+	 * 从指定的XML文件加载bean定义。
+	 *
 	 * @param resource the resource descriptor for the XML file
 	 * @return the number of bean definitions found
 	 * @throws BeanDefinitionStoreException in case of loading or parsing errors
@@ -305,7 +297,8 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 	}
 
 	/**
-	 * Load bean definitions from the specified XML file.
+	 * 从指定的XML文件加载bean定义。
+	 *
 	 * @param encodedResource the resource descriptor for the XML file,
 	 * allowing to specify an encoding to use for parsing the file
 	 * @return the number of bean definitions found
@@ -316,23 +309,46 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 		if (logger.isInfoEnabled()) {
 			logger.info("Loading XML bean definitions from " + encodedResource);
 		}
-
+		// 获取已经加载过的配置文件，第一次执行get方法，为空
+		// resourcesCurrentlyBeingLoaded 表示保存加载过的XML文件
 		Set<EncodedResource> currentResources = this.resourcesCurrentlyBeingLoaded.get();
 		if (currentResources == null) {
+			// 初始化resourcesCurrentlyBeingLoaded
 			currentResources = new HashSet<>(4);
 			this.resourcesCurrentlyBeingLoaded.set(currentResources);
 		}
+		// ###逻辑含义:如果 currentResources 集合已经包含 encodedResource ,则表示xml文件发生了循环依赖，则抛出异常
+		// 注意:本方法会在finally中清空resourcesCurrentlyBeingLoaded,
+		// 所以假如以类似方式:new ClassPathXmlApplicationContext(new String[] {"classpath*:applicationContext.xml","classpath*:applicationContext.xml"}, true, null);
+		// 配置了多个相同xml文件,不会报循环依赖的问题
+		// ###执行场景:
+		// 1.当解析一个xml文件A时,如果发现文件里import了另一个xml文件B,B文件里又import了A文件,则会发生循环依赖,抛出异常
+		// 2.当解析一个xml文件A时,如果发现文件里import了当前xml文件A,则会发生循环依赖,抛出异常
+		// ###实现解释:
+		// 0.当解析一个xml文件A时,如果发现文件里import了另一个xml文件B,会递归调用本方法,解析B文件;
+		// 在开始解析一个xml文件时,会将文件的解析内容放到HashSet<EncodedResource> currentResources集合里,如果发现集合里已经存在当前xml信息,则表示发生循环依赖
+		// 1. currentResources 是 HashSet 实例,调用HashSet#add方法,如果插入元素的hashcode相等,并且((==)内存地址相等或者(equals)内容相等)
+		// 则判断是重复元素,返回false;
+		// 2. encodedResource 是 EncodedResource 实例,EncodedResource重写了hashCode和equals,
+		// 重写逻辑是返回 成员变量 resource(ClassPathResource类型) 的 hashcode 方法和 equals 方法
+		// 3. ClassPathResource 的 hashcode 实现是 返回字符串类型的文件名hashcode,如果文件名相同,hashcode则返回true
+		// 例:org.springframework.core.io.ClassPathResource#equals
+		// 4. ClassPathResource 的 equals 实现是 如果字符串文件名内容相同,并且加载的ClassLoader 内存地址或者内容相同,则返回true
+		// 例:org.springframework.core.io.ClassPathResource#equals
 		if (!currentResources.add(encodedResource)) {
 			throw new BeanDefinitionStoreException(
 					"Detected cyclic loading of " + encodedResource + " - check your import definitions!");
 		}
 		try {
+			// 获得inputStream
 			InputStream inputStream = encodedResource.getResource().getInputStream();
 			try {
 				InputSource inputSource = new InputSource(inputStream);
+				// 默认为空
 				if (encodedResource.getEncoding() != null) {
 					inputSource.setEncoding(encodedResource.getEncoding());
 				}
+				// 加载xml中bean的定义
 				return doLoadBeanDefinitions(inputSource, encodedResource.getResource());
 			}
 			finally {
@@ -377,7 +393,8 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 
 
 	/**
-	 * Actually load bean definitions from the specified XML file.
+	 * 从指定的XML文件实际加载bean定义。
+	 *
 	 * @param inputSource the SAX InputSource to read from
 	 * @param resource the resource descriptor for the XML file
 	 * @return the number of bean definitions found
@@ -388,7 +405,9 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 	protected int doLoadBeanDefinitions(InputSource inputSource, Resource resource)
 			throws BeanDefinitionStoreException {
 		try {
+			// 将inputSource解析为document实例
 			Document doc = doLoadDocument(inputSource, resource);
+			// 加载xml中bean的定义
 			return registerBeanDefinitions(doc, resource);
 		}
 		catch (BeanDefinitionStoreException ex) {
@@ -503,9 +522,14 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 	 * @see BeanDefinitionDocumentReader#registerBeanDefinitions
 	 */
 	public int registerBeanDefinitions(Document doc, Resource resource) throws BeanDefinitionStoreException {
+		// 实例化 DefaultBeanDefinitionDocumentReader
 		BeanDefinitionDocumentReader documentReader = createBeanDefinitionDocumentReader();
+		// getRegistry返回DefaultListableBeanFactory实例
+		// 获取bean工厂中的bean定义的数量
 		int countBefore = getRegistry().getBeanDefinitionCount();
+		// createReaderContext创建 XmlReaderContext 实例
 		documentReader.registerBeanDefinitions(doc, createReaderContext(resource));
+
 		return getRegistry().getBeanDefinitionCount() - countBefore;
 	}
 

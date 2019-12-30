@@ -1,7 +1,7 @@
 package org.springframework;
 
 public class Persion {
-	public void test(){
+	public void test() {
 		System.out.println("hello world!");
 	}
 }
