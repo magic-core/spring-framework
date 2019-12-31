@@ -181,7 +181,7 @@ final class PostProcessorRegistrationDelegate {
 			ConfigurableListableBeanFactory beanFactory, AbstractApplicationContext applicationContext) {
 
 		// tofix
-		// 获得xml中类型是 BeanPostProcessor 的bean定义
+		// 获得类型是 BeanPostProcessor 的bean定义
 		String[] postProcessorNames = beanFactory.getBeanNamesForType(BeanPostProcessor.class, true, false);
 
 		// Register BeanPostProcessorChecker that logs an info message when

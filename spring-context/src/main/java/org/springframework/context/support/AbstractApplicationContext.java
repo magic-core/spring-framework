@@ -884,26 +884,27 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 * initializing all remaining singleton beans.
 	 */
 	protected void finishBeanFactoryInitialization(ConfigurableListableBeanFactory beanFactory) {
-		// Initialize conversion service for this context. 译文：为此上下文初始化转换服务。
-		// "conversionService"
+		// tofix 不常用，本Demo不涉及，暂不细讲 ==分割线start==
+		// 如果bean工厂中包含 beanName 是"conversionService"的bean 并且"conversionService"的类型是 ConversionService
 		if (beanFactory.containsBean(CONVERSION_SERVICE_BEAN_NAME) &&
 				beanFactory.isTypeMatch(CONVERSION_SERVICE_BEAN_NAME, ConversionService.class)) {
 			beanFactory.setConversionService(
 					beanFactory.getBean(CONVERSION_SERVICE_BEAN_NAME, ConversionService.class));
 		}
+		// tofix ==分割线end==
 
 		// Register a default embedded value resolver if no bean post-processor
 		// (such as a PropertyPlaceholderConfigurer bean) registered any before:
 		// at this point, primarily for resolution in annotation attribute values.
 		// 译文：
 		// 如果没有bean后处理器，注册一个默认的嵌入式值解析器
-		// (例如PropertyPlaceholderConfigurer bean)以前注册过:此时，主要用于解析注释属性值。tofix 又加了个属性
+		// (例如PropertyPlaceholderConfigurer bean)以前注册过:此时，主要用于解析注释属性值。tofix 又加了个属性,作用是啥呢
 		if (!beanFactory.hasEmbeddedValueResolver()) {
 			beanFactory.addEmbeddedValueResolver(strVal -> getEnvironment().resolvePlaceholders(strVal));
 		}
 
 		// Initialize LoadTimeWeaverAware beans early to allow for registering their transformers early.
-		// 译文：尽早初始化LoadTimeWeaverAware bean，以便尽早注册它们的转换器。
+		// 译文：尽早初始化LoadTimeWeaverAware bean，以便尽早注册它们的转换器。tofix 当前没用到
 		String[] weaverAwareNames = beanFactory.getBeanNamesForType(LoadTimeWeaverAware.class, false, false);
 		for (String weaverAwareName : weaverAwareNames) {
 			getBean(weaverAwareName);
