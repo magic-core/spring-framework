@@ -134,7 +134,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	@Nullable
 	private volatile String[] frozenBeanDefinitionNames;
 
-	/** 是否可以缓存所有bean的bean定义元数据 */
+	/** 标志所有bean的bean定义元数据是否已经被缓存(在实例化所有bean的bean定义元数据之前，会将该值改为true) */
 	private volatile boolean configurationFrozen = false;
 
 
@@ -347,7 +347,9 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 
 	@Override
 	public String[] getBeanNamesForType(@Nullable Class<?> type, boolean includeNonSingletons, boolean allowEagerInit) {
-		// 如果
+		// 如果 configurationFrozen 为false，或者allowEagerInit为false、或者 allowEagerInit为false
+		// configurationFrozen 标志所有bean的bean定义元数据是否已经被缓存，默认为false
+		// tofix 执行场景未弄清
 		if (!isConfigurationFrozen() || type == null || !allowEagerInit) {
 			return doGetBeanNamesForType(ResolvableType.forRawClass(type), includeNonSingletons, allowEagerInit);
 		}
