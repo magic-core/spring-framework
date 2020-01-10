@@ -98,6 +98,7 @@ public abstract class AbstractRefreshableConfigApplicationContext extends Abstra
 	 */
 	@Nullable
 	protected String[] getConfigLocations() {
+		// ClassPathXmlApplicationContext:getconfigLocations
 		return (this.configLocations != null ? this.configLocations : getDefaultConfigLocations());
 	}
 

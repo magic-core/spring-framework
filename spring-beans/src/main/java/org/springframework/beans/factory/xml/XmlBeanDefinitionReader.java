@@ -315,6 +315,7 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 		if (currentResources == null) {
 			// 初始化resourcesCurrentlyBeingLoaded
 			currentResources = new HashSet<>(4);
+			// XmlBeanDefinitionReader:setresourcesCurrentlyBeingLoaded
 			this.resourcesCurrentlyBeingLoaded.set(currentResources);
 		}
 		// ###逻辑含义:如果 currentResources 集合已经包含 encodedResource ,则表示xml文件发生了循环依赖，则抛出异常
@@ -526,6 +527,7 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 		BeanDefinitionDocumentReader documentReader = createBeanDefinitionDocumentReader();
 		// getRegistry返回DefaultListableBeanFactory实例
 		// 获取bean工厂中的bean定义的数量
+
 		int countBefore = getRegistry().getBeanDefinitionCount();
 		// createReaderContext创建 XmlReaderContext 实例
 		documentReader.registerBeanDefinitions(doc, createReaderContext(resource));
