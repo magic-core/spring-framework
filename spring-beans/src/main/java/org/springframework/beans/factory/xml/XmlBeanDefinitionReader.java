@@ -297,9 +297,9 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 	}
 
 	/**
-	 * 从指定的XML文件加载bean定义。
+	 * 根据指定的XML文件的encodedResource实例，将所有的bean定义，存储到bean工厂里
 	 *
-	 * @param encodedResource the resource descriptor for the XML file,
+	 * @param encodedResource XML文件的资源描述实例
 	 * allowing to specify an encoding to use for parsing the file
 	 * @return the number of bean definitions found
 	 * @throws BeanDefinitionStoreException in case of loading or parsing errors
@@ -309,8 +309,8 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 		if (logger.isInfoEnabled()) {
 			logger.info("Loading XML bean definitions from " + encodedResource);
 		}
-		// 获取已经加载过的配置文件，第一次执行get方法，为空
-		// resourcesCurrentlyBeingLoaded 表示保存加载过的XML文件
+		// 获取已经加载过的配置文件，第一次执行get方法时，返回空
+		// resourcesCurrentlyBeingLoaded保存加载过的描述XML文件的EncodedResource
 		Set<EncodedResource> currentResources = this.resourcesCurrentlyBeingLoaded.get();
 		if (currentResources == null) {
 			// 初始化resourcesCurrentlyBeingLoaded
@@ -341,15 +341,16 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 					"Detected cyclic loading of " + encodedResource + " - check your import definitions!");
 		}
 		try {
-			// 获得inputStream
+			// 获得代表xml的inputStream实例
 			InputStream inputStream = encodedResource.getResource().getInputStream();
 			try {
+				// 装饰为InputSource实例
 				InputSource inputSource = new InputSource(inputStream);
-				// 默认为空
+				// encodedResource.getEncoding()默认为空
 				if (encodedResource.getEncoding() != null) {
 					inputSource.setEncoding(encodedResource.getEncoding());
 				}
-				// 加载xml中bean的定义
+				// 根据inputSource，解析xml文件中所有的bean定义，存储到bean工厂里
 				return doLoadBeanDefinitions(inputSource, encodedResource.getResource());
 			}
 			finally {
@@ -394,9 +395,9 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 
 
 	/**
-	 * 从指定的XML文件实际加载bean定义。
+	 * 根据inputSource，解析xml文件中所有的bean定义，存储到bean工厂里
 	 *
-	 * @param inputSource the SAX InputSource to read from
+	 * @param inputSource 根据xml文件解析出的inputSource实例
 	 * @param resource the resource descriptor for the XML file
 	 * @return the number of bean definitions found
 	 * @throws BeanDefinitionStoreException in case of loading or parsing errors
@@ -406,9 +407,9 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 	protected int doLoadBeanDefinitions(InputSource inputSource, Resource resource)
 			throws BeanDefinitionStoreException {
 		try {
-			// 将inputSource解析为document实例
+			// 将代表xml文件的inputSource对象解析为document实例
 			Document doc = doLoadDocument(inputSource, resource);
-			// 加载xml中bean的定义
+			// 再根据doc实例，将xml中所有的bean定义，存储到bean工厂里
 			return registerBeanDefinitions(doc, resource);
 		}
 		catch (BeanDefinitionStoreException ex) {
@@ -510,6 +511,9 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 	}
 
 	/**
+	 *
+	 *
+	 *
 	 * Register the bean definitions contained in the given DOM document.
 	 * Called by {@code loadBeanDefinitions}.
 	 * <p>Creates a new instance of the parser class and invokes
@@ -523,15 +527,22 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 	 * @see BeanDefinitionDocumentReader#registerBeanDefinitions
 	 */
 	public int registerBeanDefinitions(Document doc, Resource resource) throws BeanDefinitionStoreException {
-		// 实例化 DefaultBeanDefinitionDocumentReader
-		BeanDefinitionDocumentReader documentReader = createBeanDefinitionDocumentReader();
-		// getRegistry返回DefaultListableBeanFactory实例
-		// 获取bean工厂中的bean定义的数量
 
+		// 实例化 DefaultBeanDefinitionDocumentReader，用于解析doc中所有的bean定义，存储（注册）到bean工厂里
+		// DefaultBeanDefinitionDocumentReader;
+		BeanDefinitionDocumentReader documentReader = createBeanDefinitionDocumentReader();
+
+		// 获取bean工厂中的当前已经包含的bean定义数量，用于计算要加载的bean定义数量
+		// getRegistry 返回DefaultListableBeanFactory实例（bean工厂）
+		// XmlBeanDefinitionReader:getregistry
 		int countBefore = getRegistry().getBeanDefinitionCount();
-		// createReaderContext创建 XmlReaderContext 实例
+
+		// createReaderContext 创建 XmlReaderContext 实例，tofix 作用？
+		// XmlReaderContext；
+		// 根据xml文件解析的doc实例，加载所有bean定义
 		documentReader.registerBeanDefinitions(doc, createReaderContext(resource));
 
+		// 返回当前线程刚加载了多少个bean定义
 		return getRegistry().getBeanDefinitionCount() - countBefore;
 	}
 
@@ -549,6 +560,7 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 	 * Create the {@link XmlReaderContext} to pass over to the document reader.
 	 */
 	public XmlReaderContext createReaderContext(Resource resource) {
+		// XmlReaderContext；
 		return new XmlReaderContext(resource, this.problemReporter, this.eventListener,
 				this.sourceExtractor, this, getNamespaceHandlerResolver());
 	}

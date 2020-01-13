@@ -217,6 +217,7 @@ public class BeanDefinitionParserDelegate {
 	 */
 	public BeanDefinitionParserDelegate(XmlReaderContext readerContext) {
 		Assert.notNull(readerContext, "XmlReaderContext must not be null");
+		// BeanDefinitionParserDelegate：readerContext
 		this.readerContext = readerContext;
 	}
 
@@ -267,7 +268,7 @@ public class BeanDefinitionParserDelegate {
 	}
 
 	/**
-	 * 对 DocumentDefaultsDefinition 实例进行赋值
+	 * 根据xml中对beans标签的配置，对 DocumentDefaultsDefinition 实例的属性进行赋值
 	 *
 	 * @param parent 父XML代表的bean定义委托类。
 	 * Initialize the default lazy-init, autowire, dependency check settings,
@@ -278,10 +279,10 @@ public class BeanDefinitionParserDelegate {
 	 * @see #getDefaults()
 	 */
 	public void initDefaults(Element root, @Nullable BeanDefinitionParserDelegate parent) {
-		// 对 DocumentDefaultsDefinition 变量设置配置的属性，如果没有设置则设置默认值，或者设置从父xml文件<beans>继承来的配置
+		// 对 defaults变量（DocumentDefaultsDefinition实例） 设置配置的属性，如果没有设置则设置默认值，或者设置从父xml文件<beans>继承来的配置
 		// this.defaults代表DocumentDefaultsDefinition实例
 		populateDefaults(this.defaults, (parent != null ? parent.defaults : null), root);
-		// 触发一个默认注册的事件
+		// 空实现
 		this.readerContext.fireDefaultsRegistered(this.defaults);
 	}
 
@@ -293,33 +294,45 @@ public class BeanDefinitionParserDelegate {
 	 * @param root the root element of the current bean definition document (or nested beans element)
 	 */
 	protected void populateDefaults(DocumentDefaultsDefinition defaults, @Nullable DocumentDefaultsDefinition parentDefaults, Element root) {
-		// 获得xml中配置的"default-lazy-init"属性
+		// 获得xml中<beans>标签配置的"default-lazy-init"属性,默认false，表示全局是否开启懒加载
+		// 懒加载，就是不在一开始进行加载bean定义到Spring容器里，而是在使用的时候，再去加载；工作中一般不使用，除非应用有很多bean要去加载，已经成为了系统瓶颈
 		String lazyInit = root.getAttribute(DEFAULT_LAZY_INIT_ATTRIBUTE);
 		// 如果配置的值是"default"或者是""
 		if (isDefaultValue(lazyInit)) {
-			// 如果指定了从外部继承的<beans>,则读取外部配置的属性，如果没有则默认“false”
+			// 如果指定了从外部继承的<beans>,则读取外部配置的属性；如果没有则默认“false”
 			lazyInit = (parentDefaults != null ? parentDefaults.getLazyInit() : FALSE_VALUE);
 		}
+		// 对 DocumentDefaultsDefinition 设置懒加载属性
+		// DocumentDefaultsDefinition：setLazyInit
 		defaults.setLazyInit(lazyInit);
 
-		// 获得xml中配置的"default-merge"属性
+		// 获得xml中<beans>标签配置的"default-merge"属性,表示全局是否开启集合合并
+		// 集合合并，就是如果有继承关系的父子bean，子bean可以将父bean中的集合属性值合并到子bean中的相同集合属性里
 		String merge = root.getAttribute(DEFAULT_MERGE_ATTRIBUTE);
-		// 如果配置的值是"default"或者是""
+		// 如果值是"default"或者是"",表示使用者没有配置该项
 		if (isDefaultValue(merge)) {
 			// 如果指定了从外部继承的<beans>,则读取外部配置的属性，如果没有则默认“false”
 			merge = (parentDefaults != null ? parentDefaults.getMerge() : FALSE_VALUE);
 		}
+		// 对 DocumentDefaultsDefinition 设置merge属性
+		// DocumentDefaultsDefinition：setMerge
 		defaults.setMerge(merge);
-		// 获得xml中配置的"default-autowire"属性
+
+		// 获得xml中配置的"default-autowire"属性，默认no；
+		// 表示如果bean包含的属性是在Spring中定义的bean，是否自动从Spring容器中注入实例以及指定注入形式；全局生效
 		String autowire = root.getAttribute(DEFAULT_AUTOWIRE_ATTRIBUTE);
-		// 如果配置的值是"default"或者是""
+		// 如果值是"default"或者是"",表示使用者没有配置该项
 		if (isDefaultValue(autowire)) {
 			// 如果指定了从外部继承的<beans>,则读取外部配置的属性，如果没有则默认“false”
 			autowire = (parentDefaults != null ? parentDefaults.getAutowire() : AUTOWIRE_NO_VALUE);
 		}
+		// 对 DocumentDefaultsDefinition 设置 autowire 属性
+		// DocumentDefaultsDefinition：setAutowire
 		defaults.setAutowire(autowire);
 
-		// 如果xml配置了"default-autowire-candidates"属性
+		// 如果xml配置了"default-autowire-candidates"属性，默认不会被定义；全局生效
+		// 首先只有定义了"default-autowire"属性，"default-autowire-candidates"属性才有效；
+		// 其次如果定义"default-autowire-candidates"值，只有值中匹配到的bean才有资格被注入
 		if (root.hasAttribute(DEFAULT_AUTOWIRE_CANDIDATES_ATTRIBUTE)) {
 			defaults.setAutowireCandidates(root.getAttribute(DEFAULT_AUTOWIRE_CANDIDATES_ATTRIBUTE));
 		}
@@ -327,7 +340,8 @@ public class BeanDefinitionParserDelegate {
 		else if (parentDefaults != null) {
 			defaults.setAutowireCandidates(parentDefaults.getAutowireCandidates());
 		}
-		// 如果xml配置了"default-init-method"属性
+
+		// 如果xml配置了"default-init-method"属性，默认不会被定义；表示bean初始化时，执行的方法；全局生效
 		if (root.hasAttribute(DEFAULT_INIT_METHOD_ATTRIBUTE)) {
 			defaults.setInitMethod(root.getAttribute(DEFAULT_INIT_METHOD_ATTRIBUTE));
 		}
@@ -336,7 +350,7 @@ public class BeanDefinitionParserDelegate {
 			defaults.setInitMethod(parentDefaults.getInitMethod());
 		}
 
-		// 如果xml配置了"default-destroy-method"
+		// 如果xml配置了"default-destroy-method"，默认不会被定义；表示bean被销毁时，执行的方法；全局生效
 		if (root.hasAttribute(DEFAULT_DESTROY_METHOD_ATTRIBUTE)) {
 			defaults.setDestroyMethod(root.getAttribute(DEFAULT_DESTROY_METHOD_ATTRIBUTE));
 		}
@@ -344,7 +358,10 @@ public class BeanDefinitionParserDelegate {
 		else if (parentDefaults != null) {
 			defaults.setDestroyMethod(parentDefaults.getDestroyMethod());
 		}
+
 		// 设置xml配置源
+		// readerContext 表示 XmlReaderContext 实例
+		// extractSource 方法 返回空
 		defaults.setSource(this.readerContext.extractSource(root));
 	}
 
@@ -390,21 +407,27 @@ public class BeanDefinitionParserDelegate {
 	}
 
 	/**
+	 * 根据ele节点（即<bean/>），创建GenericBeanDefinition实例，用于表示bean定义
+	 *
 	 * Parses the supplied {@code <bean>} element. May return {@code null}
 	 * if there were errors during parse. Errors are reported to the
 	 * {@link org.springframework.beans.factory.parsing.ProblemReporter}.
+	 * @param ele 即<bean/>
+	 * @param containingBean 当前<bean/>包含的bean定义，刚开始解析一个<bean/>时，不知道里面是否包含另一个bean，所以为空
+	 * @return
 	 */
 	@Nullable
 	public BeanDefinitionHolder parseBeanDefinitionElement(Element ele, @Nullable BeanDefinition containingBean) {
+		// 获得<bean/>节点的id属性，例：persion
 		String id = ele.getAttribute(ID_ATTRIBUTE);
+		// 获得<bean/>节点的name属性，一般Spring的使用不定义name属性，所以不讲解本内容
 		String nameAttr = ele.getAttribute(NAME_ATTRIBUTE);
-
 		List<String> aliases = new ArrayList<>();
 		if (StringUtils.hasLength(nameAttr)) {
 			String[] nameArr = StringUtils.tokenizeToStringArray(nameAttr, MULTI_VALUE_ATTRIBUTE_DELIMITERS);
 			aliases.addAll(Arrays.asList(nameArr));
 		}
-
+		// beanName表示<bean/>标签的id属性
 		String beanName = id;
 		if (!StringUtils.hasText(beanName) && !aliases.isEmpty()) {
 			beanName = aliases.remove(0);
@@ -413,7 +436,8 @@ public class BeanDefinitionParserDelegate {
 						"' as bean name and " + aliases + " as aliases");
 			}
 		}
-
+		// 如果containingBean等于null，则校验beanName是否已经被定义过了（beanName不能重复定义）
+		// 刚开始解析一个<bean/>节点时，不知道里面是否包含另一个bean，所以containingBean为空，所以以这个为标志，标识是否第一次解析一个<bean/>，校验beanName是否重复
 		if (containingBean == null) {
 			checkNameUniqueness(beanName, aliases, ele);
 		}
@@ -456,6 +480,8 @@ public class BeanDefinitionParserDelegate {
 	}
 
 	/**
+	 * 校验beanName是否已经被定义（beanName不能重复定义）
+	 *
 	 * Validate that the specified bean name and aliases have not been used already
 	 * within the current level of beans element nesting.
 	 */
@@ -469,9 +495,11 @@ public class BeanDefinitionParserDelegate {
 			foundName = CollectionUtils.findFirstMatch(this.usedNames, aliases);
 		}
 		if (foundName != null) {
+			// tofix beanName重复的逻辑可以通过debug看看
 			error("Bean name '" + foundName + "' is already used in this <beans> element", beanElement);
 		}
-
+		//BeanDefinitionParserDelegate：setusedNames
+		// usedNames(HashSet类型不允许重复）；存储已经解析到的beanName，用于校验beanName重复
 		this.usedNames.add(beanName);
 		this.usedNames.addAll(aliases);
 	}
@@ -484,18 +512,24 @@ public class BeanDefinitionParserDelegate {
 	public AbstractBeanDefinition parseBeanDefinitionElement(
 			Element ele, String beanName, @Nullable BeanDefinition containingBean) {
 
+		// 向parseState添加代表当前bean的BeanEntry
+		// BeanDefinitionParserDelegate：setparseState
 		this.parseState.push(new BeanEntry(beanName));
 
+		// className表示当前<bean/>设置的"class"属性（如果设置了）
 		String className = null;
 		if (ele.hasAttribute(CLASS_ATTRIBUTE)) {
 			className = ele.getAttribute(CLASS_ATTRIBUTE).trim();
 		}
+
+		// parent表示当前<bean/>设置的"parent"属性（如果设置了），一般不使用
 		String parent = null;
 		if (ele.hasAttribute(PARENT_ATTRIBUTE)) {
 			parent = ele.getAttribute(PARENT_ATTRIBUTE);
 		}
 
 		try {
+			// 创建GenericBeanDefinition实例，代表bean定义的对应实体，封装了className、parent属性（如果有）
 			AbstractBeanDefinition bd = createBeanDefinition(className, parent);
 
 			parseBeanDefinitionAttributes(ele, beanName, containingBean, bd);
@@ -531,47 +565,60 @@ public class BeanDefinitionParserDelegate {
 	}
 
 	/**
-	 * Apply the attributes of the given bean element to the given bean * definition.
-	 * @param ele bean declaration element
+	 * 将使用者在<beans/>上配置的属性，set到bd里
+	 *
+	 *  @param ele bean declaration element
 	 * @param beanName bean name
 	 * @param containingBean containing bean definition
+	 * @param bd containing bean definition
 	 * @return a bean definition initialized according to the bean element attributes
 	 */
 	public AbstractBeanDefinition parseBeanDefinitionAttributes(Element ele, String beanName,
 			@Nullable BeanDefinition containingBean, AbstractBeanDefinition bd) {
-
+		// 如果<bean/>指定了"singleton"属性，只有1.x才有效，标识bean为单例
 		if (ele.hasAttribute(SINGLETON_ATTRIBUTE)) {
 			error("Old 1.x 'singleton' attribute in use - upgrade to 'scope' declaration", ele);
 		}
+		// 如果<bean/>指定了"singleton"属性,识bean为单例
 		else if (ele.hasAttribute(SCOPE_ATTRIBUTE)) {
 			bd.setScope(ele.getAttribute(SCOPE_ATTRIBUTE));
 		}
+		// 如果<bean/>包含另一个bean，尝试从包含的bean中获取"singleton"设置的属性值
 		else if (containingBean != null) {
 			// Take default from containing bean in case of an inner bean definition.
 			bd.setScope(containingBean.getScope());
 		}
-
+		// 如果<bean/>指定了"abstract"属性，标识bean是抽象类，虽然不会被实例化，但是可以让继承该抽象类的多个bean能够复用一个抽象bean下的属性配置，减少配置
 		if (ele.hasAttribute(ABSTRACT_ATTRIBUTE)) {
 			bd.setAbstract(TRUE_VALUE.equals(ele.getAttribute(ABSTRACT_ATTRIBUTE)));
 		}
-
+		// 尝试从ele节点（<bean/>）上获取"lazy-init"配置
 		String lazyInit = ele.getAttribute(LAZY_INIT_ATTRIBUTE);
+		// 如果值是“default”或者“”，则表示用户没有在<bean/>上进行配置
 		if (isDefaultValue(lazyInit)) {
+			// 尝试从<beans/>读取懒加载的全局配置
+			// defaults(DocumentDefaultsDefinition实例)封装着<beans/>中定义的全局配置
 			lazyInit = this.defaults.getLazyInit();
 		}
 		bd.setLazyInit(TRUE_VALUE.equals(lazyInit));
 
+		// 尝试从ele节点（<bean/>）上获取"autowire"配置,set到bd
 		String autowire = ele.getAttribute(AUTOWIRE_ATTRIBUTE);
 		bd.setAutowireMode(getAutowireMode(autowire));
 
+		// 尝试从ele节点（<bean/>）上获取"depends-on"配置,set到bd
 		if (ele.hasAttribute(DEPENDS_ON_ATTRIBUTE)) {
 			String dependsOn = ele.getAttribute(DEPENDS_ON_ATTRIBUTE);
 			bd.setDependsOn(StringUtils.tokenizeToStringArray(dependsOn, MULTI_VALUE_ATTRIBUTE_DELIMITERS));
 		}
 
+		// 尝试从ele节点（<bean/>）上获取"autowire-candidate"配置,set到bd
 		String autowireCandidate = ele.getAttribute(AUTOWIRE_CANDIDATE_ATTRIBUTE);
+		// 如果值是“default”或者“”，则表示用户没有在<bean/>上进行配置
 		if (isDefaultValue(autowireCandidate)) {
+			// 尝试从<beans/>读取"autowire-candidate"的全局配置
 			String candidatePattern = this.defaults.getAutowireCandidates();
+			// 如果<beans/>没有配置
 			if (candidatePattern != null) {
 				String[] patterns = StringUtils.commaDelimitedListToStringArray(candidatePattern);
 				bd.setAutowireCandidate(PatternMatchUtils.simpleMatch(patterns, beanName));
@@ -581,10 +628,12 @@ public class BeanDefinitionParserDelegate {
 			bd.setAutowireCandidate(TRUE_VALUE.equals(autowireCandidate));
 		}
 
+		// "primary"
 		if (ele.hasAttribute(PRIMARY_ATTRIBUTE)) {
 			bd.setPrimary(TRUE_VALUE.equals(ele.getAttribute(PRIMARY_ATTRIBUTE)));
 		}
 
+		// "init-method"
 		if (ele.hasAttribute(INIT_METHOD_ATTRIBUTE)) {
 			String initMethodName = ele.getAttribute(INIT_METHOD_ATTRIBUTE);
 			bd.setInitMethodName(initMethodName);
@@ -594,6 +643,7 @@ public class BeanDefinitionParserDelegate {
 			bd.setEnforceInitMethod(false);
 		}
 
+		// "destroy-method"
 		if (ele.hasAttribute(DESTROY_METHOD_ATTRIBUTE)) {
 			String destroyMethodName = ele.getAttribute(DESTROY_METHOD_ATTRIBUTE);
 			bd.setDestroyMethodName(destroyMethodName);
@@ -603,9 +653,11 @@ public class BeanDefinitionParserDelegate {
 			bd.setEnforceDestroyMethod(false);
 		}
 
+		// "factory-method"
 		if (ele.hasAttribute(FACTORY_METHOD_ATTRIBUTE)) {
 			bd.setFactoryMethodName(ele.getAttribute(FACTORY_METHOD_ATTRIBUTE));
 		}
+		// "factory-bean"
 		if (ele.hasAttribute(FACTORY_BEAN_ATTRIBUTE)) {
 			bd.setFactoryBeanName(ele.getAttribute(FACTORY_BEAN_ATTRIBUTE));
 		}
@@ -614,6 +666,8 @@ public class BeanDefinitionParserDelegate {
 	}
 
 	/**
+	 * 创建GenericBeanDefinition实例，代表bean定义的对应实体，封装了className、parent属性（如果有）
+	 *
 	 * Create a bean definition for the given class name and parent name.
 	 * @param className the name of the bean class
 	 * @param parentName the name of the bean's parent bean
@@ -622,7 +676,7 @@ public class BeanDefinitionParserDelegate {
 	 */
 	protected AbstractBeanDefinition createBeanDefinition(@Nullable String className, @Nullable String parentName)
 			throws ClassNotFoundException {
-
+		// 创建GenericBeanDefinition实例，包含className、parent（如果有）
 		return BeanDefinitionReaderUtils.createBeanDefinition(
 				parentName, className, this.readerContext.getBeanClassLoader());
 	}

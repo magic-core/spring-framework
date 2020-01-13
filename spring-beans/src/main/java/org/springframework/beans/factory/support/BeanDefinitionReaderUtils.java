@@ -45,6 +45,8 @@ public class BeanDefinitionReaderUtils {
 
 
 	/**
+	 * 创建GenericBeanDefinition实例，包含className、parent（如果有）
+	 *
 	 * Create a new GenericBeanDefinition for the given parent name and class name,
 	 * eagerly loading the bean class if a ClassLoader has been specified.
 	 * @param parentName the name of the parent bean, if any
@@ -56,14 +58,21 @@ public class BeanDefinitionReaderUtils {
 	 */
 	public static AbstractBeanDefinition createBeanDefinition(
 			@Nullable String parentName, @Nullable String className, @Nullable ClassLoader classLoader) throws ClassNotFoundException {
-
+		// 初始化GenericBeanDefinition(bean定义实例)
+		// GenericBeanDefinition；
 		GenericBeanDefinition bd = new GenericBeanDefinition();
+		// 设置GenericBeanDefinition
+		// GenericBeanDefinition：setParentName
 		bd.setParentName(parentName);
+		// 设置GenericBeanDefinition的BeanClassName属性
 		if (className != null) {
+			// 当前流程classLoader为空，不走本分支
 			if (classLoader != null) {
 				bd.setBeanClass(ClassUtils.forName(className, classLoader));
 			}
+			// 走当前分支
 			else {
+				// GenericBeanDefinition：setBeanClassName
 				bd.setBeanClassName(className);
 			}
 		}

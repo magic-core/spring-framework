@@ -490,7 +490,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	@Override
 	public void refresh() throws BeansException, IllegalStateException {
 		synchronized (this.startupShutdownMonitor) {
-			// 初始化必要参数
+			// 初始化 AbstractApplicationContext 必要属性
 			prepareRefresh();
 
 			// 1.如果已经存在bean工厂，则调用销毁方法，将旧bean工厂销毁
@@ -590,20 +590,16 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		// 验证所有标记为必需的属性都是可解析的:
 		// 参见ConfigurablePropertyResolver#setRequiredProperties
 
-		// tofix 不常用，本Demo不涉及，暂不细讲
+		// tofix 当前Demo无实际逻辑被执行
 		getEnvironment().validateRequiredProperties();
 
-		/**初始化属性*/
-		// tofix 本Demo不涉及，暂不细讲
-
 		// Store pre-refresh ApplicationListeners...
-		// 存储 pre-refresh ApplicationListeners...
+		// tofix 作用是什么？不清楚？
 		if (this.earlyApplicationListeners == null) {
 			this.earlyApplicationListeners = new LinkedHashSet<>(this.applicationListeners);
 		}
 		else {
 			// Reset local application listeners to pre-refresh state.
-			// 将本地应用程序监听器重置为预刷新状态。
 			this.applicationListeners.clear();
 			this.applicationListeners.addAll(this.earlyApplicationListeners);
 		}

@@ -91,12 +91,14 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 	 */
 	@Override
 	public void registerBeanDefinitions(Document doc, XmlReaderContext readerContext) {
-		// readerContext 代表 XmlReaderContext 实例
+		// readerContext 代表 XmlReaderContext 实例，tofix 用于？
+		// DefaultBeanDefinitionDocumentReader：setreaderContext
 		this.readerContext = readerContext;
 		logger.debug("Loading bean definitions");
-		// 获得xml配置文件的根节点,beans标签
+
+		// 获得代表xml配置文件的Document实例根节点root,即<beans/>节点
 		Element root = doc.getDocumentElement();
-		// 加载xml中bean的定义
+		// 根据xml根节点，即<beans/>节点，加载xml中所有的bean定义
 		doRegisterBeanDefinitions(root);
 	}
 
@@ -119,24 +121,22 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 
 
 	/**
-	 * Register each bean definition within the given root {@code <beans/>} element.
-	 * 注册给定根{@code <beans/>}元素中的每个bean定义。
-	 *
+	 * 根据xml文件的root节点，即<beans/>节点，加载xml中所有的bean定义
 	 */
 	protected void doRegisterBeanDefinitions(Element root) {
-		// this.delegate 代表 BeanDefinitionParserDelegate 实例”bean定义解析委托类“,定义了解析XML文件的一系列方法，是核心解析器
-		// 如果this.delegate不为空，代表发生了递归，即xml文件还引入了一个</beans>标签
-		// parent 表示 父<beans/>中的bean定义解析委托类 BeanDefinitionParserDelegate 实例
+		// delegate成员变量，代表 BeanDefinitionParserDelegate 实例(bean定义的解析委托类),定义了解析XML文件的一系列方法，是核心解析器
+		// parent 局部变量，表示父<beans/>中的bean定义解析委托类 BeanDefinitionParserDelegate 实例
+		// 如果当前流程下，this.delegate不为空，代表发生了递归，即xml文件还引入了一个</beans>标签
 		BeanDefinitionParserDelegate parent = this.delegate;
-		// 创建 BeanDefinitionParserDelegate 实例
+		// 对delegate进行赋值
+		// getReaderContext() 返回 XmlReaderContext 实例
+		// DefaultBeanDefinitionDocumentReader：setdelegate
 		this.delegate = createDelegate(getReaderContext(), root, parent);
-		// 如果node隶属默认命名空间
+		// 如果node隶属默认命名空间”http://www.springframework.org/schema/beans“
 		if (this.delegate.isDefaultNamespace(root)) {
-			// 获得根节点"profile"属性
+			// 获得root节点(即<beans/>)的"profile"属性,根据指定的环境变量，动态切换<beans/>，没有企业使用这种切换环境变量的方式，都是使用maven/gradle等方式来切换
 			String profileSpec = root.getAttribute(PROFILE_ATTRIBUTE);
-			// tofix 不常用，本Demo不涉及，暂不细讲
-			// tofix ==分割线start==
-			// 如果根节点"profile"属性包含文本表示xml中配置了"profile"属性
+			// 如果<beans/>配置了profile属性；几乎不被使用，粉丝无需理会
 			if (StringUtils.hasText(profileSpec)) {
 				String[] specifiedProfiles = StringUtils.tokenizeToStringArray(
 						profileSpec, BeanDefinitionParserDelegate.MULTI_VALUE_ATTRIBUTE_DELIMITERS);
@@ -148,13 +148,12 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 					return;
 				}
 			}
-			// tofix ==分割线end==
 		}
-		// 模版模式,默认空实现,用于子类继承
+		// 模版模式,默认空实现,用于子类继承，自定义逻辑
 		preProcessXml(root);
 		// 根据root遍历子节点，注册bean定义
 		parseBeanDefinitions(root, this.delegate);
-		// 模版模式,默认空实现,用于子类继承
+		// 模版模式,默认空实现,用于子类继承，自定义逻辑
 		postProcessXml(root);
 
 		this.delegate = parent;
@@ -172,8 +171,10 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 	protected BeanDefinitionParserDelegate createDelegate(
 			XmlReaderContext readerContext, Element root, @Nullable BeanDefinitionParserDelegate parentDelegate) {
 		// 初始化 BeanDefinitionParserDelegate 实例，用于解析XML bean定义的有状态（有成员变量）委托类。
+		// readerContext 表示 XmlReaderContext  实例
+		// BeanDefinitionParserDelegate；
 		BeanDefinitionParserDelegate delegate = new BeanDefinitionParserDelegate(readerContext);
-		// 设置 BeanDefinitionParserDelegate 实例的默认属性
+		// 根据beans中的配置，初始化BeanDefinitionParserDelegate的相应属性
 		delegate.initDefaults(root, parentDelegate);
 		return delegate;
 	}
@@ -187,15 +188,15 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 	protected void parseBeanDefinitions(Element root, BeanDefinitionParserDelegate delegate) {
 		// 如果 node 隶属默认命名空间 默认命名空间:"http://www.springframework.org/schema/beans"
 		if (delegate.isDefaultNamespace(root)) {
-			// 获得 根节点 的子标签
+			// 获得 根节点 的子节点，即<beans/>下的所有节点，不包括beans本身
 			NodeList nl = root.getChildNodes();
-			// 遍历子标签
+			// 遍历子节点
 			for (int i = 0; i < nl.getLength(); i++) {
 				Node node = nl.item(i);
-				// 如果子标签属于元素标签
+				// 如果子节点属于元素节点，例<bean/>就是元素节点
 				if (node instanceof Element) {
 					Element ele = (Element) node;
-					// 如果当前元素隶属默认命名空间
+					// 如果当前元素隶属默认命名空间，例：<bean/>节点就会继承root节点的命名空间
 					if (delegate.isDefaultNamespace(ele)) {
 						parseDefaultElement(ele, delegate);
 					}
@@ -341,7 +342,7 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 	 * and registering it with the registry.
 	 */
 	protected void processBeanDefinition(Element ele, BeanDefinitionParserDelegate delegate) {
-		// 解析bean标签中的信息,创建BeanDefinitionHolder实例(是xml文件中bean定义信息的对应实体，也可称为bean定义信息的持有者实体)
+		// 解析bean节点中的信息,创建BeanDefinitionHolder实例(是xml文件中bean定义信息的对应实体，也可称为bean定义信息的持有者实体)
 		BeanDefinitionHolder bdHolder = delegate.parseBeanDefinitionElement(ele);
 		if (bdHolder != null) {
 			// tofix 不常用，本Demo不涉及，暂不细讲

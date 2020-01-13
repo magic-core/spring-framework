@@ -155,6 +155,7 @@ public class ReaderContext {
 	 * Fire an defaults-registered event.
 	 */
 	public void fireDefaultsRegistered(DefaultsDefinition defaultsDefinition) {
+		// eventListener 为 EmptyReaderEventListener 实例，为空实现
 		this.eventListener.defaultsRegistered(defaultsDefinition);
 	}
 
@@ -205,6 +206,8 @@ public class ReaderContext {
 	 */
 	@Nullable
 	public Object extractSource(Object sourceCandidate) {
+		// sourceExtractor 代表 NullSourceExtractor 实例
+		// sourceExtractor 在初始化 XmlReaderContext 实例时，进行的赋值
 		return this.sourceExtractor.extractSource(sourceCandidate, this.resource);
 	}
 
