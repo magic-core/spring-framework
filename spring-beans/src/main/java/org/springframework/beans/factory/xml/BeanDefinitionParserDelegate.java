@@ -531,18 +531,27 @@ public class BeanDefinitionParserDelegate {
 		}
 
 		try {
-			// 创建 GenericBeanDefinition 实例，代表bean定义的对应实体，封装了className、parent属性（如果有）
+			// 创建 GenericBeanDefinition 实例,继承自AbstractBeanDefinition，代表bean定义的对应实体
 			AbstractBeanDefinition bd = createBeanDefinition(className, parent);
 			// 将使用者在<bean/>上配置的属性(如果<bean/>没有配置,尝试从<beans/>读取相关全局配置)，set到bd(GenericBeanDefinition)实例里
 			parseBeanDefinitionAttributes(ele, beanName, containingBean, bd);
-			bd.setDescription(DomUtils.getChildElementValueByTagName(ele, DESCRIPTION_ELEMENT));
-
-			parseMetaElements(ele, bd);
-			parseLookupOverrideSubElements(ele, bd.getMethodOverrides());
-			parseReplacedMethodSubElements(ele, bd.getMethodOverrides());
-
-			parseConstructorArgElements(ele, bd);
+			// 用于解析<bean/>下的"property"标签,set到bd里
 			parsePropertyElements(ele, bd);
+
+			/**一般不使用,不讲解*/
+			// 获得bean标签里的"description"节点,用于告诉开发人员关于bean的描述;
+			bd.setDescription(DomUtils.getChildElementValueByTagName(ele, DESCRIPTION_ELEMENT));
+			// 用于解析<bean/>下的<meta key="" value=""/>标签,set到bd里;
+			parseMetaElements(ele, bd);
+			// 用于解析<bean/>下的"lookup-method"标签,set到bd里;一般并使用,不讲解
+			// 例:<lookup-method name="getLatestBean" bean="latestBean"/>,name指的是返回bean的方法名,bean指的是返回的bean实例;
+			// 用于调用getLatestBean方法时,每次都返回一个新创建的bean实例latestBean
+			parseLookupOverrideSubElements(ele, bd.getMethodOverrides());
+			// 用于解析<bean/>下的"replaced-method"标签,set到bd里
+			parseReplacedMethodSubElements(ele, bd.getMethodOverrides());
+			// 用于解析<bean/>下的"constructor-arg"标签,set到bd里
+			parseConstructorArgElements(ele, bd);
+			// 用于解析<bean/>下的"qualifier"标签,set到bd里
 			parseQualifierElements(ele, bd);
 
 			bd.setResource(this.readerContext.getResource());
@@ -675,7 +684,7 @@ public class BeanDefinitionParserDelegate {
 	}
 
 	/**
-	 * 创建GenericBeanDefinition实例，代表bean定义的对应实体，封装了className、parent属性（如果有）
+	 * 创建GenericBeanDefinition实例,继承自AbstractBeanDefinition，代表bean定义的对应实体
 	 *
 	 * Create a bean definition for the given class name and parent name.
 	 * @param className the name of the bean class

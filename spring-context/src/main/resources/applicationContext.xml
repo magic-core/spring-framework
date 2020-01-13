@@ -11,6 +11,9 @@
 	<!--	<import resource="classpath:test.xml"/>-->
 
 	<bean  id="persion" class="org.springframework.Persion" >
+		<description></description>
+		<meta key="" value=""/>
+		<lookup-method name="getLatestBean" bean="latestBean"/>
 		<property name="name" >
 			<list  merge="true">
 				<value>Java Core</value>
