@@ -423,12 +423,14 @@ public class BeanDefinitionParserDelegate {
 		// 获得<bean/>节点的name属性，一般Spring的使用不定义name属性，所以不讲解本内容
 		String nameAttr = ele.getAttribute(NAME_ATTRIBUTE);
 		List<String> aliases = new ArrayList<>();
+		// 和name属性相关,不会走本分支,不讲解
 		if (StringUtils.hasLength(nameAttr)) {
 			String[] nameArr = StringUtils.tokenizeToStringArray(nameAttr, MULTI_VALUE_ATTRIBUTE_DELIMITERS);
 			aliases.addAll(Arrays.asList(nameArr));
 		}
 		// beanName表示<bean/>标签的id属性
 		String beanName = id;
+		// 和name属性相关,不会走本分支,不讲解
 		if (!StringUtils.hasText(beanName) && !aliases.isEmpty()) {
 			beanName = aliases.remove(0);
 			if (logger.isDebugEnabled()) {
@@ -529,9 +531,9 @@ public class BeanDefinitionParserDelegate {
 		}
 
 		try {
-			// 创建GenericBeanDefinition实例，代表bean定义的对应实体，封装了className、parent属性（如果有）
+			// 创建 GenericBeanDefinition 实例，代表bean定义的对应实体，封装了className、parent属性（如果有）
 			AbstractBeanDefinition bd = createBeanDefinition(className, parent);
-
+			// 将使用者在<bean/>上配置的属性(如果<bean/>没有配置,尝试从<beans/>读取相关全局配置)，set到bd(GenericBeanDefinition)实例里
 			parseBeanDefinitionAttributes(ele, beanName, containingBean, bd);
 			bd.setDescription(DomUtils.getChildElementValueByTagName(ele, DESCRIPTION_ELEMENT));
 
@@ -565,21 +567,24 @@ public class BeanDefinitionParserDelegate {
 	}
 
 	/**
-	 * 将使用者在<beans/>上配置的属性，set到bd里
+	 * 将使用者在<bean/>上配置的属性(如果<bean/>没有配置,尝试从<beans/>读取相关全局配置)，set到bd(GenericBeanDefinition)实例里
+	 * bd表示<bean/>的通用bean定义类
 	 *
-	 *  @param ele bean declaration element
-	 * @param beanName bean name
-	 * @param containingBean containing bean definition
-	 * @param bd containing bean definition
-	 * @return a bean definition initialized according to the bean element attributes
+	 *  @param ele bean元素,例:<bean/>
+	 * @param beanName <bean/>定义的name,通常指的是id属性
+	 * @param containingBean 当前<bean/>里包含的其它<bean/>
+	 * @param bd 表示<bean/>的通用bean定义类
+	 * @return 根据<bean/>上配置的属性,初始化bd的相关属性
 	 */
 	public AbstractBeanDefinition parseBeanDefinitionAttributes(Element ele, String beanName,
 			@Nullable BeanDefinition containingBean, AbstractBeanDefinition bd) {
-		// 如果<bean/>指定了"singleton"属性，只有1.x才有效，标识bean为单例
+
+		/**尝试配置bd(GenericBeanDefinition)的单例属性Scope*/
+		// 如果<bean/>指定了"singleton"属性，会报错,只有老的1.x Spring版本才会使用
 		if (ele.hasAttribute(SINGLETON_ATTRIBUTE)) {
 			error("Old 1.x 'singleton' attribute in use - upgrade to 'scope' declaration", ele);
 		}
-		// 如果<bean/>指定了"singleton"属性,识bean为单例
+		// 如果<bean/>指定了"scope"属性
 		else if (ele.hasAttribute(SCOPE_ATTRIBUTE)) {
 			bd.setScope(ele.getAttribute(SCOPE_ATTRIBUTE));
 		}
@@ -588,52 +593,55 @@ public class BeanDefinitionParserDelegate {
 			// Take default from containing bean in case of an inner bean definition.
 			bd.setScope(containingBean.getScope());
 		}
-		// 如果<bean/>指定了"abstract"属性，标识bean是抽象类，虽然不会被实例化，但是可以让继承该抽象类的多个bean能够复用一个抽象bean下的属性配置，减少配置
+
+		// 如果<bean/>指定了"abstract"属性，标识这个bean是抽象类，虽然不会被实例化，但是可以让继承该抽象类的多个bean能够复用一个抽象bean下的属性配置，减少配置
 		if (ele.hasAttribute(ABSTRACT_ATTRIBUTE)) {
 			bd.setAbstract(TRUE_VALUE.equals(ele.getAttribute(ABSTRACT_ATTRIBUTE)));
 		}
+
 		// 尝试从ele节点（<bean/>）上获取"lazy-init"配置
 		String lazyInit = ele.getAttribute(LAZY_INIT_ATTRIBUTE);
-		// 如果值是“default”或者“”，则表示用户没有在<bean/>上进行配置
+		// 如果值是“default”或者“”，则表示用户没有在<bean/>上进行配置,是默认值
 		if (isDefaultValue(lazyInit)) {
 			// 尝试从<beans/>读取懒加载的全局配置
-			// defaults(DocumentDefaultsDefinition实例)封装着<beans/>中定义的全局配置
+			/** defaults是DocumentDefaultsDefinition实例,封装着<beans/>中定义的全局配置属性*/
 			lazyInit = this.defaults.getLazyInit();
 		}
 		bd.setLazyInit(TRUE_VALUE.equals(lazyInit));
 
-		// 尝试从ele节点（<bean/>）上获取"autowire"配置,set到bd
+		// 尝试从ele节点（<bean/>）获取"autowire"配置,如果获取不到,从this.defaults上获取,set到bd里
 		String autowire = ele.getAttribute(AUTOWIRE_ATTRIBUTE);
 		bd.setAutowireMode(getAutowireMode(autowire));
 
-		// 尝试从ele节点（<bean/>）上获取"depends-on"配置,set到bd
+		// 从ele节点（<bean/>）获取"depends-on"
 		if (ele.hasAttribute(DEPENDS_ON_ATTRIBUTE)) {
 			String dependsOn = ele.getAttribute(DEPENDS_ON_ATTRIBUTE);
 			bd.setDependsOn(StringUtils.tokenizeToStringArray(dependsOn, MULTI_VALUE_ATTRIBUTE_DELIMITERS));
 		}
 
-		// 尝试从ele节点（<bean/>）上获取"autowire-candidate"配置,set到bd
+		// 尝试从ele节点（<bean/>）上获取"autowire-candidate"配置
 		String autowireCandidate = ele.getAttribute(AUTOWIRE_CANDIDATE_ATTRIBUTE);
-		// 如果值是“default”或者“”，则表示用户没有在<bean/>上进行配置
+		// 如果值是“default”(默认值)或者“”，则表示用户没有在<bean/>上进行配置
 		if (isDefaultValue(autowireCandidate)) {
-			// 尝试从<beans/>读取"autowire-candidate"的全局配置
+			// 尝试从this.defaults上获取
 			String candidatePattern = this.defaults.getAutowireCandidates();
-			// 如果<beans/>没有配置
+			// 如果从this.defaults上获取到了值,set到bd
 			if (candidatePattern != null) {
 				String[] patterns = StringUtils.commaDelimitedListToStringArray(candidatePattern);
 				bd.setAutowireCandidate(PatternMatchUtils.simpleMatch(patterns, beanName));
 			}
 		}
+		// 如果用户配置了"autowire-candidate",set到bd
 		else {
 			bd.setAutowireCandidate(TRUE_VALUE.equals(autowireCandidate));
 		}
 
-		// "primary"
+		// 从ele节点（<bean/>）获取"primary",set到bd
 		if (ele.hasAttribute(PRIMARY_ATTRIBUTE)) {
 			bd.setPrimary(TRUE_VALUE.equals(ele.getAttribute(PRIMARY_ATTRIBUTE)));
 		}
 
-		// "init-method"
+		// 从ele节点（<bean/>）获取"init-method",如果获取不到,从this.defaults上获取,set到bd
 		if (ele.hasAttribute(INIT_METHOD_ATTRIBUTE)) {
 			String initMethodName = ele.getAttribute(INIT_METHOD_ATTRIBUTE);
 			bd.setInitMethodName(initMethodName);
@@ -643,7 +651,7 @@ public class BeanDefinitionParserDelegate {
 			bd.setEnforceInitMethod(false);
 		}
 
-		// "destroy-method"
+		// 从ele节点（<bean/>）获取"destroy-method";如果获取不到,从this.defaults上获取,set到bd
 		if (ele.hasAttribute(DESTROY_METHOD_ATTRIBUTE)) {
 			String destroyMethodName = ele.getAttribute(DESTROY_METHOD_ATTRIBUTE);
 			bd.setDestroyMethodName(destroyMethodName);
@@ -653,11 +661,12 @@ public class BeanDefinitionParserDelegate {
 			bd.setEnforceDestroyMethod(false);
 		}
 
-		// "factory-method"
+		// 从ele节点（<bean/>）获取"factory-method",set到bd
 		if (ele.hasAttribute(FACTORY_METHOD_ATTRIBUTE)) {
 			bd.setFactoryMethodName(ele.getAttribute(FACTORY_METHOD_ATTRIBUTE));
 		}
-		// "factory-bean"
+
+		// 从ele节点（<bean/>）获取"factory-bean",set到bd
 		if (ele.hasAttribute(FACTORY_BEAN_ATTRIBUTE)) {
 			bd.setFactoryBeanName(ele.getAttribute(FACTORY_BEAN_ATTRIBUTE));
 		}

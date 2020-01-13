@@ -10,7 +10,7 @@
 
 	<!--	<import resource="classpath:test.xml"/>-->
 
-	<bean id="persion" class="org.springframework.Persion" >
+	<bean  id="persion" class="org.springframework.Persion" >
 		<property name="name" >
 			<list  merge="true">
 				<value>Java Core</value>

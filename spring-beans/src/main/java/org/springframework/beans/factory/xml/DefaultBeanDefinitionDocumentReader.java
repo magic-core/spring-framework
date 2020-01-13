@@ -186,17 +186,17 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 	 * @param root the DOM root element of the document
 	 */
 	protected void parseBeanDefinitions(Element root, BeanDefinitionParserDelegate delegate) {
-		// 如果 node 隶属默认命名空间 默认命名空间:"http://www.springframework.org/schema/beans"
+		// 如果 node 隶属默认命名空间,走本分支,默认命名空间:"http://www.springframework.org/schema/beans"
 		if (delegate.isDefaultNamespace(root)) {
 			// 获得 根节点 的子节点，即<beans/>下的所有节点，不包括beans本身
 			NodeList nl = root.getChildNodes();
 			// 遍历子节点
 			for (int i = 0; i < nl.getLength(); i++) {
 				Node node = nl.item(i);
-				// 如果子节点属于元素节点，例<bean/>就是元素节点
+				// 如果子节点属于元素节点，走本分支,例<bean/>就是元素节点
 				if (node instanceof Element) {
 					Element ele = (Element) node;
-					// 如果当前元素隶属默认命名空间，例：<bean/>节点就会继承root节点的命名空间
+					// 如果当前元素隶属默认命名空间，走本分支,例：<bean/>节点就会继承root节点的命名空间
 					if (delegate.isDefaultNamespace(ele)) {
 						parseDefaultElement(ele, delegate);
 					}
