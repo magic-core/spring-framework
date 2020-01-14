@@ -533,9 +533,9 @@ public class BeanDefinitionParserDelegate {
 		try {
 			// 创建 GenericBeanDefinition 实例,继承自AbstractBeanDefinition，代表bean定义的对应实体
 			AbstractBeanDefinition bd = createBeanDefinition(className, parent);
-			// 将使用者在<bean/>上配置的属性(如果<bean/>没有配置,尝试从<beans/>读取相关全局配置)，set到bd(GenericBeanDefinition)实例里
+			// 将使用者在<bean/>上配置的属性(如果<bean/>没有配置,尝试从<beans/>读取相关全局配置（如果使用者配置了）)，set到bd(GenericBeanDefinition)实例里
 			parseBeanDefinitionAttributes(ele, beanName, containingBean, bd);
-			// 用于解析<bean/>下的"property"标签,set到bd里
+			// 将使用者在<bean/>里配置的子标签"property"，set到bd(GenericBeanDefinition)实例里
 			parsePropertyElements(ele, bd);
 
 			/**一般不使用,不讲解*/
