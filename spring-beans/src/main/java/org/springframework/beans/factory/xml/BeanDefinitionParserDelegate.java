@@ -412,8 +412,10 @@ public class BeanDefinitionParserDelegate {
 	 * Parses the supplied {@code <bean>} element. May return {@code null}
 	 * if there were errors during parse. Errors are reported to the
 	 * {@link org.springframework.beans.factory.parsing.ProblemReporter}.
-	 * @param ele 即<bean/>
-	 * @param containingBean 当前<bean/>包含的bean定义，刚开始解析一个<bean/>时，不知道里面是否包含另一个bean，所以为空
+	 * @param ele 当前要解析的<bean/>节点
+	 * @param containingBean
+	 * containingBean不为空,则代表当前节点ele是<bean/>中的<property/>里的子<bean/>;而containingBean就代表<property>外的父<bean/>
+	 * containingBean为空,则表示当前解析的ele是普通的<bean/>
 	 * @return
 	 */
 	@Nullable
@@ -436,8 +438,10 @@ public class BeanDefinitionParserDelegate {
 						"' as bean name and " + aliases + " as aliases");
 			}
 		}
-		// 如果containingBean等于null，则校验beanName是否已经被定义过了（beanName不能重复定义）
-		// 刚开始解析一个<bean/>节点时，不知道里面是否包含另一个bean，所以containingBean为空，所以以这个为标志，标识是否第一次解析一个<bean/>，校验beanName是否重复
+		// 如果containingBean等于null，则校验beanName是否已经被定义过了,如果被定义了,则抛出异常
+		//解释:
+		// containingBean不为空,则代表当前节点ele是<bean/>中的<property/>里的<bean/>标签,并且这个bean不纳入beanName验重的行列里;而containingBean就代表<property>外的<bean/>
+		// containingBean为空,则表示当前解析的ele是普通的<bean/>,需要校验beanName是否被重复定义
 		if (containingBean == null) {
 			checkNameUniqueness(beanName, aliases, ele);
 		}
