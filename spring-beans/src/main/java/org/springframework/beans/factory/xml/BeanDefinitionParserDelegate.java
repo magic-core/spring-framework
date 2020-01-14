@@ -201,6 +201,7 @@ public class BeanDefinitionParserDelegate {
 
 	private final DocumentDefaultsDefinition defaults = new DocumentDefaultsDefinition();
 
+	// parseState是以List的数据结构,存储解析过程中的逻辑位置,当出现异常时,可以打印parseState,借此找到执行的逻辑位置
 	private final ParseState parseState = new ParseState();
 
 	/**
@@ -412,8 +413,10 @@ public class BeanDefinitionParserDelegate {
 	 * Parses the supplied {@code <bean>} element. May return {@code null}
 	 * if there were errors during parse. Errors are reported to the
 	 * {@link org.springframework.beans.factory.parsing.ProblemReporter}.
-	 * @param ele 即<bean/>
-	 * @param containingBean 当前<bean/>包含的bean定义，刚开始解析一个<bean/>时，不知道里面是否包含另一个bean，所以为空
+	 * @param ele 当前要解析的<bean/>节点
+	 * @param containingBean
+	 * containingBean不为空,则代表当前节点ele是<bean/>中的<property/>里的子<bean/>;而containingBean就代表<property>外的父<bean/>
+	 * containingBean为空,则表示当前解析的ele是普通的<bean/>
 	 * @return
 	 */
 	@Nullable
@@ -438,8 +441,10 @@ public class BeanDefinitionParserDelegate {
 						"' as bean name and " + aliases + " as aliases");
 			}
 		}
-		// 如果containingBean等于null，则校验beanName是否已经被定义过了（beanName不能重复定义）
-		// 刚开始解析一个<bean/>节点时，不知道里面是否包含另一个bean，所以containingBean为空，所以以这个为标志，标识是否第一次解析一个<bean/>，校验beanName是否重复
+		// 如果containingBean等于null，则校验beanName是否已经被定义过了,如果被定义了,则抛出异常
+		//解释:
+		// containingBean不为空,则代表当前节点ele是<bean/>中的<property/>里的<bean/>标签,并且这个bean不纳入beanName验重的行列里;而containingBean就代表<property>外的<bean/>
+		// containingBean为空,则表示当前解析的ele是普通的<bean/>,需要校验beanName是否被重复定义
 		if (containingBean == null) {
 			checkNameUniqueness(beanName, aliases, ele);
 		}
@@ -510,12 +515,19 @@ public class BeanDefinitionParserDelegate {
 	 * Parse the bean definition itself, without regard to name or aliases. May return
 	 * {@code null} if problems occurred during the parsing of the bean definition.
 	 */
+	/**
+	 * 解析ele节点中的配置,存入到
+	 * @param ele 表示<bean/>节点
+	 * @param beanName 表示bean的名字,一般是节点配置的id值
+	 * @param containingBean 表示当前bean
+	 * @return
+	 */
 	@Nullable
 	public AbstractBeanDefinition parseBeanDefinitionElement(
 			Element ele, String beanName, @Nullable BeanDefinition containingBean) {
 
-		// 向parseState添加代表当前bean的BeanEntry
-		// BeanDefinitionParserDelegate：setparseState
+		// 将beanName封装到PropertyEntry,存入parseState
+		// parseState是以List的数据结构,存储解析过程中的逻辑位置,当出现异常时,可以打印parseState,借此找到执行的逻辑位置
 		this.parseState.push(new BeanEntry(beanName));
 
 		// className表示当前<bean/>设置的"class"属性（如果设置了）
@@ -535,8 +547,13 @@ public class BeanDefinitionParserDelegate {
 			AbstractBeanDefinition bd = createBeanDefinition(className, parent);
 			// 将使用者在<bean/>上配置的属性(如果<bean/>没有配置,尝试从<beans/>读取相关全局配置（如果使用者配置了）)，set到bd(GenericBeanDefinition)实例里
 			parseBeanDefinitionAttributes(ele, beanName, containingBean, bd);
-			// 将使用者在<bean/>里配置的子标签"property"，set到bd(GenericBeanDefinition)实例里
+			// 将使用者在<bean/>里配置的子标签<property/>，解析到bd(GenericBeanDefinition)实例里
 			parsePropertyElements(ele, bd);
+			// readerContext表示XmlReaderContext实例
+			// Resource代表application.xml资源文件的UrlResource实例
+			bd.setResource(this.readerContext.getResource());
+			// 当前Demo,extractSource没有实现逻辑,直接返回空
+			bd.setSource(extractSource(ele));
 
 			/**一般不使用,不讲解*/
 			// 获得bean标签里的"description"节点,用于告诉开发人员关于bean的描述;
@@ -556,9 +573,6 @@ public class BeanDefinitionParserDelegate {
 			parseConstructorArgElements(ele, bd);
 			// 用于解析<bean/>下的"qualifier"标签,set到bd里
 			parseQualifierElements(ele, bd);
-
-			bd.setResource(this.readerContext.getResource());
-			bd.setSource(extractSource(ele));
 
 			return bd;
 		}
@@ -761,15 +775,19 @@ public class BeanDefinitionParserDelegate {
 	}
 
 	/**
-	 * 解析beanEle节点中的property配置，set到bd中
+	 * 解析<bean/>节点中的<property/>，添加到bd中
+	 * @param beanEle <bean/>节点
+	 * @param bd 每个bean的定义对应实体
 	 */
 	public void parsePropertyElements(Element beanEle, BeanDefinition bd) {
-		// 循环beanEle（<beans/>）里的子节点
+		// 循环beanEle（<bean/>节点）里的子节点
 		NodeList nl = beanEle.getChildNodes();
 		for (int i = 0; i < nl.getLength(); i++) {
+			// 不包括<bean/>节点本身
 			Node node = nl.item(i);
-			// 如果节点名字是"property"，并且是属于Element类型
+			// 如果节点名字是"property"，并且是属于Element类型(即非换行符或者注释之类的)
 			if (isCandidateElement(node) && nodeNameEquals(node, PROPERTY_ELEMENT)) {
+				// 将<property/>解析到bd里
 				parsePropertyElement((Element) node, bd);
 			}
 		}
@@ -895,24 +913,34 @@ public class BeanDefinitionParserDelegate {
 	}
 
 	/**
-	 * Parse a property element.
+	 * 将<property/>解析到bd里
+	 * @param ele <bean/>包含的<property/>节点
+	 * @param bd 每个bean的定义对应实体
 	 */
 	public void parsePropertyElement(Element ele, BeanDefinition bd) {
+		// 获得<property/>节点的"name"属性值
 		String propertyName = ele.getAttribute(NAME_ATTRIBUTE);
 		if (!StringUtils.hasLength(propertyName)) {
 			error("Tag 'property' must have a 'name' attribute", ele);
 			return;
 		}
+		// 将当前解析的属性名封装到PropertyEntry,存入parseState
+		// parseState是以List的数据结构,存储解析过程中的逻辑位置,当出现异常时,可以打印parseState,借此找到执行的逻辑位置
 		this.parseState.push(new PropertyEntry(propertyName));
 		try {
 			if (bd.getPropertyValues().contains(propertyName)) {
 				error("Multiple 'property' definitions for property '" + propertyName + "'", ele);
 				return;
 			}
+			// 解析xml中<bean/>里的<property/>配置的值
 			Object val = parsePropertyValue(ele, bd, propertyName);
+			// 将<property/>中的name和值封装到pv(PropertyValue)里
 			PropertyValue pv = new PropertyValue(propertyName, val);
+			// 如果<property/>里配置了<meta key="" value=""/>标签,则也解析到pv里,基本不用,不讲解
 			parseMetaElements(ele, pv);
+			// 当前Demo,extractSource没有实现逻辑,直接返回空
 			pv.setSource(extractSource(ele));
+			// 将pv放到bd里的PropertyValues属性里
 			bd.getPropertyValues().addPropertyValue(pv);
 		}
 		finally {
