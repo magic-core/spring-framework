@@ -544,12 +544,15 @@ public class BeanDefinitionParserDelegate {
 			// 用于解析<bean/>下的<meta key="" value=""/>标签,set到bd里;
 			parseMetaElements(ele, bd);
 			// 用于解析<bean/>下的"lookup-method"标签,set到bd里;一般并使用,不讲解
-			// 例:<lookup-method name="getLatestBean" bean="latestBean"/>,name指的是返回bean的方法名,bean指的是返回的bean实例;
-			// 用于调用getLatestBean方法时,每次都返回一个新创建的bean实例latestBean
+			// 例:<lookup-method name="getLatestBean" bean="latestBean"/>,name指的是作用的方法（getLatestBean）,bean指的是返回的bean实例;
+			// getLatestBean返回的是latestBean的父类，也就是说在调用getLatestBean方法时,返回值向上转型为指定的bean属性
 			parseLookupOverrideSubElements(ele, bd.getMethodOverrides());
 			// 用于解析<bean/>下的"replaced-method"标签,set到bd里
+			// 例：<replaced-method name="被替换的方法" replacer="实现MethodReplacer的类"/>
+			// name指定的方法实现将被替换为在实现了MethodReplacer的类的reimplement方法
 			parseReplacedMethodSubElements(ele, bd.getMethodOverrides());
 			// 用于解析<bean/>下的"constructor-arg"标签,set到bd里
+			// 例：<constructor-arg value="构造函数传入参数"></constructor-arg>
 			parseConstructorArgElements(ele, bd);
 			// 用于解析<bean/>下的"qualifier"标签,set到bd里
 			parseQualifierElements(ele, bd);
@@ -758,12 +761,14 @@ public class BeanDefinitionParserDelegate {
 	}
 
 	/**
-	 * Parse property sub-elements of the given bean element.
+	 * 解析beanEle节点中的property配置，set到bd中
 	 */
 	public void parsePropertyElements(Element beanEle, BeanDefinition bd) {
+		// 循环beanEle（<beans/>）里的子节点
 		NodeList nl = beanEle.getChildNodes();
 		for (int i = 0; i < nl.getLength(); i++) {
 			Node node = nl.item(i);
+			// 如果节点名字是"property"，并且是属于Element类型
 			if (isCandidateElement(node) && nodeNameEquals(node, PROPERTY_ELEMENT)) {
 				parsePropertyElement((Element) node, bd);
 			}
