@@ -196,7 +196,7 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 				// 如果子节点属于元素节点，走本分支,例<bean/>就是元素节点
 				if (node instanceof Element) {
 					Element ele = (Element) node;
-					// 如果当前元素隶属默认命名空间，走本分支,例：<bean/>节点就会继承root节点的命名空间
+					// 走本分支,如果当前元素隶属默认命名空间，例：<bean/>节点就会继承root节点的命名空间
 					if (delegate.isDefaultNamespace(ele)) {
 						parseDefaultElement(ele, delegate);
 					}

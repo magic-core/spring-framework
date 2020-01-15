@@ -433,7 +433,7 @@ public class BeanDefinitionParserDelegate {
 		}
 		// beanName表示<bean/>标签的id属性
 		String beanName = id;
-		// 和name属性相关,不会走本分支,不讲解
+		// 没有设置<bean/>中的id和name,会走本分支,一般都指定id，所以不讲解本代码
 		if (!StringUtils.hasText(beanName) && !aliases.isEmpty()) {
 			beanName = aliases.remove(0);
 			if (logger.isDebugEnabled()) {
@@ -449,8 +449,10 @@ public class BeanDefinitionParserDelegate {
 			checkNameUniqueness(beanName, aliases, ele);
 		}
 
+		// 解析ele(<bean/>)节点,初始化bd（GenericBeanDefinition）实例
 		AbstractBeanDefinition beanDefinition = parseBeanDefinitionElement(ele, beanName, containingBean);
 		if (beanDefinition != null) {
+			// 如果没有指定<bean/>中的id或name，则会走当前分支，但是一般都会指定id，所以不讲解本代码块
 			if (!StringUtils.hasText(beanName)) {
 				try {
 					if (containingBean != null) {
@@ -479,7 +481,9 @@ public class BeanDefinitionParserDelegate {
 					return null;
 				}
 			}
+			// 只指定<bean/>的id，aliasesArray为空
 			String[] aliasesArray = StringUtils.toStringArray(aliases);
+			// 创建BeanDefinitionHolder，向构造器传入GenericBeanDefinition、beanName
 			return new BeanDefinitionHolder(beanDefinition, beanName, aliasesArray);
 		}
 
@@ -502,7 +506,6 @@ public class BeanDefinitionParserDelegate {
 			foundName = CollectionUtils.findFirstMatch(this.usedNames, aliases);
 		}
 		if (foundName != null) {
-			// tofix beanName重复的逻辑可以通过debug看看
 			error("Bean name '" + foundName + "' is already used in this <beans> element", beanElement);
 		}
 		//BeanDefinitionParserDelegate：setusedNames
@@ -512,15 +515,15 @@ public class BeanDefinitionParserDelegate {
 	}
 
 	/**
+	 * 解析ele(<bean/>)节点,初始化bd（GenericBeanDefinition）实例
+	 *
 	 * Parse the bean definition itself, without regard to name or aliases. May return
 	 * {@code null} if problems occurred during the parsing of the bean definition.
-	 */
-	/**
-	 * 解析ele节点中的配置,存入到
+	 *
 	 * @param ele 表示<bean/>节点
 	 * @param beanName 表示bean的名字,一般是节点配置的id值
 	 * @param containingBean 表示当前bean
-	 * @return
+	 * @return bd（GenericBeanDefinition）实例
 	 */
 	@Nullable
 	public AbstractBeanDefinition parseBeanDefinitionElement(
