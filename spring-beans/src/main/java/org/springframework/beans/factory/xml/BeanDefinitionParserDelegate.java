@@ -409,10 +409,10 @@ public class BeanDefinitionParserDelegate {
 
 	/**
 	 * 根据ele节点（即<bean/>），创建GenericBeanDefinition实例，用于表示bean定义
-	 *
 	 * Parses the supplied {@code <bean>} element. May return {@code null}
 	 * if there were errors during parse. Errors are reported to the
 	 * {@link org.springframework.beans.factory.parsing.ProblemReporter}.
+	 *
 	 * @param ele 当前要解析的<bean/>节点
 	 * @param containingBean
 	 * containingBean不为空,则代表当前节点ele是<bean/>中的<property/>里的子<bean/>;而containingBean就代表<property>外的父<bean/>
@@ -483,7 +483,7 @@ public class BeanDefinitionParserDelegate {
 			}
 			// 只指定<bean/>的id，aliasesArray为空
 			String[] aliasesArray = StringUtils.toStringArray(aliases);
-			// 创建BeanDefinitionHolder，向构造器传入GenericBeanDefinition、beanName
+			// 创建BeanDefinitionHolder实例，向构造器传入GenericBeanDefinition、beanName
 			return new BeanDefinitionHolder(beanDefinition, beanName, aliasesArray);
 		}
 

@@ -98,7 +98,7 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 
 		// 获得代表xml配置文件的Document实例根节点root,即<beans/>节点
 		Element root = doc.getDocumentElement();
-		// 根据xml根节点，即<beans/>节点，加载xml中所有的bean定义
+		/**根据xml根节点，即<beans/>节点，加载xml中所有的bean定义*/
 		doRegisterBeanDefinitions(root);
 	}
 
@@ -151,7 +151,7 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 		}
 		// 模版模式,默认空实现,用于子类继承，自定义逻辑
 		preProcessXml(root);
-		// 根据root遍历子节点，注册bean定义
+		/**根据root遍历子节点，注册bean定义*/
 		parseBeanDefinitions(root, this.delegate);
 		// 模版模式,默认空实现,用于子类继承，自定义逻辑
 		postProcessXml(root);
@@ -196,7 +196,7 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 				// 如果子节点属于元素节点，走本分支,例<bean/>就是元素节点
 				if (node instanceof Element) {
 					Element ele = (Element) node;
-					// 走本分支,如果当前元素隶属默认命名空间，例：<bean/>节点就会继承root节点的命名空间
+					/**走本分支,如果当前元素隶属默认命名空间，例：<bean/>节点就会继承root节点的命名空间*/
 					if (delegate.isDefaultNamespace(ele)) {
 						parseDefaultElement(ele, delegate);
 					}
