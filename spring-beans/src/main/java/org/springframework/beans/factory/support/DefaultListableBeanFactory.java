@@ -759,9 +759,10 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	//---------------------------------------------------------------------
 
 	/**
+	 * 将bean定义存储(注册)到bean工厂里
 	 *
-	 * @param beanName 表示xml文件中bean的id
-	 * @param beanDefinition definition of the bean instance to register
+	 * @param beanName 一般指的是xml文件中bean的id
+	 * @param beanDefinition xml文件中对应的bean定义实体
 	 * @throws BeanDefinitionStoreException
 	 */
 	@Override
@@ -770,12 +771,12 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 
 		Assert.hasText(beanName, "Bean name must not be empty");
 		Assert.notNull(beanDefinition, "BeanDefinition must not be null");
+
 		// 如果 beanDefinition 继承 AbstractBeanDefinition
-		// beanDefinition 实例是GenericBeanDefinition
-		// tofix 不常用，本Demo不涉及，暂不细讲
-		// xml文件中bean标签的class属性为Class类型时起作用
+		// beanDefinition是GenericBeanDefinition类,继承AbstractBeanDefinition,所以走本分支
 		if (beanDefinition instanceof AbstractBeanDefinition) {
 			try {
+				// 当前方法只有<bean/>对应的class属性为Class类型时才起作用,一般不使用,不讲解
 				((AbstractBeanDefinition) beanDefinition).validate();
 			}
 			catch (BeanDefinitionValidationException ex) {
@@ -783,9 +784,9 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 						"Validation of bean definition failed", ex);
 			}
 		}
-		// 先尝试根据bean定义的id(beanName)从缓存中获取bean定义
+		// 先尝试根据bean定义的id(beanName)从beanDefinitionMap中获取bean定义实体
 		BeanDefinition existingDefinition = this.beanDefinitionMap.get(beanName);
-		// 如果曾经已经注册过id为beanName的bean定义
+		// 如果有已经注册过id为beanName的bean定义实体,也就是说重复idgyi tofix 0116
 		if (existingDefinition != null) {
 			if (!isAllowBeanDefinitionOverriding()) {
 				throw new BeanDefinitionStoreException(beanDefinition.getResourceDescription(), beanName,

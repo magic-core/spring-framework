@@ -342,8 +342,9 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 			// 这个方法是用于解析xml文件中<bean/>里使用者自己开发的自定义标签，使用自定义标签需要另编写XSD文件、命名空间解析器等；一般不使用，不讲解
 			bdHolder = delegate.decorateBeanDefinitionIfRequired(ele, bdHolder);
 			try {
-				// 注册最后的修饰实例。
-				// getReaderContext() 返回 XmlReaderContext; getRegistry()返回 DefaultListableBeanFactory
+				/** 将最终解析成的bean定义,存储到(注册)bean工厂里*/
+				// getReaderContext() 返回 XmlReaderContext;
+				// getRegistry()返回 DefaultListableBeanFactory
 				BeanDefinitionReaderUtils.registerBeanDefinition(bdHolder, getReaderContext().getRegistry());
 			} catch (BeanDefinitionStoreException ex) {
 				getReaderContext().error("Failed to register bean definition with name '" +
