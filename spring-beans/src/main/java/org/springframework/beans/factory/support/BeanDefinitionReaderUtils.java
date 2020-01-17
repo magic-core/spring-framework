@@ -160,7 +160,8 @@ public class BeanDefinitionReaderUtils {
 		/**将bean定义存储(注册)到bean工厂里*/
 		registry.registerBeanDefinition(beanName, definitionHolder.getBeanDefinition());
 
-		// 注册别名,别名一般是<bean/>里的name属性,一般不使用,不讲解
+		// 一般不使用,不讲解
+		// 注册别名,别名一般是<bean/>里的name属性
 		String[] aliases = definitionHolder.getAliases();
 		if (aliases != null) {
 			for (String alias : aliases) {

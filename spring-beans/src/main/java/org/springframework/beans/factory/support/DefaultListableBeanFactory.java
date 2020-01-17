@@ -776,7 +776,8 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 		// beanDefinition是GenericBeanDefinition类,继承AbstractBeanDefinition,所以走本分支
 		if (beanDefinition instanceof AbstractBeanDefinition) {
 			try {
-				// 当前方法只有<bean/>对应的class属性为Class类型时才起作用,一般不使用,不讲解
+				// 一般不使用,不讲解
+				// 当前方法只有<bean/>对应的class属性为Class类型时才起作用
 				((AbstractBeanDefinition) beanDefinition).validate();
 			}
 			catch (BeanDefinitionValidationException ex) {
@@ -786,7 +787,8 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 		}
 		// 先尝试根据bean定义的id(beanName)从beanDefinitionMap中获取bean定义实体
 		BeanDefinition existingDefinition = this.beanDefinitionMap.get(beanName);
-		// 如果有已经注册过id为beanName的bean定义实体,也就是说重复idgyi tofix 0116
+		// 如果已经注册过id为beanName的bean定义实体,也就是说定义了重复的<bean id=""/>,判断是否允许覆盖；
+		// 如果不允许则抛出异常；允许的话，直接在bean工厂的beanDefinitionMap，使用相同的key(beanName)覆盖即可
 		if (existingDefinition != null) {
 			if (!isAllowBeanDefinitionOverriding()) {
 				throw new BeanDefinitionStoreException(beanDefinition.getResourceDescription(), beanName,
@@ -819,7 +821,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 		}
 		// 如果没有注册过id为beanName的bean定义
 		else {
-			// 如果已经创建过bean了
+			// 如果已经创建过bean了 tofix 这是什么时间点设置的属性呢？
 			if (hasBeanCreationStarted()) {
 				// Cannot modify startup-time collection elements anymore (for stable iteration)
 				synchronized (this.beanDefinitionMap) {
@@ -848,8 +850,8 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 			this.frozenBeanDefinitionNames = null;
 		}
 
-		// tofix 不常用，本Demo不涉及，暂不细讲
-		// 当前注册的bean的定义已经在beanDefinitionMap缓存中存在，或者其实例已经存在于单例bean缓存中
+		// tofix 什么时候放到 singletonObjects 0117
+		// 当前注册的bean的定义已经在beanDefinitionMap缓存中存在 或者 其实例已经存在于单例bean缓存中
 		if (existingDefinition != null || containsSingleton(beanName)) {
 			resetBeanDefinition(beanName);
 		}

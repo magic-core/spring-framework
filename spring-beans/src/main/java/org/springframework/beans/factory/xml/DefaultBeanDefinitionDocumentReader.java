@@ -338,8 +338,8 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 		// 解析bean节点中的信息,创建BeanDefinitionHolder实例,是xml文件bean定义信息对应实体的持有者,也就是说通过<bean/>解析出的对象是bdHolder的一个成员变量
 		BeanDefinitionHolder bdHolder = delegate.parseBeanDefinitionElement(ele);
 		if (bdHolder != null) {
-
-			// 这个方法是用于解析xml文件中<bean/>里使用者自己开发的自定义标签，使用自定义标签需要另编写XSD文件、命名空间解析器等；一般不使用，不讲解
+			// 一般不使用，不讲解
+			// 这个方法是用于解析xml文件中<bean/>里使用者自己开发的自定义标签，使用自定义标签需要另编写XSD文件、命名空间解析器等；
 			bdHolder = delegate.decorateBeanDefinitionIfRequired(ele, bdHolder);
 			try {
 				/** 将最终解析成的bean定义,存储到(注册)bean工厂里*/
