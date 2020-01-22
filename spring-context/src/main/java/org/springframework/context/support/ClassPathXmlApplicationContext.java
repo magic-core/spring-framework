@@ -76,6 +76,8 @@ public class ClassPathXmlApplicationContext extends AbstractXmlApplicationContex
 	}
 
 	/**
+	 * 创建一个新的ClassPathXmlApplicationContext，构造函数里执行了所有操作：构造函数中解析XML文件中bean定义，并将bean定义加载成Spring内部的实体，并根据实体中的信息实例化使用者定义的类
+	 *
 	 * Create a new ClassPathXmlApplicationContext, loading the definitions
 	 * from the given XML file and automatically refreshing the context.
 	 * @param configLocation resource location
@@ -124,6 +126,8 @@ public class ClassPathXmlApplicationContext extends AbstractXmlApplicationContex
 	}
 
 	/**
+	 * 创建一个新的ClassPathXmlApplicationContext，构造函数里执行了所有操作：构造函数中解析XML文件中bean定义，并将bean定义加载成Spring内部的实体，并根据实体中的信息实例化使用者定义的类
+	 *
 	 * Create a new ClassPathXmlApplicationContext with the given parent,
 	 * loading the definitions from the given XML files.
 	 * @param configLocations array of resource locations
@@ -137,12 +141,12 @@ public class ClassPathXmlApplicationContext extends AbstractXmlApplicationContex
 	public ClassPathXmlApplicationContext(
 			String[] configLocations, boolean refresh, @Nullable ApplicationContext parent)
 			throws BeansException {
-		// 默认为null
 		super(parent);
-		// 设置application配置文件
+		// 设置application配置文件，企业编程不是执行当前方式设置，暂时不讲解
 		setConfigLocations(configLocations);
-		// 默认true，执行java对象的创建
+		// 默认true，表示允许启动刷新Spring
 		if (refresh) {
+			/**执行所有操作*/
 			refresh();
 		}
 	}

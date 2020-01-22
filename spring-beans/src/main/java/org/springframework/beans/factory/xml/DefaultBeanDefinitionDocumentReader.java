@@ -98,7 +98,7 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 
 		// 获得代表xml配置文件的Document实例根节点root,即<beans/>节点
 		Element root = doc.getDocumentElement();
-		// 根据xml根节点，即<beans/>节点，加载xml中所有的bean定义
+		/**根据xml根节点，即<beans/>节点，加载xml中所有的bean定义*/
 		doRegisterBeanDefinitions(root);
 	}
 
@@ -151,7 +151,7 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 		}
 		// 模版模式,默认空实现,用于子类继承，自定义逻辑
 		preProcessXml(root);
-		// 根据root遍历子节点，注册bean定义
+		/**根据root遍历子节点，注册bean定义*/
 		parseBeanDefinitions(root, this.delegate);
 		// 模版模式,默认空实现,用于子类继承，自定义逻辑
 		postProcessXml(root);
@@ -160,7 +160,6 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 	}
 
 	/**
-	 *
 	 * 创建 BeanDefinitionParserDelegate 实例，用于解析XML bean定义的有状态（有成员变量）委托类。
 	 *
 	 * @param readerContext
@@ -186,17 +185,17 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 	 * @param root the DOM root element of the document
 	 */
 	protected void parseBeanDefinitions(Element root, BeanDefinitionParserDelegate delegate) {
-		// 如果 node 隶属默认命名空间 默认命名空间:"http://www.springframework.org/schema/beans"
+		// 如果 node 隶属默认命名空间,走本分支,默认命名空间:"http://www.springframework.org/schema/beans"
 		if (delegate.isDefaultNamespace(root)) {
 			// 获得 根节点 的子节点，即<beans/>下的所有节点，不包括beans本身
 			NodeList nl = root.getChildNodes();
 			// 遍历子节点
 			for (int i = 0; i < nl.getLength(); i++) {
 				Node node = nl.item(i);
-				// 如果子节点属于元素节点，例<bean/>就是元素节点
+				// 如果子节点属于元素节点，走本分支,例<bean/>就是元素节点
 				if (node instanceof Element) {
 					Element ele = (Element) node;
-					// 如果当前元素隶属默认命名空间，例：<bean/>节点就会继承root节点的命名空间
+					/**走本分支,如果当前元素隶属默认命名空间，例：<bean/>节点就会继承root节点的命名空间*/
 					if (delegate.isDefaultNamespace(ele)) {
 						parseDefaultElement(ele, delegate);
 					}
@@ -257,8 +256,7 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 		try {
 			// 判断配置的xml文件路径是绝对路径还是相对路径
 			absoluteLocation = ResourcePatternUtils.isUrl(location) || ResourceUtils.toURI(location).isAbsolute();
-		}
-		catch (URISyntaxException ex) {
+		} catch (URISyntaxException ex) {
 			// cannot convert to an URI, considering the location relative
 			// unless it is the well-known Spring prefix "classpath*:"
 		}
@@ -273,8 +271,7 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 				if (logger.isDebugEnabled()) {
 					logger.debug("Imported " + importCount + " bean definitions from URL location [" + location + "]");
 				}
-			}
-			catch (BeanDefinitionStoreException ex) {
+			} catch (BeanDefinitionStoreException ex) {
 				getReaderContext().error(
 						"Failed to import bean definitions from URL location [" + location + "]", ele, ex);
 			}
@@ -288,8 +285,7 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 				if (relativeResource.exists()) {
 					importCount = getReaderContext().getReader().loadBeanDefinitions(relativeResource);
 					actualResources.add(relativeResource);
-				}
-				else {
+				} else {
 					String baseLocation = getReaderContext().getResource().getURL().toString();
 					importCount = getReaderContext().getReader().loadBeanDefinitions(
 							StringUtils.applyRelativePath(baseLocation, location), actualResources);
@@ -297,11 +293,9 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 				if (logger.isDebugEnabled()) {
 					logger.debug("Imported " + importCount + " bean definitions from relative location [" + location + "]");
 				}
-			}
-			catch (IOException ex) {
+			} catch (IOException ex) {
 				getReaderContext().error("Failed to resolve current resource location", ele, ex);
-			}
-			catch (BeanDefinitionStoreException ex) {
+			} catch (BeanDefinitionStoreException ex) {
 				getReaderContext().error("Failed to import bean definitions from relative location [" + location + "]",
 						ele, ex);
 			}
@@ -328,8 +322,7 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 		if (valid) {
 			try {
 				getReaderContext().getRegistry().registerAlias(name, alias);
-			}
-			catch (Exception ex) {
+			} catch (Exception ex) {
 				getReaderContext().error("Failed to register alias '" + alias +
 						"' for bean with name '" + name + "'", ele, ex);
 			}
@@ -342,18 +335,18 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 	 * and registering it with the registry.
 	 */
 	protected void processBeanDefinition(Element ele, BeanDefinitionParserDelegate delegate) {
-		// 解析bean节点中的信息,创建BeanDefinitionHolder实例(是xml文件中bean定义信息的对应实体，也可称为bean定义信息的持有者实体)
+		// 解析bean节点中的信息,创建BeanDefinitionHolder实例,是xml文件bean定义信息对应实体的持有者,也就是说通过<bean/>解析出的对象是bdHolder的一个成员变量
 		BeanDefinitionHolder bdHolder = delegate.parseBeanDefinitionElement(ele);
 		if (bdHolder != null) {
-			// tofix 不常用，本Demo不涉及，暂不细讲
-			// 对bean进行修饰 基于自定义属性
+			// 一般不使用，不讲解
+			// 这个方法是用于解析xml文件中<bean/>里使用者自己开发的自定义标签，使用自定义标签需要另编写XSD文件、命名空间解析器等；
 			bdHolder = delegate.decorateBeanDefinitionIfRequired(ele, bdHolder);
 			try {
-				// 注册最后的修饰实例。
-				// getReaderContext() 返回 XmlReaderContext; getRegistry()返回 DefaultListableBeanFactory
+				/** 将最终解析成的bean定义,存储到(注册)bean工厂里*/
+				// getReaderContext() 返回 XmlReaderContext;
+				// getRegistry()返回 DefaultListableBeanFactory
 				BeanDefinitionReaderUtils.registerBeanDefinition(bdHolder, getReaderContext().getRegistry());
-			}
-			catch (BeanDefinitionStoreException ex) {
+			} catch (BeanDefinitionStoreException ex) {
 				getReaderContext().error("Failed to register bean definition with name '" +
 						bdHolder.getBeanName() + "'", ele, ex);
 			}
@@ -371,6 +364,7 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 	 * convert custom elements into standard Spring bean definitions, for example.
 	 * Implementors have access to the parser's bean definition reader and the
 	 * underlying XML resource, through the corresponding accessors.
+	 *
 	 * @see #getReaderContext()
 	 */
 	protected void preProcessXml(Element root) {
@@ -384,6 +378,7 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 	 * convert custom elements into standard Spring bean definitions, for example.
 	 * Implementors have access to the parser's bean definition reader and the
 	 * underlying XML resource, through the corresponding accessors.
+	 *
 	 * @see #getReaderContext()
 	 */
 	protected void postProcessXml(Element root) {

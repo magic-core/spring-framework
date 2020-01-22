@@ -2,22 +2,32 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
 	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd"
+	   profile=""
 	   >
 <!--	   default-merge="true"-->
 <!--&gt;-->
 		<!--default-merge="true"-->
 
 	<!--	<import resource="classpath:test.xml"/>-->
-
-	<bean id="persion" class="org.springframework.Persion" >
-<!--		<property name="name" >-->
-<!--&lt;!&ndash;			<bean id="persion" class="org.springframework.Persion"></bean>&ndash;&gt;-->
-<!--&lt;!&ndash;			<list  merge="true">&ndash;&gt;-->
-<!--&lt;!&ndash;				<value>Java Core</value>&ndash;&gt;-->
-<!--&lt;!&ndash;				<value>Java Concurrency</value>&ndash;&gt;-->
-<!--&lt;!&ndash;			</list>&ndash;&gt;-->
-<!--		</property>-->
+	<bean  class="org.springframework.Persion" >
+		<property name="p" >
+			<bean id="children" class="org.springframework.Persion1"></bean>
+			<!--			<list  merge="true">-->
+			<!--				<value>Java Core</value>-->
+			<!--				<value>Java Concurrency</value>-->
+			<!--			</list>-->
+		</property>
 	</bean>
+<!--	<bean  id="persion" class="org.springframework.Persion" >-->
+<!--		<description></description>-->
+<!--		<meta key="" value=""/>-->
+<!--		<lookup-method name="getLatestBean" bean="latestBean"/>-->
+<!--		<property name="name" >-->
+<!--			<list  merge="true">-->
+<!--				<value>Java Core</value>-->
+<!--				<value>Java Concurrency</value>-->
+<!--			</list>-->
+<!--		</property>	</bean>-->
 <!--	<bean id="children"  parent="persion">-->
 <!--		<property name="name">-->
 <!--			<list>-->

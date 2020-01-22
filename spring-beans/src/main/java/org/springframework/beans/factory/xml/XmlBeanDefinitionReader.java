@@ -350,7 +350,7 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 				if (encodedResource.getEncoding() != null) {
 					inputSource.setEncoding(encodedResource.getEncoding());
 				}
-				// 根据inputSource，解析xml文件中所有的bean定义，存储到bean工厂里
+				/**根据inputSource，解析xml文件中所有的bean定义，存储到bean工厂里*/
 				return doLoadBeanDefinitions(inputSource, encodedResource.getResource());
 			}
 			finally {
@@ -409,7 +409,7 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 		try {
 			// 将代表xml文件的inputSource对象解析为document实例
 			Document doc = doLoadDocument(inputSource, resource);
-			// 再根据doc实例，将xml中所有的bean定义，存储到bean工厂里
+			/** 再根据doc实例，将xml中所有的bean定义，存储到bean工厂里*/
 			return registerBeanDefinitions(doc, resource);
 		}
 		catch (BeanDefinitionStoreException ex) {
@@ -529,17 +529,14 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 	public int registerBeanDefinitions(Document doc, Resource resource) throws BeanDefinitionStoreException {
 
 		// 实例化 DefaultBeanDefinitionDocumentReader，用于解析doc中所有的bean定义，存储（注册）到bean工厂里
-		// DefaultBeanDefinitionDocumentReader;
 		BeanDefinitionDocumentReader documentReader = createBeanDefinitionDocumentReader();
 
 		// 获取bean工厂中的当前已经包含的bean定义数量，用于计算要加载的bean定义数量
 		// getRegistry 返回DefaultListableBeanFactory实例（bean工厂）
-		// XmlBeanDefinitionReader:getregistry
 		int countBefore = getRegistry().getBeanDefinitionCount();
 
 		// createReaderContext 创建 XmlReaderContext 实例，tofix 作用？
-		// XmlReaderContext；
-		// 根据xml文件解析的doc实例，加载所有bean定义
+		/**根据xml文件解析的doc实例，加载所有bean定义*/
 		documentReader.registerBeanDefinitions(doc, createReaderContext(resource));
 
 		// 返回当前线程刚加载了多少个bean定义
