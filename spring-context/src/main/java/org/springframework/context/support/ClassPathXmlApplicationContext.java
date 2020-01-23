@@ -80,7 +80,8 @@ public class ClassPathXmlApplicationContext extends AbstractXmlApplicationContex
 	 *
 	 * Create a new ClassPathXmlApplicationContext, loading the definitions
 	 * from the given XML file and automatically refreshing the context.
-	 * @param configLocation resource location
+	 *
+	 * @param configLocation application.xml 资源路径的地址
 	 * @throws BeansException if context creation failed
 	 */
 	public ClassPathXmlApplicationContext(String configLocation) throws BeansException {
@@ -130,6 +131,7 @@ public class ClassPathXmlApplicationContext extends AbstractXmlApplicationContex
 	 *
 	 * Create a new ClassPathXmlApplicationContext with the given parent,
 	 * loading the definitions from the given XML files.
+	 *
 	 * @param configLocations array of resource locations
 	 * @param refresh whether to automatically refresh the context,
 	 * loading all bean definitions and creating all singletons.
@@ -142,7 +144,7 @@ public class ClassPathXmlApplicationContext extends AbstractXmlApplicationContex
 			String[] configLocations, boolean refresh, @Nullable ApplicationContext parent)
 			throws BeansException {
 		super(parent);
-		// 设置application配置文件，企业编程不是执行当前方式设置，暂时不讲解
+		// 设置application.xml配置文件路径
 		setConfigLocations(configLocations);
 		// 默认true，表示允许启动刷新Spring
 		if (refresh) {

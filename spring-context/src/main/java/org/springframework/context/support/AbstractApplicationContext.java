@@ -487,14 +487,19 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		return this.applicationListeners;
 	}
 
+	/**
+	 * 核心逻辑：解析XML文件中bean定义，并将bean定义加载成Spring内部的实体，并根据实体中的信息实例化使用者定义的类
+	 *
+	 * @throws BeansException
+	 * @throws IllegalStateException
+	 */
 	@Override
 	public void refresh() throws BeansException, IllegalStateException {
 		synchronized (this.startupShutdownMonitor) {
-			// 初始化 AbstractApplicationContext 必要属性
+			// 初始化 AbstractApplicationContext 部分属性，对后续逻辑没有影响，不需要学习
 			prepareRefresh();
 
-			// 1.如果已经存在bean工厂，则调用销毁方法，将旧bean工厂销毁
-			// 2.然后再根据配置文件中的标签解析为bean定义，创建新的beanfactory bean工厂（以map的方式放到beanfactory实例中）
+			// 创建新的beanfactory bean工厂，根据配置文件中的标签解析为bean定义，以map的方式放到beanfactory实例中
 			ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();
 
 			// 对beanFactory 的属性进行赋值
@@ -564,7 +569,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	}
 
 	/**
-	 * 准备此上下文用于刷新、设置其启动日期和活动标志以及执行的任何属性的初始化。
+	 * 初始化AbstractApplicationContext部分属性
 	 */
 	protected void prepareRefresh() {
 		// 标记启动时间
@@ -578,19 +583,12 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 			logger.info("Refreshing " + this);
 		}
 
-		// Initialize any placeholder property sources in the context environment.
-		// 在上下文环境中初始化任何占位符属性源。
-
-		// tofix 当前Demo中使用的是 ClassPathXmlApplicationContext 实例,从 AbstractApplicationContext 继承而来，实现为空
-		// 切换企业实战后，执行 AbstractRefreshableWebApplicationContext
+		// 当前Demo中使用的是 ClassPathXmlApplicationContext 实例,从 AbstractApplicationContext 继承而来，实现为空
+		// 切换企业实战后（执行 AbstractRefreshableWebApplicationContext），再详细讲解
 		initPropertySources();
 
-		// Validate that all properties marked as required are resolvable:
-		// see ConfigurablePropertyResolver#setRequiredProperties
-		// 验证所有标记为必需的属性都是可解析的:
-		// 参见ConfigurablePropertyResolver#setRequiredProperties
-
-		// tofix 当前Demo无实际逻辑被执行
+		// 一般不使用，不讲解
+		// 启动Spring后，启动环境变量校验，如果使用者指定的环境变量不存在，则抛出异常；默认不校验任何环境变量
 		getEnvironment().validateRequiredProperties();
 
 		// Store pre-refresh ApplicationListeners...
@@ -620,20 +618,17 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 	/**
 	 *
-	 * 1.如果已经存在bean工厂，则调用销毁方法，将旧bean工厂销毁
-	 * 2.然后再根据配置文件中的标签解析为bean定义，创建新的beanfactory bean工厂（以map的方式放到beanfactory实例中）
+	 * 创建新的beanfactory bean工厂，根据配置文件中的标签解析为bean定义，以map的方式放到beanfactory实例中
 	 * @return 返回bean工厂 DefaultListableBeanFactory 实例
 	 *
 	 * Tell the subclass to refresh the internal bean factory.
-	 * 告诉子类刷新内部bean工厂。
 	 * @return the fresh BeanFactory instance
 	 * @see #refreshBeanFactory()
 	 * @see #getBeanFactory()
 	 */
 	protected ConfigurableListableBeanFactory obtainFreshBeanFactory() {
 
-		// 1.如果已经存在bean工厂，则调用销毁方法，将旧bean工厂销毁
-		// 2.然后再根据配置文件中的标签解析为bean定义，创建新的beanfactory bean工厂（以map的方式放到beanfactory实例中）
+		// 创建新的beanfactory bean工厂，根据配置文件中的标签解析为bean定义，以map的方式放到beanfactory实例中
 		// 调用的是从 AbstractRefreshableApplicationContext 继承过来的方法
 		refreshBeanFactory();
 		// 获得bean工厂 DefaultListableBeanFactory 实例

@@ -205,7 +205,7 @@ public abstract class AbstractBeanDefinitionReader implements EnvironmentCapable
 	}
 
 	/**
-	 * 解析xml中bean的定义到bean工厂里
+	 * 根据locations获取xml文件信息，解析bean的定义到bean工厂里
 	 *
 	 * @param location the resource location, to be loaded with the ResourceLoader
 	 * (or ResourcePatternResolver) of this bean definition reader
@@ -218,7 +218,7 @@ public abstract class AbstractBeanDefinitionReader implements EnvironmentCapable
 	}
 
 	/**
-	 * 解析xml中bean的定义到bean工厂里
+	 *  根据locations获取xml文件信息，解析bean的定义到bean工厂里
 	 *
 	 * @return the number of bean definitions found
 	 * @throws BeanDefinitionStoreException in case of loading or parsing errors
@@ -227,7 +227,7 @@ public abstract class AbstractBeanDefinitionReader implements EnvironmentCapable
 	 * @see #loadBeanDefinitions(org.springframework.core.io.Resource[])
 	 */
 	public int loadBeanDefinitions(String location, @Nullable Set<Resource> actualResources) throws BeanDefinitionStoreException {
-		// 获得 resourceLoader（ClassPathXmlApplicationContext 实例），用于读取xml文件
+		// 获得 resourceLoader（ClassPathXmlApplicationContext 实例），表示XmlBeanDefinitionReader中具体负责读取application.xml配置文件的类
 		// resourceLoader 是在调用 new XmlBeanDefinitionReader(BeanDefinitionRegistry registry) 时进行的赋值
 		ResourceLoader resourceLoader = getResourceLoader();
 		if (resourceLoader == null) {
@@ -284,7 +284,7 @@ public abstract class AbstractBeanDefinitionReader implements EnvironmentCapable
 	@Override
 	public int loadBeanDefinitions(String... locations) throws BeanDefinitionStoreException {
 		Assert.notNull(locations, "Location array must not be null");
-		// 表示加载bean定义的总数
+		// counter表示当前操作加载bean定义的数量
 		int counter = 0;
 		// 循环遍历使用者指定的xml配置路径，比如"classpath*:applicationContext.xml"，加载bean的定义
 		for (String location : locations) {

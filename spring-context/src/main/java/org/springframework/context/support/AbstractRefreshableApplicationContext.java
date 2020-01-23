@@ -118,30 +118,28 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 
 
 	/**
-	 * 1.如果已经存在bean工厂，则调用销毁方法，将旧bean工厂销毁
-	 * 2.然后再根据配置文件中的标签解析为bean定义，创建新的beanfactory bean工厂（以map的方式放到beanfactory实例中）
+	 * 创建新的beanfactory bean工厂，根据配置文件中的标签解析为bean定义，以map的方式放到beanfactory实例中
 	 */
 	@Override
 	protected final void refreshBeanFactory() throws BeansException {
-		// 如果存在bean工厂，则销毁原bean工厂，然后重新创建
+		// 一般不使用，不讲解
+		// 如果存在bean工厂，则销毁原bean工厂，然后重新创建，也就是说可以启动bean工厂后，再执行当前方法，用于刷新bean工厂
 		if (hasBeanFactory()) {
 			destroyBeans();
 			closeBeanFactory();
 		}
 		try {
-			// 创建 DefaultListableBeanFactory bean工厂
+			// 创建 DefaultListableBeanFactory bean工厂，bean实例加载的核心逻辑都在bean工厂里
 			DefaultListableBeanFactory beanFactory = createBeanFactory();
-
-			// getId() 例：org.springframework.context.support.ClassPathXmlApplicationContext@402c4085
-			// 对bean工厂的 SerializationId 赋值
 			beanFactory.setSerializationId(getId());
 
 			// 对beanFactory 的 AllowCircularReferences 和 AllowBeanDefinitionOverriding 属性赋值
-			// allowCircularReferences 表示允许循环引用
-			// allowBeanDefinitionOverriding 表示xml中相同beanId的bean定义允许覆盖
+			// allowCircularReferences 表示允许bean循环引用,默认true
+			// allowBeanDefinitionOverriding 表示xml中相同beanId的bean定义允许覆盖,默认true
 			customizeBeanFactory(beanFactory);
 
 			// 执行从 AbstractXmlApplicationContext 继承的 loadBeanDefinitions 方法
+			/**核心方法*/
 			loadBeanDefinitions(beanFactory);
 
 			synchronized (this.beanFactoryMonitor) {
