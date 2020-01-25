@@ -409,12 +409,13 @@ public class BeanDefinitionParserDelegate {
 
 	/**
 	 * 根据ele节点（即<bean/>），创建GenericBeanDefinition实例，用于表示bean定义
+	 *
 	 * Parses the supplied {@code <bean>} element. May return {@code null}
 	 * if there were errors during parse. Errors are reported to the
 	 * {@link org.springframework.beans.factory.parsing.ProblemReporter}.
-	 *
 	 * @param ele 当前要解析的<bean/>节点
 	 * @param containingBean
+	 * 解释：
 	 * containingBean不为空,则代表当前节点ele是<bean/>中的<property/>里的子<bean/>;而containingBean就代表<property>外的父<bean/>
 	 * containingBean为空,则表示当前解析的ele是普通的<bean/>
 	 * @return
@@ -423,14 +424,15 @@ public class BeanDefinitionParserDelegate {
 	public BeanDefinitionHolder parseBeanDefinitionElement(Element ele, @Nullable BeanDefinition containingBean) {
 		// 获得<bean/>节点的id属性，例：persion
 		String id = ele.getAttribute(ID_ATTRIBUTE);
+
 		// 获得<bean/>节点的name属性，一般Spring的使用不定义name属性，所以不讲解本内容
 		String nameAttr = ele.getAttribute(NAME_ATTRIBUTE);
 		List<String> aliases = new ArrayList<>();
-		// 和name属性相关,不会走本分支,不讲解
 		if (StringUtils.hasLength(nameAttr)) {
 			String[] nameArr = StringUtils.tokenizeToStringArray(nameAttr, MULTI_VALUE_ATTRIBUTE_DELIMITERS);
 			aliases.addAll(Arrays.asList(nameArr));
 		}
+
 		// beanName表示<bean/>标签的id属性
 		String beanName = id;
 		// 没有设置<bean/>中的id和name,会走本分支,一般都指定id，所以不讲解本代码
@@ -441,6 +443,7 @@ public class BeanDefinitionParserDelegate {
 						"' as bean name and " + aliases + " as aliases");
 			}
 		}
+
 		// 如果containingBean等于null，则校验beanName是否已经被定义过了,如果被定义了,则抛出异常
 		//解释:
 		// containingBean不为空,则代表当前节点ele是<bean/>中的<property/>里的<bean/>标签,并且这个bean不纳入beanName验重的行列里;而containingBean就代表<property>外的<bean/>

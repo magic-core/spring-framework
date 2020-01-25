@@ -146,6 +146,7 @@ public class BeanDefinitionReaderUtils {
 
 	/**
 	 * 将bean定义存储(注册)到bean工厂里
+	 *
 	 * @param definitionHolder 持有bean定义实体的对象,即通过xml解析成的beanDefinition是本对象的一个成员变量
 	 * @param registry bean工厂 DefaultListableBeanFactory实例
 	 * @throws BeanDefinitionStoreException if registration failed

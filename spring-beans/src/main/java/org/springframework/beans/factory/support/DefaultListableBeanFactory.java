@@ -761,7 +761,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	/**
 	 * 将bean定义存储(注册)到bean工厂里
 	 *
-	 * @param beanName 一般指的是xml文件中bean的id
+	 * @param beanName 指代bean的名字,一般指的是xml文件中bean的id
 	 * @param beanDefinition xml文件中对应的bean定义实体
 	 * @throws BeanDefinitionStoreException
 	 */
@@ -777,7 +777,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 		if (beanDefinition instanceof AbstractBeanDefinition) {
 			try {
 				// 一般不使用,不讲解
-				// 当前方法只有<bean/>对应的class属性为Class类型时才起作用
+				// 当前方法只有<bean/>对应的class属性为Class类型时才起作用，比如XXX.class
 				((AbstractBeanDefinition) beanDefinition).validate();
 			}
 			catch (BeanDefinitionValidationException ex) {
@@ -785,9 +785,11 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 						"Validation of bean definition failed", ex);
 			}
 		}
+
 		// 先尝试根据bean定义的id(beanName)从beanDefinitionMap中获取bean定义实体
 		BeanDefinition existingDefinition = this.beanDefinitionMap.get(beanName);
-		// 如果已经注册过id为beanName的bean定义实体,也就是说定义了重复的<bean id=""/>,判断是否允许覆盖；
+
+		// 如果已经注册过id为beanName的bean定义实体,也就是说定义了重复的<bean id=""/>,判断是否允许覆盖（默认允许）；
 		// 如果不允许则抛出异常；允许的话，直接在bean工厂的beanDefinitionMap，使用相同的key(beanName)覆盖即可
 		if (existingDefinition != null) {
 			if (!isAllowBeanDefinitionOverriding()) {
@@ -817,6 +819,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 							"] with [" + beanDefinition + "]");
 				}
 			}
+			// 将bean定义根据beanName进行覆盖
 			this.beanDefinitionMap.put(beanName, beanDefinition);
 		}
 		// 如果没有注册过id为beanName的bean定义

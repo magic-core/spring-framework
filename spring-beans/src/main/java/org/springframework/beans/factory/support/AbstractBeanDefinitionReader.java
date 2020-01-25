@@ -185,7 +185,7 @@ public abstract class AbstractBeanDefinitionReader implements EnvironmentCapable
 
 
 	/**
-	 * 循环所有配置文件，加载bean定义
+	 * 循环所有xml配置文件资源，加载bean定义
 	 *
 	 * @param resources the resource descriptors
 	 * @return
@@ -196,7 +196,7 @@ public abstract class AbstractBeanDefinitionReader implements EnvironmentCapable
 		Assert.notNull(resources, "Resource array must not be null");
 		// 表示加载到的bean定义个数
 		int counter = 0;
-		// 循环遍历resources（xml文件资源），当前Demo，只有一个元素（文件）
+		// 循环遍历resources（xml文件资源）
 		for (Resource resource : resources) {
 			// 在 XmlBeanDefinitionReader 实现的 loadBeanDefinitions 方法
 			counter += loadBeanDefinitions(resource);
@@ -220,6 +220,10 @@ public abstract class AbstractBeanDefinitionReader implements EnvironmentCapable
 	/**
 	 *  根据locations获取xml文件信息，解析bean的定义到bean工厂里
 	 *
+	 * @param location xml配置资源路径
+	 * @param actualResources
+	 * 						如果是刚要解析xml配置文件，actualResources为空，用不到
+	 * 						如果解析xml配置文件时遇到import标签，则会递归，再次调用当前方法去解析import中指定的xml文件资源，actualResources会传递一个set实例，但是不包含元素
 	 * @return the number of bean definitions found
 	 * @throws BeanDefinitionStoreException in case of loading or parsing errors
 	 * @see #getResourceLoader()
@@ -227,8 +231,8 @@ public abstract class AbstractBeanDefinitionReader implements EnvironmentCapable
 	 * @see #loadBeanDefinitions(org.springframework.core.io.Resource[])
 	 */
 	public int loadBeanDefinitions(String location, @Nullable Set<Resource> actualResources) throws BeanDefinitionStoreException {
-		// 获得 resourceLoader（ClassPathXmlApplicationContext 实例），表示XmlBeanDefinitionReader中具体负责读取application.xml配置文件的类
-		// resourceLoader 是在调用 new XmlBeanDefinitionReader(BeanDefinitionRegistry registry) 时进行的赋值
+		// 获得 resourceLoader（ClassPathXmlApplicationContext 实例），resourceLoader是XmlBeanDefinitionReader中具体负责读取application.xml配置文件的类
+		// resourceLoader 是在初始化new XmlBeanDefinitionReader时进行的赋值
 		ResourceLoader resourceLoader = getResourceLoader();
 		if (resourceLoader == null) {
 			throw new BeanDefinitionStoreException(
@@ -238,12 +242,13 @@ public abstract class AbstractBeanDefinitionReader implements EnvironmentCapable
 		// ClassPathXmlApplicationContext 继承 ResourcePatternResolver，所以走本分支
 		if (resourceLoader instanceof ResourcePatternResolver) {
 			try {
-				// 获得配置文件的资源实例，一个Resource元素代表一个文件
-				// 调用 AbstractApplicationContext#getResources
+				// 获得配置文件的资源实例，一个Resource实例代表一个文件
+				// getResources方法是ResourcePatternResolver从继承AbstractApplicationContext来的
 				Resource[] resources = ((ResourcePatternResolver) resourceLoader).getResources(location);
-				// 根据Resource数组解析bean定义
+				/**根据Resource数组解析bean定义,注册到bean工厂里*/
 				int loadCount = loadBeanDefinitions(resources);
-				// tofix 不常用，本Demo不涉及，暂不细讲
+				// 如果是刚要解析xml配置文件，actualResources为空，用不到
+				// 如果解析xml配置文件时遇到import标签，则会递归，再次调用当前方法去解析import中指定的xml文件资源，actualResources会传递一个set实例，但是不包含元素
 				if (actualResources != null) {
 					for (Resource resource : resources) {
 						actualResources.add(resource);
