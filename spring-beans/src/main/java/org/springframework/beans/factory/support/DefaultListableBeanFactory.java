@@ -131,6 +131,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	private volatile Set<String> manualSingletonNames = new LinkedHashSet<>(16);
 
 	/** Cached array of bean definition names in case of frozen configuration */
+	/** 缓存的bean定义名数组，以防冻结配置 */
 	@Nullable
 	private volatile String[] frozenBeanDefinitionNames;
 
@@ -824,7 +825,9 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 		}
 		// 如果没有注册过id为beanName的bean定义
 		else {
-			// 如果已经创建过bean了 tofix 这是什么时间点设置的属性呢？
+			// 校验 alreadyCreated 集合是否已经存在元素，alreadyCreated 表示 已经被实例化的bean定义集合
+			// 只有当spring在启动并且已经有bean定义被实例化时，又调用了refresh方法（进行刷新bean定义操作）；才会执行当前代码块
+			// 一般不使用 Spring启动后的再刷新，不讲解
 			if (hasBeanCreationStarted()) {
 				// Cannot modify startup-time collection elements anymore (for stable iteration)
 				synchronized (this.beanDefinitionMap) {
@@ -840,22 +843,29 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 					}
 				}
 			}
-			// 如果还没有创建过bean
+			// 如果还没有创建过bean，走本分支
 			else {
 				// 以键值对的方式{bean标签中的id->BeanDefinition},存放从xml文件中解析出来的bean配置
 				this.beanDefinitionMap.put(beanName, beanDefinition);
-				// 存放从xml文件中解析出来的bean标签中的id
+				// beanDefinitionNames 表示通过调用当前方法得到的bean定义的名字（beanName）
 				this.beanDefinitionNames.add(beanName);
-				// tofix 不常用，本Demo不涉及，暂不细讲
-				// manualSingletonNames 代表了手动注册的单例bean,例如：xmlBeanFactory.registerSingleton("testName", new Test());
+				// 一般不使用，为空集合
+				// manualSingletonNames 表示通过调用 DefaultListableBeanFactory.registerSingleton(String beanName, Object singletonObject) 方法手动注册的单例bean定义的名字（beanName）,例如：new ClassPathXmlApplicationContext("classpath:applicationContext.xml").getBeanFactory().registerSingleton("testName", new Test());
+				// 因为Spring通过当前方法注册了该beanName，所以根据beanName将 manualSingletonNames 里的删除了
 				this.manualSingletonNames.remove(beanName);
 			}
+			// 初始化 frozenBeanDefinitionNames 变量，用于后期扩展，现在没有实质用处;
+			// 初始化时为空；解析完所有的bean定义后，实例化bean定义前，从 beanDefinitionNames 中获取一份保存起来
 			this.frozenBeanDefinitionNames = null;
 		}
 
-		// tofix 什么时候放到 singletonObjects 0117
-		// 当前注册的bean的定义已经在beanDefinitionMap缓存中存在 或者 其实例已经存在于单例bean缓存中
+		// 在适应Spring时，应该将允许定义重复beanName（id）的配置设置为false，所以正常情况不会执行本代码，不讲解
+		// 如果已经执行过当前方法，注册过相同beanName的bean定义；
+		// 或者调用了DefaultListableBeanFactory.registerSingleton(String beanName, Object singletonObject)方法，实例化了相同beanName的单例bean
+		// existingDefinition 表示是否执行了当前方法，注册了相同 beanName（beanName一般指的是<bean/>相同的id值）的bean定义
+		// containsSingleton 表示是否调用了 DefaultListableBeanFactory.registerSingleton(String beanName, Object singletonObject) 方法，注册了相同beanName的单例实例
 		if (existingDefinition != null || containsSingleton(beanName)) {
+			// 重置给定bean的所有bean定义缓存，包括派生自该bean的bean的缓存。
 			resetBeanDefinition(beanName);
 		}
 	}
