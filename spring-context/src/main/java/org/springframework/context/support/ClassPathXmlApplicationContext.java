@@ -76,7 +76,7 @@ public class ClassPathXmlApplicationContext extends AbstractXmlApplicationContex
 	}
 
 	/**
-	 * 创建一个新的ClassPathXmlApplicationContext，构造函数里执行了所有操作：构造函数中解析XML文件中bean定义，并将bean定义加载成Spring内部的实体，并根据实体中的信息实例化使用者定义的类
+	 * 实例化ClassPathXmlApplicationContext，构造函数里执行了所有操作：构造函数中解析XML文件中bean定义，并将bean定义加载成Spring内部的实体，并根据实体中的信息实例化使用者定义的类
 	 *
 	 * Create a new ClassPathXmlApplicationContext, loading the definitions
 	 * from the given XML file and automatically refreshing the context.
@@ -127,7 +127,7 @@ public class ClassPathXmlApplicationContext extends AbstractXmlApplicationContex
 	}
 
 	/**
-	 * 创建一个新的ClassPathXmlApplicationContext，构造函数里执行了所有操作：构造函数中解析XML文件中bean定义，并将bean定义加载成Spring内部的实体，并根据实体中的信息实例化使用者定义的类
+	 * 实例化ClassPathXmlApplicationContext，构造函数里执行了所有操作：构造函数中解析XML文件中bean定义，并将bean定义加载成Spring内部的实体，并根据实体中的信息实例化使用者定义的类
 	 *
 	 * Create a new ClassPathXmlApplicationContext with the given parent,
 	 * loading the definitions from the given XML files.

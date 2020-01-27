@@ -188,7 +188,7 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 	 * @param delegate BeanDefinitionParserDelegate 实例(bean定义的解析委托类),定义了解析XML文件（Doc形式）的一系列方法，是核心解析器
 	 */
 	protected void parseBeanDefinitions(Element root, BeanDefinitionParserDelegate delegate) {
-		// 如果 node 隶属默认命名空间,默认命名空间:"http://www.springframework.org/schema/beans"（即Spring自带的标签）,走本分支
+		// 如果 root根节点 隶属默认命名空间,默认命名空间:"http://www.springframework.org/schema/beans",走本分支
 		if (delegate.isDefaultNamespace(root)) {
 			// 获得 根节点 的子节点，即<beans/>下的所有节点，不包括beans本身
 			NodeList nl = root.getChildNodes();
@@ -198,19 +198,20 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 				// 如果子节点属于元素节点，走本分支,例<bean/>就是元素节点；换行符、注释就不是节点
 				if (node instanceof Element) {
 					Element ele = (Element) node;
-					// 走本分支,如果当前元素是Spring自带的标签
+					// 如果当前元素是不存在命名空间或者属于"http://www.springframework.org/schema/beans"命名空间，走本分支；例：<bean/>、<import/>等
 					if (delegate.isDefaultNamespace(ele)) {
 					/**解析当前的ele节点，根据节点类型，做不同操作；如果是<bean/>,注册到bean工厂里；如果是<import/>,则根据配置项resource，递归重新调用AbstractBeanDefinitionReader#loadBeanDefinitions方法，解析指定的xml资源路径*/
 						parseDefaultElement(ele, delegate);
 					}
-					// 如果当前元素不隶属默认命名空间（即使用者自己定义的标签）
+					// 如果当前元素不隶属默认命名空间，例：<context:property-placeholder location="classpath*:application.properties"  />、使用者自定义标签
 					else {
+						/**解析当前的ele节点，根据节点的命名空间，找到相应的处理器进行处理*/
 						delegate.parseCustomElement(ele);
 					}
 				}
 			}
 		}
-		// 如果node 不隶属默认名称空间。（即使用者自己定义的标签）
+		// 如果当前根节点root不隶属默认命名空间
 		else {
 			delegate.parseCustomElement(root);
 		}
@@ -351,8 +352,8 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 	 *
 	 * Process the given bean element, parsing the bean definition
 	 * and registering it with the registry.
-	 * @param ele
-	 * @param delegate
+	 * @param ele 当前节点
+	 * @param delegate BeanDefinitionParserDelegate 实例(bean定义的解析委托类),定义了解析XML文件（Doc形式）的一系列方法，是核心解析器
 	 */
 	protected void processBeanDefinition(Element ele, BeanDefinitionParserDelegate delegate) {
 		// 解析bean节点中的信息,创建BeanDefinitionHolder实例,是xml文件bean定义信息对应实体的持有者,也就是说通过<bean/>解析出的对象是bdHolder的一个成员变量
