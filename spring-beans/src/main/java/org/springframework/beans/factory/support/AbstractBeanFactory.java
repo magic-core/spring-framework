@@ -107,7 +107,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	/** BeanPostProcessors to apply in createBean */
 	private final List<BeanPostProcessor> beanPostProcessors = new CopyOnWriteArrayList<>();
 
-	/** Indicates whether any InstantiationAwareBeanPostProcessors have been registered  指示是否注册了任何InstantiationAwareBeanPostProcessors*/
+	/** Indicates whether any InstantiationAwareBeanPostProcessors have been registered  指示是否注册了任何 InstantiationAwareBeanPostProcessor */
 	private volatile boolean hasInstantiationAwareBeanPostProcessors;
 
 	/** Indicates whether any DestructionAwareBeanPostProcessors have been registered */
@@ -446,12 +446,23 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 		}
 	}
 
+	/**
+	 * 根据beanName获得bean定义对象，然后判断 typeToMatch 是否是bean定义对象的类型或子类
+	 *
+	 * @param name beanName
+	 * @param typeToMatch 要匹配的类型
+	 * @return typeToMatch 是否是 name 代表的bean定义对象的类型或子类
+	 * @throws NoSuchBeanDefinitionException
+	 */
 	@Override
 	public boolean isTypeMatch(String name, ResolvableType typeToMatch) throws NoSuchBeanDefinitionException {
+		// 一般不使用factory-bean，不讲解
+		// 如果beanName开头带有"&",去掉"&"（beanName开头带有"&"，是获取通过factory-bean方式生成的）
 		String beanName = transformedBeanName(name);
 
-		// Check manually registered singletons.
+		// 尝试根据beanName获取单例实例（只有执行过或执行中bean定义实例化的过程，才有可能不返回空）
 		Object beanInstance = getSingleton(beanName, false);
+		// 如果获得到了实例
 		if (beanInstance != null && beanInstance.getClass() != NullBean.class) {
 			if (beanInstance instanceof FactoryBean) {
 				if (!BeanFactoryUtils.isFactoryDereference(name)) {
@@ -490,30 +501,36 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 			}
 			return false;
 		}
+		// 如果没获取到实例，则判断singletonObjects是否包含beanName，beanDefinitionMap是否包含beanName
+		// tofix 怎么可能，包含beanName的实例，但是不包含注册的beanName
 		else if (containsSingleton(beanName) && !containsBeanDefinition(beanName)) {
 			// null instance registered
 			return false;
 		}
 
-		// No singleton instance found -> check bean definition.
+		// 获得 parentBeanFactory 变量，parentBeanFactory 的赋值操作没有地方调用，所以 parentBeanFactory 肯定为空
 		BeanFactory parentBeanFactory = getParentBeanFactory();
 		if (parentBeanFactory != null && !containsBeanDefinition(beanName)) {
 			// No bean definition found in this factory -> delegate to parent.
 			return parentBeanFactory.isTypeMatch(originalBeanName(name), typeToMatch);
 		}
 
-		// Retrieve corresponding bean definition.
+		// 根据传入的beanName，返回RootBeanDefinition实例
 		RootBeanDefinition mbd = getMergedLocalBeanDefinition(beanName);
 
+		// 获得参数真正封装的bean定义类型
 		Class<?> classToMatch = typeToMatch.resolve();
 		if (classToMatch == null) {
 			classToMatch = FactoryBean.class;
 		}
+		//typesToMatch 代表数组：new Class<?>[] {FactoryBean.class, classToMatch})
 		Class<?>[] typesToMatch = (FactoryBean.class == classToMatch ?
 				new Class<?>[] {classToMatch} : new Class<?>[] {FactoryBean.class, classToMatch});
 
-		// Check decorated bean definition, if any: We assume it'll be easier
-		// to determine the decorated bean's type than the proxy's type.
+
+		// 一般不使用，不讲解
+		// 只有<bean/>中的<property/>包含子<bean/>这种情况，dbd 才有值
+		// dbd代表 RootBeanDefinition 装饰的 BeanDefinitionHolder 实例，子<bean/>；
 		BeanDefinitionHolder dbd = mbd.getDecoratedDefinition();
 		if (dbd != null && !BeanFactoryUtils.isFactoryDereference(name)) {
 			RootBeanDefinition tbd = getMergedBeanDefinition(dbd.getBeanName(), dbd.getBeanDefinition(), mbd);
@@ -523,12 +540,15 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 			}
 		}
 
+		// 获取mbd（RootBeanDefinition实例）指代的类型，即<bean/>中的class
+		// 执行的是从 AbstractAutowireCapableBeanFactory 继承的 predictBeanType，因为当前的实例 DefaultListableBeanFactory 继承 AbstractAutowireCapableBeanFactory
 		Class<?> beanType = predictBeanType(beanName, mbd, typesToMatch);
 		if (beanType == null) {
 			return false;
 		}
 
-		// Check bean class whether we're dealing with a FactoryBean.
+		// 一般不使用FactoryBean来创建bean的实例，不讲解
+		// 如果beanType是FactoryBean的子类，即使用FactoryBean来创建bean的实例
 		if (FactoryBean.class.isAssignableFrom(beanType)) {
 			if (!BeanFactoryUtils.isFactoryDereference(name) && beanInstance == null) {
 				// If it's a FactoryBean, we want to look at what it creates, not the factory class.
@@ -538,6 +558,8 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 				}
 			}
 		}
+		// 一般不使用FactoryBean来创建bean的实例，不讲解
+		// 如果beanType不是FactoryBean的子类，但beanName以 "&" 开头
 		else if (BeanFactoryUtils.isFactoryDereference(name)) {
 			// Special case: A SmartInstantiationAwareBeanPostProcessor returned a non-FactoryBean
 			// type but we nevertheless are being asked to dereference a FactoryBean...
@@ -547,17 +569,30 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 				return false;
 			}
 		}
-
+		// 当前案例，不会被执行，不讲解
+		// mbd.targetType 调用无参构造函数，初始化时不会被赋值，所以为空
 		ResolvableType resolvableType = mbd.targetType;
+		// factoryMethodReturnType 没有使用FactoryBean来创建bean的实例，也为空
 		if (resolvableType == null) {
 			resolvableType = mbd.factoryMethodReturnType;
 		}
 		if (resolvableType != null && resolvableType.resolve() == beanType) {
 			return typeToMatch.isAssignableFrom(resolvableType);
 		}
+
+
+		// 返回 typeToMatch 是否是 beanType 的子类
 		return typeToMatch.isAssignableFrom(beanType);
 	}
 
+	/**
+	 * 根据name(beanName)获得bean定义对象，然后判断 typeToMatch 是否是bean定义对象的类型或子类
+	 *
+	 * @param name the name of the bean to query
+	 * @param typeToMatch the type to match against (as a {@code Class})
+	 * @return
+	 * @throws NoSuchBeanDefinitionException
+	 */
 	@Override
 	public boolean isTypeMatch(String name, @Nullable Class<?> typeToMatch) throws NoSuchBeanDefinitionException {
 		return isTypeMatch(name, ResolvableType.forRawClass(typeToMatch));
@@ -1168,12 +1203,10 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 
 
 	/**
+	 * 根据传入的beanName，返回RootBeanDefinition实例
+	 *
 	 * Return a merged RootBeanDefinition, traversing the parent bean definition
 	 * if the specified bean corresponds to a child bean definition.
-	 * 译文：
-	 * 返回一个合并的RootBeanDefinition，遍历父bean定义
-	 * 如果指定的bean对应于子bean定义。
-	 *
 	 * @param beanName the name of the bean to retrieve the merged definition for
 	 * @return a (potentially merged) RootBeanDefinition for the given bean
 	 * @throws NoSuchBeanDefinitionException if there is no bean with the given name
@@ -1181,19 +1214,29 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	 */
 	protected RootBeanDefinition getMergedLocalBeanDefinition(String beanName) throws BeansException {
 		// Quick check on the concurrent map first, with minimal locking.
-		// 译文：首先快速检查并发映射，并使用最少的锁。
-		//
+		// 先尝试在 mergedBeanDefinitions 缓存里,根据beanName获得RootBeanDefinition
 		RootBeanDefinition mbd = this.mergedBeanDefinitions.get(beanName);
+		// 若获取到了，则直接获得
 		if (mbd != null) {
 			return mbd;
 		}
+		// 如果没有获取到，再根据beanName和对应的GenericBeanDefinition实例，创建 RootBeanDefinition 实例
 		return getMergedBeanDefinition(beanName, getBeanDefinition(beanName));
 	}
 
 	/**
+	 * 根据传入的bd（GenericBeanDefinition实例），返回RootBeanDefinition实例，有以下情况:
+	 * 1.如果当前传入的bean定义指定了parent属性，则会将parent指定的bean的指定的属性覆盖到本bean中，但是如果本bean指定了属性，则本bean的该属性值不被覆盖，如例1
+	 * 例1：	<bean id="persion"  class="org.springframework.Persion" parent="parent" >
+	 * 		<bean id="parent" class="org.springframework.Parent"/>
+	 *			<property name="属性1" value="值1（会覆盖到persion的相同属性里，但如果persion中该属性有值，不会被覆盖）">
+	 * 			</property>
+	 *
+	 * 2.如果当前传入的bean定义是普通的<bean/>，则会直接转化为RootBeanDefinition实例，如例2
+	 * 例2：	<bean id="persion"  class="org.springframework.Persion" />
+	 *
 	 * Return a RootBeanDefinition for the given top-level bean, by merging with
 	 * the parent if the given bean's definition is a child bean definition.
-	 * 译文：如果给定bean的定义是子bean定义，则通过与父bean合并，为给定的顶级bean返回一个RootBeanDefinition。
 	 * @param beanName the name of the bean definition
 	 * @param bd the original bean definition (Root/ChildBeanDefinition)
 	 * @return a (potentially merged) RootBeanDefinition for the given bean
@@ -1201,23 +1244,37 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	 */
 	protected RootBeanDefinition getMergedBeanDefinition(String beanName, BeanDefinition bd)
 			throws BeanDefinitionStoreException {
-
 		return getMergedBeanDefinition(beanName, bd, null);
 	}
 
 	/**
+	 * 根据传入的bd（GenericBeanDefinition实例），返回RootBeanDefinition实例，有以下情况:
+	 * 1.如果当前传入的bean定义是<bean/>中的<property/>里的子<bean/>（例子中的Child），则会直接转化为RootBeanDefinition实例，如例1
+	 * 例1：	<bean id="persion"  class="org.springframework.Persion" >
+	 * 		<property name="child（Persion的child类型属性名）" >
+	 * 			<bean  class="org.springframework.Child"/>
+	 * 		</property>
+	 * 	</bean>
+	 *
+	 * 2.如果当前传入的bean定义指定了parent属性，则会将parent指定的bean的指定的属性覆盖到本bean中，但是如果本bean指定了属性，则本bean的该属性值不被覆盖，如例2
+	 * 例2：	<bean id="persion"  class="org.springframework.Persion" parent="parent" >
+	 * 		<bean id="parent" class="org.springframework.Parent"/>
+	 *			<property name="属性1" value="值1（会覆盖到persion的相同属性里，但如果persion中该属性有值，不会被覆盖）">
+	 * 			</property>
+	 *
+	 * 3.如果当前传入的bean定义是普通的<bean/>，则会直接转化为RootBeanDefinition实例，如例3
+	 * 例3：	<bean id="persion"  class="org.springframework.Persion" />
+	 *
 	 * Return a RootBeanDefinition for the given bean, by merging with the
 	 * parent if the given bean's definition is a child bean definition.
-	 * 译文：如果给定bean的定义是子bean定义，则通过与父bean合并来返回给定bean的RootBeanDefinition。
-	 *
-	 * @param beanName the name of the bean definition
-	 * @param bd the original bean definition (Root/ChildBeanDefinition)
-	 * @param containingBd the containing bean definition in case of inner bean,
-	 * or {@code null} in case of a top-level bean
-	 * @return a (potentially merged) RootBeanDefinition for the given bean
+	 * @param beanName bean定义的名字，一般指的是<bean/>中的id属性
+	 * @param bd 当前处理的bean定义实例 GenericBeanDefinition实例
+	 * @param containingBd
+	 * 						containingBean不为空,则代表当前的Bean定义是<bean/>中的<property/>里的子<bean/>;而containingBean就代表外层的<bean id="persion"/>
+	 * 						containingBean为空,则表示当前的Bean定义是普通的<bean/>，也就是<beans/>里的一个<bean/>标签
+	 * @return RootBeanDefinition实例，是Spring在运行时统一的bean定义实体
 	 * @throws BeanDefinitionStoreException in case of an invalid bean definition
 	 */
-	// tofix containingBd 是啥意思
 	protected RootBeanDefinition getMergedBeanDefinition(
 			String beanName, BeanDefinition bd, @Nullable BeanDefinition containingBd)
 			throws BeanDefinitionStoreException {
@@ -1225,23 +1282,29 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 		synchronized (this.mergedBeanDefinitions) {
 			RootBeanDefinition mbd = null;
 
-			// Check with full lock now in order to enforce the same merged instance.
-			// 译文：现在使用full lock进行检查，以执行相同的合并实例。
+			// containingBd == null 则表示当前的bd是普通bean定义，有可能已经调过当前方法，所以尝试从 mergedBeanDefinitions 缓存获取之前创建的实例
+			// 如果containingBd不等于null，则表示当前的Bean定义是<bean/>中的<property/>里的子<bean/>，不会放在 mergedBeanDefinitions 缓存里，也就不用获取
 			if (containingBd == null) {
 				mbd = this.mergedBeanDefinitions.get(beanName);
 			}
 
+			// 如果mdb为空，则说明之前没有生成过本beanName的bean定义，继续执行
 			if (mbd == null) {
+				// 如果bd的parentName为空，则表示普通的<bean/>
 				if (bd.getParentName() == null) {
-					// Use copy of given root bean definition.
+					// tofix 执行过程中没有遇到本场景，不讲解
 					if (bd instanceof RootBeanDefinition) {
 						mbd = ((RootBeanDefinition) bd).cloneBeanDefinition();
 					}
-					// tofix 如果不存在父类<beans/>,则初始化 RootBeanDefinition
 					else {
+						// 走本分支
+						// bd 是GenericBeanDefinition实例，和RootBeanDefinition没有继承关系
+						// 实例化 RootBeanDefinition
 						mbd = new RootBeanDefinition(bd);
 					}
 				}
+				// 一般不使用，不讲解
+				// 如果bd的parentName为不空，则表示指定了parent属性
 				else {
 					// Child bean definition: needs to be merged with parent.
 					BeanDefinition pbd;
@@ -1271,7 +1334,8 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 					mbd.overrideFrom(bd);
 				}
 
-				// 如果没有设置 mbd 的单例范围，则赋值为默认值 "singleton"
+				// 如果没有设置 mbd 的作用域，则赋值为默认值 "singleton"
+				// mbd默认是不会设置作用域，所以会走本逻辑
 				if (!StringUtils.hasLength(mbd.getScope())) {
 					mbd.setScope(RootBeanDefinition.SCOPE_SINGLETON);
 				}
@@ -1280,25 +1344,21 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 				// Let's correct this on the fly here, since this might be the result of
 				// parent-child merging for the outer bean, in which case the original inner bean
 				// definition will not have inherited the merged outer bean's singleton status.
-				// 译文：
-				// 非单例bean中包含的bean本身不能是单例的。
-				// 让我们在这里动态地修正一下，因为这可能是外部bean的父-子合并的结果，在这种情况下，原始的内部bean定义将不会继承合并后的外部bean的单例状态。
-				// tofix 作用
+
+				// 一般不使用，不需要阅读
+				// 这个判断的意思：
+				// 针对”如果当前传入的bean定义是<bean/>中的<property/>里的子<bean/>“情况；子<bean/>的作用域和<property/>外的一致
 				if (containingBd != null && !containingBd.isSingleton() && mbd.isSingleton()) {
 					mbd.setScope(containingBd.getScope());
 				}
 
 				// Cache the merged bean definition for the time being
 				// (it might still get re-merged later on in order to pick up metadata changes)
-				// 译文：
-				// 暂时缓存合并的bean定义
-				// (为了收集元数据的变化，它可能会在以后重新合并)
 
-				// 如果isCacheBeanMetadata方法返回true 并且 containingBd为空
-				// isCacheBeanMetadata 表示是否缓存bean元数据（false：每次访问重新获取）
+				// 如果当前传入的bean定义是普通的<bean/>,并且允许缓存RootBeanDefinition（默认允许）
+				// isCacheBeanMetadata 表示是否在mergedBeanDefinitions缓存 RootBeanDefinition 实例，默认true
 				if (containingBd == null && isCacheBeanMetadata()) {
-					// 以beanName->RootBeanDefinition形式向 mergedBeanDefinitions 缓存里添加
-					// tofix mergedBeanDefinitions 表示什么
+					// 以beanName->RootBeanDefinition形式向 mergedBeanDefinitions 缓存里添加值
 					this.mergedBeanDefinitions.put(beanName, mbd);
 				}
 			}

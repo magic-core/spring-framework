@@ -346,11 +346,23 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 		return getBeanNamesForType(type, true, true);
 	}
 
+	/**
+	 * 根据类型获得bean定义的名字（beanName）
+	 *
+	 * @param type the class or interface to match, or {@code null} for all bean names
+	 * @param includeNonSingletons whether to include prototype or scoped beans too
+	 * or just singletons (also applies to FactoryBeans)
+	 * @param allowEagerInit whether to initialize <i>lazy-init singletons</i> and
+	 * <i>objects created by FactoryBeans</i> (or by factory methods with a
+	 * "factory-bean" reference) for the type check. Note that FactoryBeans need to be
+	 * eagerly initialized to determine their type: So be aware that passing in "true"
+	 * for this flag will initialize FactoryBeans and "factory-bean" references.
+	 * @return
+	 */
 	@Override
 	public String[] getBeanNamesForType(@Nullable Class<?> type, boolean includeNonSingletons, boolean allowEagerInit) {
-		// 如果 configurationFrozen 为false，或者allowEagerInit为false、或者 allowEagerInit为false
 		// configurationFrozen 标志所有bean的bean定义元数据是否已经被缓存，默认为false
-		// tofix 执行场景未弄清
+		// tofix 代码含义没有弄明白，执行场景未弄清
 		if (!isConfigurationFrozen() || type == null || !allowEagerInit) {
 			return doGetBeanNamesForType(ResolvableType.forRawClass(type), includeNonSingletons, allowEagerInit);
 		}
@@ -367,17 +379,33 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 		return resolvedBeanNames;
 	}
 
+	/**
+	 * 根据type获取bean定义的名字
+	 *
+	 * @param type bean定义的类型
+	 * @param includeNonSingletons
+	 * @param allowEagerInit
+	 * @return
+	 */
 	private String[] doGetBeanNamesForType(ResolvableType type, boolean includeNonSingletons, boolean allowEagerInit) {
 		List<String> result = new ArrayList<>();
 
-		// Check all bean definitions.
 		for (String beanName : this.beanDefinitionNames) {
 			// Only consider bean as eligible if the bean name
 			// is not defined as alias for some other bean.
 			if (!isAlias(beanName)) {
 				try {
+					// 获得beanName的bean定义（RootBeanDefinition实例）；
+					// 因为Spring有parent属性等相关功能，所以会进行对父子bean进行类似合并操作，所以会最后合并成RootBeanDefinition实例，区分GenericBeanDefinition实例（没有进行合并操作）
 					RootBeanDefinition mbd = getMergedLocalBeanDefinition(beanName);
-					// Only check bean definition if it is complete.
+					// tofix 现在认为这个判断的含义是判断是否可能实例化
+					// 但是如果是判断是否可以实例化，requiresEagerInitForType是什么意思呢？
+					// 什么方法会触发实例化呢？应该是isTypeMatch会实例化
+					// 包括后面又有很多逻辑，实在是不明白什么意思？
+					// 这种：：根据传参判断执行分支、并且判断的因素还有非常多的，尝试过很多学习方式：
+					// 1.查看当前方法的调用代码，但是调用代码没有见过，不知道什么意思
+					// 2.查阅了很多资料，但是讲的不是流水账、就是翻译英文翻译、要不就是深入说了一点，但是任然部门明白
+					// 3.现在尝试第三种方法，就是把后面的逻辑阅读完，再回头看这里
 					if (!mbd.isAbstract() && (allowEagerInit ||
 							(mbd.hasBeanClass() || !mbd.isLazyInit() || isAllowEagerClassLoading()) &&
 									!requiresEagerInitForType(mbd.getFactoryBeanName()))) {
@@ -859,7 +887,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 			this.frozenBeanDefinitionNames = null;
 		}
 
-		// 在适应Spring时，应该将允许定义重复beanName（id）的配置设置为false，所以正常情况不会执行本代码，不讲解
+		// 在使用Spring时，应该将允许定义重复beanName（id）的配置设置为false，所以正常情况不会执行本代码，不讲解
 		// 如果已经执行过当前方法，注册过相同beanName的bean定义；
 		// 或者调用了DefaultListableBeanFactory.registerSingleton(String beanName, Object singletonObject)方法，实例化了相同beanName的单例bean
 		// existingDefinition 表示是否执行了当前方法，注册了相同 beanName（beanName一般指的是<bean/>相同的id值）的bean定义

@@ -581,13 +581,24 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		return exposedObject;
 	}
 
+	/**
+	 * 获取mbd指代的类型，即<bean/>中的class
+	 *
+	 * @param beanName the name of the bean
+	 * @param mbd the merged bean definition to determine the type for
+	 * @param typesToMatch the types to match in case of internal type matching purposes
+	 * (also signals that the returned {@code Class} will never be exposed to application code)
+	 * @return
+	 */
 	@Override
 	@Nullable
 	protected Class<?> predictBeanType(String beanName, RootBeanDefinition mbd, Class<?>... typesToMatch) {
+		// 获取mbd指代的类型，即<bean/>中的class
 		Class<?> targetType = determineTargetType(beanName, mbd, typesToMatch);
 
-		// Apply SmartInstantiationAwareBeanPostProcessors to predict the
-		// eventual type after a before-instantiation shortcut.
+		// 当前案例没有用到实现了 hasInstantiationAwareBeanPostProcessors 的类，不讲解
+		// 如果mbd的synthetic为false（默认为false，只有AOP切面相关的，才会为true），并且 hasInstantiationAwareBeanPostProcessors 为true
+		// hasInstantiationAwareBeanPostProcessors 表示是否注册了任何继承于 InstantiationAwareBeanPostProcessor 的Bean
 		if (targetType != null && !mbd.isSynthetic() && hasInstantiationAwareBeanPostProcessors()) {
 			for (BeanPostProcessor bp : getBeanPostProcessors()) {
 				if (bp instanceof SmartInstantiationAwareBeanPostProcessor) {
@@ -604,6 +615,8 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	}
 
 	/**
+	 * 获取mbd指代的类型，即<bean/>中的class
+	 *
 	 * Determine the target type for the given bean definition.
 	 * @param beanName the name of the bean (for error handling purposes)
 	 * @param mbd the merged bean definition for the bean
@@ -613,7 +626,11 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	 */
 	@Nullable
 	protected Class<?> determineTargetType(String beanName, RootBeanDefinition mbd, Class<?>... typesToMatch) {
+		// targetType 代表mbd指代bean定义的类
 		Class<?> targetType = mbd.getTargetType();
+		// 一般不使用，不讲解
+		// 如果获得的 targetType 等于空，则说明使用factory-bean生成的实例，所以没有指定<bean/>中的class
+		// targetType 来自 mbd 的 resolvedTargetType 属性
 		if (targetType == null) {
 			targetType = (mbd.getFactoryMethodName() != null ?
 					getTypeForFactoryMethod(beanName, mbd, typesToMatch) :

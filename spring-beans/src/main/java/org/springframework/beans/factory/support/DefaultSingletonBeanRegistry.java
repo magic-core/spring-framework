@@ -155,6 +155,8 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	}
 
 	/**
+	 *
+	 *
 	 * Return the (raw) singleton object registered under the given name.
 	 * <p>Checks already instantiated singletons and also allows for an early
 	 * reference to a currently created singleton (resolving a circular reference).
@@ -164,9 +166,9 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	 */
 	@Nullable
 	protected Object getSingleton(String beanName, boolean allowEarlyReference) {
-		// 从单例缓存中获取bean实例
+		// 从singletonObjects中获取bean实例（singletonObjects在实例化bean定义时，进行的赋值）
 		Object singletonObject = this.singletonObjects.get(beanName);
-		// tofix 不常用，本Demo不走本分支，暂不细讲 ==分割线start==
+		// singletonsCurrentlyInCreation
 		if (singletonObject == null && isSingletonCurrentlyInCreation(beanName)) {
 			synchronized (this.singletonObjects) {
 				singletonObject = this.earlySingletonObjects.get(beanName);
@@ -181,7 +183,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 				}
 			}
 		}
-		// tofix ==分割线end==
+
 		return singletonObject;
 	}
 

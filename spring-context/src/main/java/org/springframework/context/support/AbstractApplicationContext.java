@@ -506,16 +506,16 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 			prepareBeanFactory(beanFactory);
 
 			try {
+				// 空实现，不讲解
 				// postProcessBeanFactory方法从 AbstractApplicationContext 继承而来，实现为空;
-				// 切换企业实战后，从 AbstractRefreshableWebApplicationContext 继承，再详细讲解
+				// tofix 切换企业实战后，从 AbstractRefreshableWebApplicationContext 继承，再详细讲解
 				postProcessBeanFactory(beanFactory);
-				// 执行实现 BeanFactoryPostProcessor 接口的类的方法：postProcessBeanFactory
+
+				// Spring将bean工厂对象作为参数，调用所有实现了 BeanDefinitionRegistryPostProcessor、BeanFactoryPostProcessor 的bean的重写方法，借此让这些bean自定义处理逻辑
 				invokeBeanFactoryPostProcessors(beanFactory);
-				// tofix ==分割线end==
 
 				// 向bean工厂注册实现 BeanPostProcessor 接口的类
 				// 实现 BeanPostProcessor 接口的类，可以在Spring中的bean定义实例化前后，分别调用 postProcessBeforeInitialization 和 postProcessAfterInitialization 方法
-				//tofix 待完善
 				registerBeanPostProcessors(beanFactory);
 
 				// Initialize message source for this context.
@@ -700,20 +700,24 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	}
 
 	/**
+	 * 执行场景：bean定义组装好实体后，实例化前
+	 * 作用：Spring将bean工厂对象作为参数，调用所有实现了 BeanDefinitionRegistryPostProcessor、BeanFactoryPostProcessor 的bean的重写方法，借此让这些bean自定义处理逻辑
+	 * 大体逻辑：
+	 * 1.查找所有实现了 BeanDefinitionRegistryPostProcessor 的bean，遍历执行重写方法,将bean工厂对象作为参数
+	 * 2.查找所有实现了 BeanFactoryPostProcessor 的bean，遍历执行重写方法,将bean工厂对象作为参数
+	 *
 	 * Instantiate and invoke all registered BeanFactoryPostProcessor beans,
 	 * respecting explicit order if given.
 	 * <p>Must be called before singleton instantiation.
-	 * 实例化并调用所有已注册的BeanFactoryPostProcessor bean，如果给定则遵循显式顺序。
-	 * 必须在单例实例化之前调用。
+	 * @param beanFactory
 	 */
 	protected void invokeBeanFactoryPostProcessors(ConfigurableListableBeanFactory beanFactory) {
+
+		// Spring将bean工厂对象作为参数，调用所有实现了 BeanDefinitionRegistryPostProcessor、BeanFactoryPostProcessor 的bean的重写方法，借此让这些bean自定义处理逻辑
 		PostProcessorRegistrationDelegate.invokeBeanFactoryPostProcessors(beanFactory, getBeanFactoryPostProcessors());
 
-		// Detect a LoadTimeWeaver and prepare for weaving, if found in the meantime
-		// (e.g. through an @Bean method registered by ConfigurationClassPostProcessor)
-		// 检测LoadTimeWeaver并准备编织，如果同时发现
-		// (例如，通过ConfigurationClassPostProcessor注册的@Bean方法)
-
+		// 不常用，不讲解
+		// 启用类加载期，切面织入（LTW）的相关源码；不是通常使用的切面织入
 		if (beanFactory.getTempClassLoader() == null && beanFactory.containsBean(LOAD_TIME_WEAVER_BEAN_NAME)) {
 			beanFactory.addBeanPostProcessor(new LoadTimeWeaverAwareProcessor(beanFactory));
 			beanFactory.setTempClassLoader(new ContextTypeMatchClassLoader(beanFactory.getBeanClassLoader()));
