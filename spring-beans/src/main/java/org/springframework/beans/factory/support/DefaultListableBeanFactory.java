@@ -347,7 +347,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	}
 
 	/**
-	 * 根据类型获得bean定义的名字（beanName）
+	 * 获得实现指定类的bean定义名（beanName）数组
 	 *
 	 * @param type the class or interface to match, or {@code null} for all bean names
 	 * @param includeNonSingletons whether to include prototype or scoped beans too

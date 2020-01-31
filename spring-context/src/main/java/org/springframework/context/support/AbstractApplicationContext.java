@@ -511,11 +511,10 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				// tofix 切换企业实战后，从 AbstractRefreshableWebApplicationContext 继承，再详细讲解
 				postProcessBeanFactory(beanFactory);
 
-				// Spring将bean工厂对象作为参数，调用所有实现了 BeanDefinitionRegistryPostProcessor、BeanFactoryPostProcessor 的bean的重写方法，借此让这些bean自定义处理逻辑
+				// Spring将bean工厂对象作为参数，调用所有实现了 BeanDefinitionRegistryPostProcessor、BeanFactoryPostProcessor 的bean的重写方法，这些bean自定义处理逻辑
 				invokeBeanFactoryPostProcessors(beanFactory);
 
-				// 向bean工厂注册实现 BeanPostProcessor 接口的类
-				// 实现 BeanPostProcessor 接口的类，可以在Spring中的bean定义实例化前后，分别调用 postProcessBeforeInitialization 和 postProcessAfterInitialization 方法
+				// 向bean工厂注册实现 BeanPostProcessor 接口的bean（后置处理器）
 				registerBeanPostProcessors(beanFactory);
 
 				// Initialize message source for this context.
@@ -725,14 +724,12 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	}
 
 	/**
-	 * 向bean工厂注册实现 BeanPostProcessor 接口的类
+	 * 向bean工厂注册实现 BeanPostProcessor 接口的bean（后置处理器）
 	 *
 	 * Instantiate and register all BeanPostProcessor beans,
 	 * respecting explicit order if given.
 	 * <p>Must be called before any instantiation of application beans.
-	 * 译文：
-	 * 实例化并注册所有BeanPostProcessor bean，如果给定，则遵循显式顺序。
-	 * 必须在应用程序bean的任何实例化之前调用
+	 * @param beanFactory
 	 */
 	protected void registerBeanPostProcessors(ConfigurableListableBeanFactory beanFactory) {
 		PostProcessorRegistrationDelegate.registerBeanPostProcessors(beanFactory, this);

@@ -215,7 +215,7 @@ final class PostProcessorRegistrationDelegate {
 		List<String> orderedPostProcessorNames = new ArrayList<>();
 		List<String> nonOrderedPostProcessorNames = new ArrayList<>();
 
-		// 获得类型是 BeanPostProcessor 的beanName集合
+		// 获得实现了 BeanPostProcessor 的bean的beanName集合
 		String[] postProcessorNames = beanFactory.getBeanNamesForType(BeanPostProcessor.class, true, false);
 
 		/**将实现 BeanPostProcessor 的 BeanPostProcessorChecker 注册到bean工厂的后置处理器列表里*/
@@ -224,7 +224,7 @@ final class PostProcessorRegistrationDelegate {
 		beanFactory.addBeanPostProcessor(new BeanPostProcessorChecker(beanFactory, beanProcessorTargetCount));
 
 
-		/**组装 BeanPostProcessor 相关集合数据*/
+		/**根据实现种类，组装 BeanPostProcessor 集合数据*/
 		for (String ppName : postProcessorNames) {
 			// 如果当前ppName所指的bean，还实现了PriorityOrdered
 			if (beanFactory.isTypeMatch(ppName, PriorityOrdered.class)) {
