@@ -296,7 +296,7 @@ public class BeanDefinitionParserDelegate {
 	 */
 	protected void populateDefaults(DocumentDefaultsDefinition defaults, @Nullable DocumentDefaultsDefinition parentDefaults, Element root) {
 		// 获得xml中<beans>标签配置的"default-lazy-init"属性,默认false，表示全局是否开启懒加载
-		// 懒加载，就是不在一开始进行加载bean定义到Spring容器里，而是在使用的时候，再去加载；工作中一般不使用，除非应用有很多bean要去加载，已经成为了系统瓶颈
+		// 懒加载，就是不在一开始进行加载bean定义到Spring容器里，而是在使用的时候，再去加载；工作中Demo不涉及，除非应用有很多bean要去加载，已经成为了系统瓶颈
 		String lazyInit = root.getAttribute(DEFAULT_LAZY_INIT_ATTRIBUTE);
 		// 如果配置的值是"default"或者是""
 		if (isDefaultValue(lazyInit)) {
@@ -425,7 +425,7 @@ public class BeanDefinitionParserDelegate {
 		// 获得<bean/>节点的id属性，例：persion
 		String id = ele.getAttribute(ID_ATTRIBUTE);
 
-		// 获得<bean/>节点的name属性，一般Spring的使用不定义name属性，所以不讲解本内容
+		// 获得<bean/>节点的name属性，一般Spring的使用不定义name属性，所以暂不讲解本内容
 		String nameAttr = ele.getAttribute(NAME_ATTRIBUTE);
 		List<String> aliases = new ArrayList<>();
 		if (StringUtils.hasLength(nameAttr)) {
@@ -435,7 +435,7 @@ public class BeanDefinitionParserDelegate {
 
 		// beanName表示<bean/>标签的id属性
 		String beanName = id;
-		// 没有设置<bean/>中的id和name,会走本分支,一般都指定id，所以不讲解本代码
+		// 没有设置<bean/>中的id和name,会走本分支,一般都指定id，所以暂不讲解本代码
 		if (!StringUtils.hasText(beanName) && !aliases.isEmpty()) {
 			beanName = aliases.remove(0);
 			if (logger.isDebugEnabled()) {
@@ -455,7 +455,7 @@ public class BeanDefinitionParserDelegate {
 		// 解析ele(<bean/>)节点,初始化bd（GenericBeanDefinition）实例
 		AbstractBeanDefinition beanDefinition = parseBeanDefinitionElement(ele, beanName, containingBean);
 		if (beanDefinition != null) {
-			// 如果没有指定<bean/>中的id或name，则会走当前分支，但是一般都会指定id，所以不讲解本代码块
+			// 如果没有指定<bean/>中的id或name，则会走当前分支，但是一般都会指定id，所以暂不讲解本代码块
 			if (!StringUtils.hasText(beanName)) {
 				try {
 					if (containingBean != null) {
@@ -542,7 +542,7 @@ public class BeanDefinitionParserDelegate {
 			className = ele.getAttribute(CLASS_ATTRIBUTE).trim();
 		}
 
-		// parent表示当前<bean/>设置的"parent"属性（如果设置了），一般不使用
+		// parent表示当前<bean/>设置的"parent"属性（如果设置了），Demo不涉及
 		String parent = null;
 		if (ele.hasAttribute(PARENT_ATTRIBUTE)) {
 			parent = ele.getAttribute(PARENT_ATTRIBUTE);
@@ -561,12 +561,12 @@ public class BeanDefinitionParserDelegate {
 			// 当前Demo,extractSource没有实现逻辑,直接返回空
 			bd.setSource(extractSource(ele));
 
-			/**一般不使用,不讲解*/
+			/**Demo不涉及,暂不讲解*/
 			// 获得bean标签里的"description"节点,用于告诉开发人员关于bean的描述;
 			bd.setDescription(DomUtils.getChildElementValueByTagName(ele, DESCRIPTION_ELEMENT));
 			// 用于解析<bean/>下的<meta key="" value=""/>标签,set到bd里;
 			parseMetaElements(ele, bd);
-			// 用于解析<bean/>下的"lookup-method"标签,set到bd里;一般并使用,不讲解
+			// 用于解析<bean/>下的"lookup-method"标签,set到bd里;一般并使用,暂不讲解
 			// 例:<lookup-method name="getLatestBean" bean="latestBean"/>,name指的是作用的方法（getLatestBean）,bean指的是返回的bean实例;
 			// getLatestBean返回的是latestBean的父类，也就是说在调用getLatestBean方法时,返回值向上转型为指定的bean属性
 			parseLookupOverrideSubElements(ele, bd.getMethodOverrides());
@@ -942,7 +942,7 @@ public class BeanDefinitionParserDelegate {
 			Object val = parsePropertyValue(ele, bd, propertyName);
 			// 将<property/>中的name和值封装到pv(PropertyValue)里
 			PropertyValue pv = new PropertyValue(propertyName, val);
-			// 如果<property/>里配置了<meta key="" value=""/>标签,则也解析到pv里,基本不用,不讲解
+			// 如果<property/>里配置了<meta key="" value=""/>标签,则也解析到pv里,基本不用,暂不讲解
 			parseMetaElements(ele, pv);
 			// 当前Demo,extractSource没有实现逻辑,直接返回空
 			pv.setSource(extractSource(ele));

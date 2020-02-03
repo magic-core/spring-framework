@@ -720,6 +720,11 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 		return (this.configurationFrozen || super.isBeanEligibleForMetadataCaching(beanName));
 	}
 
+	/**
+	 * 实例化所有还没有实例化的(非“懒加载”、非抽象)单例Bean
+	 *
+	 * @throws BeansException
+	 */
 	@Override
 	public void preInstantiateSingletons() throws BeansException {
 		if (logger.isDebugEnabled()) {
@@ -730,14 +735,15 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 		// While this may not be part of the regular factory bootstrap, it does otherwise work fine.
 		List<String> beanNames = new ArrayList<>(this.beanDefinitionNames);
 
-		// Trigger initialization of all non-lazy singleton beans...
+		// 遍历所有beanName，实例化Bean
 		for (String beanName : beanNames) {
-			// tofix 合并父 Bean 中的配置，例：<bean parent="" /> 不常用，在本Demo中，无逻辑执行，暂不细讲
+			// 获得beanName的RootBeanDefinition实例
 			RootBeanDefinition bd = getMergedLocalBeanDefinition(beanName);
-			// 如果xml文件的bean定义没有配置"abstract=true"、并且bean是单例，非懒加载的
+			// 如果bean定义没有配置"abstract=true"（不实例化）、scope="prototype"(原型模式)、lazy-init="true"(懒加载)
 			if (!bd.isAbstract() && bd.isSingleton() && !bd.isLazyInit()) {
-				// tofix 不常用，在本Demo中不涉及，暂不细讲 ==分割线start==
-				// 如果是通过FactoryBean的方式创建的
+				// Demo不涉及，暂不讲解
+				// 执行场景：如果是通过 FactoryBean 的方式创建的bean实例，会被执行
+				// 作用：用于 FactoryBean 方式的实例化
 				if (isFactoryBean(beanName)) {
 					Object bean = getBean(FACTORY_BEAN_PREFIX + beanName);
 					if (bean instanceof FactoryBean) {
@@ -757,14 +763,16 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 						}
 					}
 				}
-				// tofix ==分割线end==
+				/**实例化Bean*/
 				else {
 					getBean(beanName);
 				}
 			}
 		}
 
-		// Trigger post-initialization callback for all applicable beans...
+		// Demo不涉及，暂不讲解
+		// 使用场景：如果使用者定义了实现 SmartInitializingSingleton 接口的bean的话，本代码会在所有bean实例化后被执行
+		// 代码作用：调用 SmartInitializingSingleton 的 afterSingletonsInstantiated 方法
 		for (String beanName : beanNames) {
 			Object singletonInstance = getSingleton(beanName);
 			if (singletonInstance instanceof SmartInitializingSingleton) {
@@ -805,7 +813,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 		// beanDefinition是GenericBeanDefinition类,继承AbstractBeanDefinition,所以走本分支
 		if (beanDefinition instanceof AbstractBeanDefinition) {
 			try {
-				// 一般不使用,不讲解
+				// Demo不涉及,暂不讲解
 				// 当前方法只有<bean/>对应的class属性为Class类型时才起作用，比如XXX.class
 				((AbstractBeanDefinition) beanDefinition).validate();
 			}
@@ -855,7 +863,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 		else {
 			// 校验 alreadyCreated 集合是否已经存在元素，alreadyCreated 表示 已经被实例化的bean定义集合
 			// 只有当spring在启动并且已经有bean定义被实例化时，又调用了refresh方法（进行刷新bean定义操作）；才会执行当前代码块
-			// 一般不使用 Spring启动后的再刷新，不讲解
+			// Demo不涉及 Spring启动后的再刷新，暂不讲解
 			if (hasBeanCreationStarted()) {
 				// Cannot modify startup-time collection elements anymore (for stable iteration)
 				synchronized (this.beanDefinitionMap) {
@@ -877,7 +885,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 				this.beanDefinitionMap.put(beanName, beanDefinition);
 				// beanDefinitionNames 表示通过调用当前方法得到的bean定义的名字（beanName）
 				this.beanDefinitionNames.add(beanName);
-				// 一般不使用，为空集合
+				// Demo不涉及，为空集合
 				// manualSingletonNames 表示通过调用 DefaultListableBeanFactory.registerSingleton(String beanName, Object singletonObject) 方法手动注册的单例bean定义的名字（beanName）,例如：new ClassPathXmlApplicationContext("classpath:applicationContext.xml").getBeanFactory().registerSingleton("testName", new Test());
 				// 因为Spring通过当前方法注册了该beanName，所以根据beanName将 manualSingletonNames 里的删除了
 				this.manualSingletonNames.remove(beanName);
@@ -887,7 +895,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 			this.frozenBeanDefinitionNames = null;
 		}
 
-		// 在使用Spring时，应该将允许定义重复beanName（id）的配置设置为false，所以正常情况不会执行本代码，不讲解
+		// 在使用Spring时，应该将允许定义重复beanName（id）的配置设置为false，所以正常情况不会执行本代码，暂不讲解
 		// 如果已经执行过当前方法，注册过相同beanName的bean定义；
 		// 或者调用了DefaultListableBeanFactory.registerSingleton(String beanName, Object singletonObject)方法，实例化了相同beanName的单例bean
 		// existingDefinition 表示是否执行了当前方法，注册了相同 beanName（beanName一般指的是<bean/>相同的id值）的bean定义

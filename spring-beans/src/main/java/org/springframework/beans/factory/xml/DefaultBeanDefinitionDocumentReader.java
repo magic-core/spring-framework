@@ -129,7 +129,7 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 	 * @param root
 	 */
 	protected void doRegisterBeanDefinitions(Element root) {
-		// parent 局部变量，一般不使用，不讲解；表示当前<beans/>的父<beans/>中的bean定义解析委托类 BeanDefinitionParserDelegate 实例；
+		// parent 局部变量，Demo不涉及，暂不讲解；表示当前<beans/>的父<beans/>中的bean定义解析委托类 BeanDefinitionParserDelegate 实例；
 		BeanDefinitionParserDelegate parent = this.delegate;
 
 		// delegate成员变量，代表 BeanDefinitionParserDelegate 实例(bean定义的解析委托类),定义了解析XML文件（Doc形式）的一系列方法，是核心解析器
@@ -138,7 +138,7 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 
 		// 如果node隶属默认命名空间”http://www.springframework.org/schema/beans“（即非使用者自定义的node节点）
 		if (this.delegate.isDefaultNamespace(root)) {
-			// 一般不使用，不讲解；profileSpec表示root节点(即<beans/>)的"profile"属性,可以根据指定的环境变量，动态切换<beans/>
+			// Demo不涉及，暂不讲解；profileSpec表示root节点(即<beans/>)的"profile"属性,可以根据指定的环境变量，动态切换<beans/>
 			String profileSpec = root.getAttribute(PROFILE_ATTRIBUTE);
 			if (StringUtils.hasText(profileSpec)) {
 				String[] specifiedProfiles = StringUtils.tokenizeToStringArray(
@@ -293,7 +293,7 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 						"Failed to import bean definitions from URL location [" + location + "]", ele, ex);
 			}
 		}
-		// 如果是相对路径；一般不使用，不讲解
+		// 如果是相对路径；Demo不涉及，暂不讲解
 		else {
 			// No URL -> considering resource location as relative to the current file.
 			try {
@@ -359,7 +359,7 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 		// 解析bean节点中的信息,创建BeanDefinitionHolder实例,是xml文件bean定义信息对应实体的持有者,也就是说通过<bean/>解析出的对象是bdHolder的一个成员变量
 		BeanDefinitionHolder bdHolder = delegate.parseBeanDefinitionElement(ele);
 		if (bdHolder != null) {
-			// 一般不使用，不讲解；这个方法是用于解析xml文件中<bean/>里使用者自己开发的自定义标签，使用自定义标签需要另编写XSD文件、命名空间解析器等；
+			// Demo不涉及，暂不讲解；这个方法是用于解析xml文件中<bean/>里使用者自己开发的自定义标签，使用自定义标签需要另编写XSD文件、命名空间解析器等；
 			bdHolder = delegate.decorateBeanDefinitionIfRequired(ele, bdHolder);
 
 			try {

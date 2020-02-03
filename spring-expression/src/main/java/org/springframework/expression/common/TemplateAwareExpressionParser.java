@@ -16,16 +16,16 @@
 
 package org.springframework.expression.common;
 
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Deque;
-import java.util.List;
-
 import org.springframework.expression.Expression;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.ParseException;
 import org.springframework.expression.ParserContext;
 import org.springframework.lang.Nullable;
+
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Deque;
+import java.util.List;
 
 /**
  * An expression parser that understands templates. It can be subclassed by expression
@@ -43,9 +43,18 @@ public abstract class TemplateAwareExpressionParser implements ExpressionParser 
 		return parseExpression(expressionString, null);
 	}
 
+	/**
+	 * 返回LiteralExpression实例（Pojo对象）（封装"expressionString"字符串）
+	 *
+	 * @param expressionString 要解析的字符串
+	 * @param context 用于包含${表达式}的复杂情况，本Demo执行源码用不到
+	 * @return
+	 * @throws ParseException
+	 */
 	@Override
 	public Expression parseExpression(String expressionString, @Nullable ParserContext context) throws ParseException {
 		if (context != null && context.isTemplate()) {
+			// 返回LiteralExpression实例（Pojo对象）（封装"expressionString"字符串）
 			return parseTemplate(expressionString, context);
 		}
 		else {
@@ -54,21 +63,34 @@ public abstract class TemplateAwareExpressionParser implements ExpressionParser 
 	}
 
 
+	/**
+	 * 返回LiteralExpression实例（Pojo对象）（封装"expressionString"字符串）
+	 *
+	 * @param expressionString 要解析的字符串
+	 * @param context 用于包含${表达式}的复杂情况，本Demo执行源码用不到
+	 * @return
+	 * @throws ParseException
+	 */
 	private Expression parseTemplate(String expressionString, ParserContext context) throws ParseException {
 		if (expressionString.isEmpty()) {
 			return new LiteralExpression("");
 		}
-
+		// 返回LiteralExpression实例（Pojo对象）（封装"expressionString"字符串）
 		Expression[] expressions = parseExpressions(expressionString, context);
+		// 本Demo，走本分支
 		if (expressions.length == 1) {
 			return expressions[0];
 		}
+		// Demo不涉及，暂不讲解
+		// 只针对"expressionString"包含${表达式}的复杂情况
 		else {
 			return new CompositeStringExpression(expressionString, expressions);
 		}
 	}
 
 	/**
+	 * 返回LiteralExpression实例（封装expressionString字符串）
+	 *
 	 * Helper that parses given expression string using the configured parser. The
 	 * expression string can contain any number of expressions all contained in "${...}"
 	 * markers. For instance: "foo${expr0}bar${expr1}". The static pieces of text will
@@ -88,11 +110,13 @@ public abstract class TemplateAwareExpressionParser implements ExpressionParser 
 	 */
 	private Expression[] parseExpressions(String expressionString, ParserContext context) throws ParseException {
 		List<Expression> expressions = new ArrayList<>();
-		String prefix = context.getExpressionPrefix();
-		String suffix = context.getExpressionSuffix();
+		String prefix = context.getExpressionPrefix();// "#{"
+		String suffix = context.getExpressionSuffix();// "}"
 		int startIdx = 0;
 
 		while (startIdx < expressionString.length()) {
+			// Demo不涉及，暂不讲解
+			// 以下逻辑是 expressionString 包含"#{表达式}的处理逻辑
 			int prefixIndex = expressionString.indexOf(prefix, startIdx);
 			if (prefixIndex >= startIdx) {
 				// an inner expression was found - this is a composite
@@ -122,7 +146,7 @@ public abstract class TemplateAwareExpressionParser implements ExpressionParser 
 				startIdx = suffixIndex + suffix.length();
 			}
 			else {
-				// no more ${expressions} found in string, add rest as static text
+				// expressionString 字符串中不存在${表达式}，直接添加静态文本
 				expressions.add(new LiteralExpression(expressionString.substring(startIdx)));
 				startIdx = expressionString.length();
 			}

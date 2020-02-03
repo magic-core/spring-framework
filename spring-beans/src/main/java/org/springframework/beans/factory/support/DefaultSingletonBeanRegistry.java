@@ -208,8 +208,11 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 				if (logger.isDebugEnabled()) {
 					logger.debug("Creating shared instance of singleton bean '" + beanName + "'");
 				}
-				// 判断 beanName 是否正在创建中；如果是，则抛出异常
+
+				// 1.如果 inCreationCheckExclusions(需要使用者添加，默认不包含Bean) 不包含 beanName 并且 singletonsCurrentlyInCreation 不包含 beanName，则抛出异常
+				// 2.同时，调用add方法，向Set类型 singletonsCurrentlyInCreation 添加元素，如果元素重复，返回false
 				beforeSingletonCreation(beanName);
+
 				boolean newSingleton = false;
 				boolean recordSuppressedExceptions = (this.suppressedExceptions == null);
 				if (recordSuppressedExceptions) {
@@ -326,20 +329,17 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	}
 
 	/**
+	 * 1.如果 inCreationCheckExclusions(需要使用者添加，默认不包含Bean) 不包含 beanName 并且 singletonsCurrentlyInCreation 不包含 beanName，则抛出异常
+	 * 2.同时，调用add方法，向Set类型 singletonsCurrentlyInCreation 添加元素，如果元素重复，返回false
+	 *
 	 * Callback before singleton creation.
 	 * <p>The default implementation register the singleton as currently in creation.
-	 *
-	 * 译文：
-	 * 在单例创建之前回调。
-	 * 默认实现注册单例为当前正在创建。
-	 *
 	 * @param beanName the name of the singleton about to be created
 	 * @see #isSingletonCurrentlyInCreation
 	 */
 	protected void beforeSingletonCreation(String beanName) {
-		// 第一步.如果 inCreationCheckExclusions 不包含 beanName 并且 singletonsCurrentlyInCreation 不包含 beanName
-		// 第二步.向 singletonsCurrentlyInCreation 添加 beanName
-		// singletonsCurrentlyInCreation 是 Set 类型，调用add方法，如果元素重复，返回false
+		// 1.如果 inCreationCheckExclusions(需要使用者添加，默认不包含Bean) 不包含 beanName 并且 singletonsCurrentlyInCreation 不包含 beanName，则抛出异常
+		// 2.同时，调用add方法，向Set类型 singletonsCurrentlyInCreation 添加元素，如果元素重复，返回false
 		if (!this.inCreationCheckExclusions.contains(beanName) && !this.singletonsCurrentlyInCreation.add(beanName)) {
 			throw new BeanCurrentlyInCreationException(beanName);
 		}

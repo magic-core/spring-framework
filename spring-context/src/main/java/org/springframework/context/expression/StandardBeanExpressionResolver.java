@@ -16,9 +16,6 @@
 
 package org.springframework.context.expression;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanExpressionException;
 import org.springframework.beans.factory.config.BeanExpressionContext;
@@ -35,6 +32,9 @@ import org.springframework.expression.spel.support.StandardTypeLocator;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
+
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Standard implementation of the
@@ -130,6 +130,14 @@ public class StandardBeanExpressionResolver implements BeanExpressionResolver {
 	}
 
 
+	/**
+	 * 将className字符串值解析为真正的值（因为 value 允许#{表达式}这种形式;当前Demo，仅把请求参数value又返回了）
+	 *
+	 * @param value 要去解析的字符串，即<bean class=""/>中的class值
+	 * @param evalContext the evaluation context
+	 * @return
+	 * @throws BeansException
+	 */
 	@Override
 	@Nullable
 	public Object evaluate(@Nullable String value, BeanExpressionContext evalContext) throws BeansException {
@@ -137,11 +145,16 @@ public class StandardBeanExpressionResolver implements BeanExpressionResolver {
 			return value;
 		}
 		try {
+			/** 获得表达式解析器 */
+			// Map<String, Expression> expressionCache 表示表达式解析器缓存，第一次获取时，肯定为空
 			Expression expr = this.expressionCache.get(value);
 			if (expr == null) {
+				// expr表示 LiteralExpression实例（Pojo对象）（封装了value），this.beanExpressionParserContext在本Demo中不存与逻辑
 				expr = this.expressionParser.parseExpression(value, this.beanExpressionParserContext);
 				this.expressionCache.put(value, expr);
 			}
+
+			// Demo不涉及，暂不解释
 			StandardEvaluationContext sec = this.evaluationCache.get(evalContext);
 			if (sec == null) {
 				sec = new StandardEvaluationContext(evalContext);
@@ -158,6 +171,9 @@ public class StandardBeanExpressionResolver implements BeanExpressionResolver {
 				customizeEvaluationContext(sec);
 				this.evaluationCache.put(evalContext, sec);
 			}
+
+			/** 表达式解析器获得解析后的值*/
+			// 当前Demo中，expr是LiteralExpression实例,sec不参与执行；最后只是原原本本返回value的值
 			return expr.getValue(sec);
 		}
 		catch (Throwable ex) {

@@ -418,20 +418,21 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		if (logger.isDebugEnabled()) {
 			logger.debug("Creating instance of bean '" + beanName + "'");
 		}
+
 		RootBeanDefinition mbdToUse = mbd;
 
-		// Make sure bean class is actually resolved at this point, and
-		// clone the bean definition in case of a dynamically resolved Class
-		// which cannot be stored in the shared merged bean definition.
-		// 确保此时bean类已经解析，并在动态解析的类不能存储在共享合并bean定义中时克隆bean定义。
+		// 获得mbd的beanClass属性
 		Class<?> resolvedClass = resolveBeanClass(mbd, beanName);
+
+		// Demo不涉及，不讲解
 		if (resolvedClass != null && !mbd.hasBeanClass() && mbd.getBeanClassName() != null) {
 			mbdToUse = new RootBeanDefinition(mbd);
 			mbdToUse.setBeanClass(resolvedClass);
 		}
 
-		// Prepare method overrides.
 		try {
+			// Demo不涉及，不讲解
+			// 和<lookup-method/>标签相关
 			mbdToUse.prepareMethodOverrides();
 		}
 		catch (BeanDefinitionValidationException ex) {
@@ -596,9 +597,9 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		// 获取mbd指代的类型，即<bean/>中的class
 		Class<?> targetType = determineTargetType(beanName, mbd, typesToMatch);
 
-		// 当前案例没有用到实现了 hasInstantiationAwareBeanPostProcessors 的类，不讲解
-		// 如果mbd的synthetic为false（默认为false，只有AOP切面相关的，才会为true），并且 hasInstantiationAwareBeanPostProcessors 为true
-		// hasInstantiationAwareBeanPostProcessors 表示是否注册了任何继承于 InstantiationAwareBeanPostProcessor 的Bean
+		// Demo不涉及，暂不讲解
+		// 如果mbd的synthetic为false（默认为false，AOP切面相关），并且 hasInstantiationAwareBeanPostProcessors 为true，才会执行本代码
+		// hasInstantiationAwareBeanPostProcessors 表示是否有注册了实现 InstantiationAwareBeanPostProcessor 的Bean（默认没有）；
 		if (targetType != null && !mbd.isSynthetic() && hasInstantiationAwareBeanPostProcessors()) {
 			for (BeanPostProcessor bp : getBeanPostProcessors()) {
 				if (bp instanceof SmartInstantiationAwareBeanPostProcessor) {
@@ -628,7 +629,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	protected Class<?> determineTargetType(String beanName, RootBeanDefinition mbd, Class<?>... typesToMatch) {
 		// targetType 代表mbd指代bean定义的类
 		Class<?> targetType = mbd.getTargetType();
-		// 一般不使用，不讲解
+		// Demo不涉及，暂不讲解
 		// 如果获得的 targetType 等于空，则说明使用factory-bean生成的实例，所以没有指定<bean/>中的class
 		// targetType 来自 mbd 的 resolvedTargetType 属性
 		if (targetType == null) {
@@ -1003,7 +1004,9 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	protected Object resolveBeforeInstantiation(String beanName, RootBeanDefinition mbd) {
 		Object bean = null;
 		if (!Boolean.FALSE.equals(mbd.beforeInstantiationResolved)) {
-			// Make sure bean class is actually resolved at this point. 如果mbd不是被合成的，并且返回此工厂是否持有一个实例化awarebeanpostprocessor，该处理器将在关闭时应用于单例bean。
+			// Demo不涉及，暂不讲解
+			// 如果mbd的synthetic为false（默认为false，AOP切面相关），并且 hasInstantiationAwareBeanPostProcessors 为true，才会执行本代码
+			// hasInstantiationAwareBeanPostProcessors 表示是否有注册了实现 InstantiationAwareBeanPostProcessor 的Bean（默认没有）；
 			if (!mbd.isSynthetic() && hasInstantiationAwareBeanPostProcessors()) {
 				Class<?> targetType = determineTargetType(beanName, mbd);
 				if (targetType != null) {
