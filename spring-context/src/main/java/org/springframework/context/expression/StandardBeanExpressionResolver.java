@@ -131,9 +131,9 @@ public class StandardBeanExpressionResolver implements BeanExpressionResolver {
 
 
 	/**
-	 * 将className字符串值解析为真正的值（因为 value 允许#{表达式}这种形式;当前Demo，仅把请求参数value又返回了）
+	 * 将value字符串值解析为真正的值（因为 value 允许#{表达式}这种形式;当前Demo，仅把请求参数value又返回了）
 	 *
-	 * @param value 要去解析的字符串，即<bean class=""/>中的class值
+	 * @param value 要去解析的字符串，例<bean class=""/>中的class值、<property ref=""/>中的ref值
 	 * @param evalContext the evaluation context
 	 * @return
 	 * @throws BeansException
@@ -173,7 +173,7 @@ public class StandardBeanExpressionResolver implements BeanExpressionResolver {
 			}
 
 			/** 表达式解析器获得解析后的值*/
-			// 当前Demo中，expr是LiteralExpression实例,sec不参与执行；最后只是原原本本返回value的值
+			// 当前Demo中，expr是LiteralExpression实例,当前Demo，不需要解析#{}，所以只是把value又返回了
 			return expr.getValue(sec);
 		}
 		catch (Throwable ex) {

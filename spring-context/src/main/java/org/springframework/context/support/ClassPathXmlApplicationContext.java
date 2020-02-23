@@ -144,11 +144,11 @@ public class ClassPathXmlApplicationContext extends AbstractXmlApplicationContex
 			String[] configLocations, boolean refresh, @Nullable ApplicationContext parent)
 			throws BeansException {
 		super(parent);
-		// 设置application.xml配置文件路径
+		// 设置application.xml配置文件路径，到configLocations
 		setConfigLocations(configLocations);
-		// 默认true，表示允许启动刷新Spring
+		// 默认true，表示允许启动或刷新Spring
 		if (refresh) {
-			/**执行所有操作*/
+			/** 主线 */
 			refresh();
 		}
 	}

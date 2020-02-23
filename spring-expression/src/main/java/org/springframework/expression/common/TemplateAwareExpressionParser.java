@@ -81,7 +81,7 @@ public abstract class TemplateAwareExpressionParser implements ExpressionParser 
 		if (expressions.length == 1) {
 			return expressions[0];
 		}
-		// Demo不涉及，暂不讲解
+		// Demo不涉及，暂不深解
 		// 只针对"expressionString"包含${表达式}的复杂情况
 		else {
 			return new CompositeStringExpression(expressionString, expressions);
@@ -115,7 +115,7 @@ public abstract class TemplateAwareExpressionParser implements ExpressionParser 
 		int startIdx = 0;
 
 		while (startIdx < expressionString.length()) {
-			// Demo不涉及，暂不讲解
+			// Demo不涉及，暂不深解
 			// 以下逻辑是 expressionString 包含"#{表达式}的处理逻辑
 			int prefixIndex = expressionString.indexOf(prefix, startIdx);
 			if (prefixIndex >= startIdx) {

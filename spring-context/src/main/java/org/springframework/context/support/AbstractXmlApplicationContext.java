@@ -83,18 +83,23 @@ public abstract class AbstractXmlApplicationContext extends AbstractRefreshableC
 		// 创建 XmlBeanDefinitionReader 实例,用于读取application.xml配置文件
 		XmlBeanDefinitionReader beanDefinitionReader = new XmlBeanDefinitionReader(beanFactory);
 
-		// ResourceLoader表示XmlBeanDefinitionReader中具体负责读取application.xml配置文件的类
-		// this表示当前对象 ClassPathXmlApplicationContext，继承自ResourceLoader
+		// resourceLoader在 XmlBeanDefinitionReader 中负责读取application.xml配置文件
+		// this表示当前对象 ClassPathXmlApplicationContext 实例，继承自ResourceLoader
 		beanDefinitionReader.setResourceLoader(this);
 
-		beanDefinitionReader.setEnvironment(this.getEnvironment());// getEnvironment返回StandardEnvironment实例，tofix 作用?
-		// ResourceEntityResolver，最后将作为Document类中的一个成员变量，用于解析dom形式的application.xml文件
+		/** 非主要 */
+		// ResourceEntityResolver，后面的逻辑将作为Document类中的一个成员变量，用于解析dom形式的application.xml文件
 		beanDefinitionReader.setEntityResolver(new ResourceEntityResolver(this));
-
-		// 设置是否验证xml 默认为true
+		/** 无用逻辑-start */
+		// getEnvironment返回StandardEnvironment实例
+		beanDefinitionReader.setEnvironment(this.getEnvironment());
+		// 设置beanDefinitionReader 验证xml (默认验证)
 		initBeanDefinitionReader(beanDefinitionReader);
+		/** 无用逻辑-end */
 
-		/** 真正的加载bean定义操作*/
+
+		/** 主线 */
+		// 真正的加载bean定义操作
 		loadBeanDefinitions(beanDefinitionReader);
 	}
 
@@ -122,16 +127,20 @@ public abstract class AbstractXmlApplicationContext extends AbstractRefreshableC
 	 * @see #getResourcePatternResolver
 	 */
 	protected void loadBeanDefinitions(XmlBeanDefinitionReader reader) throws BeansException, IOException {
-		// AbstractXmlApplicationContext#getConfigResources  返回null
+		/** Demo不涉及-start */
+		// 调用AbstractXmlApplicationContext的getConfigResources，返回空
 		Resource[] configResources = getConfigResources();
 		if (configResources != null) {
 			reader.loadBeanDefinitions(configResources);
 		}
-		// 获取配置文件路径，对应setConfigLocations(configLocations);方法
-		// AbstractXmlApplicationContext#getConfigLocations 例：返回["classpath*:applicationContext.xml"]
+		/** Demo不涉及-end */
+
+		// 获取配置文件路径,例：返回["classpath*:applicationContext.xml"]
+		// 调用AbstractXmlApplicationContext的getConfigLocations方法
 		String[] configLocations = getConfigLocations();
 		if (configLocations != null) {
-			/**解析xml中bean的定义到bean工厂里*/
+			/** 主线 */
+			// 解析xml中bean的定义到bean工厂里
 			reader.loadBeanDefinitions(configLocations);
 		}
 	}

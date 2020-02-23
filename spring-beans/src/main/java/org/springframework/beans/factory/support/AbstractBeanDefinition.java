@@ -869,7 +869,6 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 
 	/**
 	 * Return if there are method overrides defined for this bean.
-	 * 如果此bean定义了方法覆盖，则返回
 	 * @since 5.0.2
 	 */
 	public boolean hasMethodOverrides() {
@@ -952,7 +951,7 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	}
 
 	/**
-	 * 如果mbd的synthetic为false（默认为false，AOP切面相关）
+	 * 默认为false，与AOP切面相关
 	 *
 	 * Return whether this bean definition is 'synthetic', that is,
 	 * not defined by the application itself.

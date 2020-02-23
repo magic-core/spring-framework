@@ -16,15 +16,6 @@
 
 package org.springframework.beans.factory.support;
 
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.TypeConverter;
@@ -32,15 +23,14 @@ import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.beans.factory.FactoryBean;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.beans.factory.config.BeanDefinitionHolder;
-import org.springframework.beans.factory.config.RuntimeBeanNameReference;
-import org.springframework.beans.factory.config.RuntimeBeanReference;
-import org.springframework.beans.factory.config.TypedStringValue;
+import org.springframework.beans.factory.config.*;
 import org.springframework.lang.Nullable;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
+
+import java.lang.reflect.Array;
+import java.util.*;
 
 /**
  * Helper class for use in bean factory implementations,
@@ -84,6 +74,8 @@ class BeanDefinitionValueResolver {
 
 
 	/**
+	 * PropertyValue
+	 *
 	 * Given a PropertyValue, return a value, resolving any references to other
 	 * beans in the factory if necessary. The value could be:
 	 * <li>A BeanDefinition, which leads to the creation of a corresponding
@@ -98,17 +90,18 @@ class BeanDefinitionValueResolver {
 	 * or Collection that will need to be resolved.
 	 * <li>An ordinary object or {@code null}, in which case it's left alone.
 	 * @param argName the name of the argument that the value is defined for
-	 * @param value the value object to resolve
+	 * @param value 表示<property>中指代的值（要去解析的值）
 	 * @return the resolved object
 	 */
 	@Nullable
 	public Object resolveValueIfNecessary(Object argName, @Nullable Object value) {
-		// We must check each value to see whether it requires a runtime reference
-		// to another bean to be resolved.
+		// 如果value是Spring工厂中另一个bean的引用（例：<property name="P" ref="persion_B"/>中的ref）
 		if (value instanceof RuntimeBeanReference) {
 			RuntimeBeanReference ref = (RuntimeBeanReference) value;
+			// 把ref解析为id为persion_B的真正bean实例
 			return resolveReference(argName, ref);
 		}
+		// Demo不涉及，暂不深解-start
 		else if (value instanceof RuntimeBeanNameReference) {
 			String refName = ((RuntimeBeanNameReference) value).getBeanName();
 			refName = String.valueOf(doEvaluate(refName));
@@ -211,6 +204,7 @@ class BeanDefinitionValueResolver {
 		else {
 			return evaluate(value);
 		}
+		// Demo不涉及，暂不深解-end
 	}
 
 	/**
@@ -282,14 +276,23 @@ class BeanDefinitionValueResolver {
 	}
 
 	/**
+	 * 将ref解析为真正的对象
+	 *
 	 * Resolve a reference to another bean in the factory.
+	 * @param argName ref的所属对象，例：ref是<property name="P" ref="persion_B"/>中的ref，argName就是代表<property/>的PropertyValue实例
+	 * @param ref 封装ref信息的RuntimeBeanReference对象
+	 * @return 例：persion对象
 	 */
 	@Nullable
 	private Object resolveReference(Object argName, RuntimeBeanReference ref) {
 		try {
 			Object bean;
+			// refName 表示<property name="P" ref="persion_B"/>中的"persion_B"
 			String refName = ref.getBeanName();
+			// 如果refName包含#{},则进行解析为真正的值
 			refName = String.valueOf(doEvaluate(refName));
+
+			// Demo不涉及，不深解
 			if (ref.isToParent()) {
 				if (this.beanFactory.getParentBeanFactory() == null) {
 					throw new BeanCreationException(
@@ -299,10 +302,14 @@ class BeanDefinitionValueResolver {
 				}
 				bean = this.beanFactory.getParentBeanFactory().getBean(refName);
 			}
+			// Demo走本分支
 			else {
+				// 在bean工厂中获取beanName为refName的bean对象
 				bean = this.beanFactory.getBean(refName);
+				// 在bean工厂中记录bean之间的依赖关系（为了保证：销毁指定Bean之前，需要先销毁它所依赖的Bean）
 				this.beanFactory.registerDependentBean(refName, this.beanName);
 			}
+			// 如果根据refName在Bean工厂中找不到指定Bean对象，返回空
 			if (bean instanceof NullBean) {
 				bean = null;
 			}

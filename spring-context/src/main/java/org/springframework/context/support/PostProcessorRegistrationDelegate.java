@@ -60,7 +60,7 @@ final class PostProcessorRegistrationDelegate {
 
 			List<BeanDefinitionRegistryPostProcessor> registryProcessors = new ArrayList<>();
 
-			// 没有执行场景，暂不讲解
+			/** Demo不涉及-start */
 			// 通过查看调用关系，当前Spring实现来看，beanFactoryPostProcessors一直为空集合。
 			List<BeanFactoryPostProcessor> regularPostProcessors = new ArrayList<>();
 			for (BeanFactoryPostProcessor postProcessor : beanFactoryPostProcessors) {
@@ -74,16 +74,18 @@ final class PostProcessorRegistrationDelegate {
 				}
 			}
 			invokeBeanFactoryPostProcessors(regularPostProcessors, beanFactory);
+			/** Demo不涉及-end */
+
+			/** Demo不涉及-start */
 
 			/**操作实现了 BeanDefinitionRegistryPostProcessor 的bean*/
-
 			List<BeanDefinitionRegistryPostProcessor> currentRegistryProcessors = new ArrayList<>();
 
 			// postProcessorNames 表示实现了 BeanDefinitionRegistryPostProcessor 的所有beanName集合；
 			String[] postProcessorNames =
 					beanFactory.getBeanNamesForType(BeanDefinitionRegistryPostProcessor.class, true, false);
 
-			// 当前Demo没有执行本逻辑,暂不讲解
+			// 当前Demo没有执行本逻辑,暂不深解
 			// 1.只有定义的Bean实现了 BeanDefinitionRegistryPostProcessor 和 PriorityOrdered ，本逻辑才有效，该bean可以在进行实例化bean步骤前，得到bean工厂实例
 			// 循环遍历 postProcessorNames
 			for (String ppName : postProcessorNames) {
@@ -98,8 +100,10 @@ final class PostProcessorRegistrationDelegate {
 			registryProcessors.addAll(currentRegistryProcessors);
 			invokeBeanDefinitionRegistryPostProcessors(currentRegistryProcessors, registry);
 			currentRegistryProcessors.clear();
+			/** Demo不涉及-end */
 
-			// 使用者Demo不涉及，在Spring内部，也没有执行本逻辑的场景，暂不讲解
+			/** Demo不涉及-start */
+			// 使用者Demo不涉及，在Spring内部，也没有执行本逻辑的场景，暂不深解
 			// 2.只有定义的Bean实现了 BeanDefinitionRegistryPostProcessor 和 Ordered,并且没有实现PriorityOrdered ，本逻辑才有效，该bean可以在所有的bean实例化前，得到bean工厂实例
 			postProcessorNames = beanFactory.getBeanNamesForType(BeanDefinitionRegistryPostProcessor.class, true, false);
 			for (String ppName : postProcessorNames) {
@@ -112,8 +116,9 @@ final class PostProcessorRegistrationDelegate {
 			registryProcessors.addAll(currentRegistryProcessors);
 			invokeBeanDefinitionRegistryPostProcessors(currentRegistryProcessors, registry);
 			currentRegistryProcessors.clear();
+			/** Demo不涉及-end */
 
-			// 使用者Demo不涉及，在Spring内部，也没有执行本逻辑的场景，暂不讲解
+			/** Demo不涉及-start */
 			// 3.只有定义的Bean实现了 BeanDefinitionRegistryPostProcessor 并且没有实现PriorityOrdered和Ordered ，本逻辑才有效，该bean可以在所有的bean实例化前，得到bean工厂实例
 			boolean reiterate = true;
 			while (reiterate) {
@@ -140,6 +145,7 @@ final class PostProcessorRegistrationDelegate {
 			// Invoke factory processors registered with the context instance.
 			invokeBeanFactoryPostProcessors(beanFactoryPostProcessors, beanFactory);
 		}
+		/** Demo不涉及-end */
 
 		/**操作实现了 BeanFactoryPostProcessor 的bean*/
 
@@ -150,6 +156,7 @@ final class PostProcessorRegistrationDelegate {
 		// nonOrderedPostProcessorNames 用于装载实现了 BeanFactoryPostProcessor ,但是没有实现任何用于排序的接口的bean的beanName
 		List<String> nonOrderedPostProcessorNames = new ArrayList<>();
 
+		/** Demo不涉及-start */
 		// 获得bean工厂中实现了BeanFactoryPostProcessor的bean定义集合 postProcessorNames
 		String[] postProcessorNames =
 				beanFactory.getBeanNamesForType(BeanFactoryPostProcessor.class, true, false);
@@ -178,8 +185,9 @@ final class PostProcessorRegistrationDelegate {
 		sortPostProcessors(priorityOrderedPostProcessors, beanFactory);
 		// 循环遍历 priorityOrderedPostProcessors集合，执行每个实例的postProcessBeanFactory方法，参数为beanFactory
 		invokeBeanFactoryPostProcessors(priorityOrderedPostProcessors, beanFactory);
+		/** Demo不涉及-end */
 
-		// 当前Demo没有执行本逻辑,暂不讲解
+		/** Demo不涉及-start */
 		// 循环遍历orderedPostProcessorNames，执行每个 BeanFactoryPostProcessor 实例的postProcessBeanFactory方法
 		List<BeanFactoryPostProcessor> orderedPostProcessors = new ArrayList<>();
 		for (String postProcessorName : orderedPostProcessorNames) {
@@ -187,14 +195,17 @@ final class PostProcessorRegistrationDelegate {
 		}
 		sortPostProcessors(orderedPostProcessors, beanFactory);
 		invokeBeanFactoryPostProcessors(orderedPostProcessors, beanFactory);
+		/** Demo不涉及-end */
 
-		// 当前Demo没有执行本逻辑,暂不讲解
+		/** Demo不涉及-start */
+		// 当前Demo没有执行本逻辑,暂不深解
 		// 循环遍历nonOrderedPostProcessorNames，执行每个 BeanFactoryPostProcessor 实例的postProcessBeanFactory方法
 		List<BeanFactoryPostProcessor> nonOrderedPostProcessors = new ArrayList<>();
 		for (String postProcessorName : nonOrderedPostProcessorNames) {
 			nonOrderedPostProcessors.add(beanFactory.getBean(postProcessorName, BeanFactoryPostProcessor.class));
 		}
 		invokeBeanFactoryPostProcessors(nonOrderedPostProcessors, beanFactory);
+		/** Demo不涉及-end */
 
 		// Clear cached merged bean definitions since the post-processors might have
 		// modified the original metadata, e.g. replacing placeholders in values...

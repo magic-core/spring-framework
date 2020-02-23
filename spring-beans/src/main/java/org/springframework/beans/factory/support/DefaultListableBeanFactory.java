@@ -673,8 +673,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	 */
 	@Override
 	public BeanDefinition getBeanDefinition(String beanName) throws NoSuchBeanDefinitionException {
-		// 根据 beanName 获取解析的bean定义
-		// beanDefinitionMap 表示 bean定义缓存,以{bean标签中的id->BeanDefinition}形式,存放从xml文件中解析出来的bean配置
+		// beanDefinitionMap 表示 bean定义缓存,以{beanName->GenericBeanDefinition}形式,存放从xml文件中解析出来的bean定义
 		BeanDefinition bd = this.beanDefinitionMap.get(beanName);
 		if (bd == null) {
 			if (logger.isTraceEnabled()) {
@@ -733,15 +732,19 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 
 		// Iterate over a copy to allow for init methods which in turn register new bean definitions.
 		// While this may not be part of the regular factory bootstrap, it does otherwise work fine.
+
+		// beanDefinitionNames 是在xml定义的Bean的beanName集合，Bean工厂在加载xml配置文件时，会把定义Bean的beanName装在这个集合里
 		List<String> beanNames = new ArrayList<>(this.beanDefinitionNames);
 
 		// 遍历所有beanName，实例化Bean
 		for (String beanName : beanNames) {
-			// 获得beanName的RootBeanDefinition实例
+
+			// 获得beanName的 RootBeanDefinition 实例
 			RootBeanDefinition bd = getMergedLocalBeanDefinition(beanName);
+
 			// 如果bean定义没有配置"abstract=true"（不实例化）、scope="prototype"(原型模式)、lazy-init="true"(懒加载)
 			if (!bd.isAbstract() && bd.isSingleton() && !bd.isLazyInit()) {
-				// Demo不涉及，暂不讲解
+				/** Demo不涉及-start */
 				// 执行场景：如果是通过 FactoryBean 的方式创建的bean实例，会被执行
 				// 作用：用于 FactoryBean 方式的实例化
 				if (isFactoryBean(beanName)) {
@@ -763,14 +766,16 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 						}
 					}
 				}
-				/**实例化Bean*/
+				/** Demo不涉及-end */
 				else {
+					/** 主线 */
+					// 实例化Bean
 					getBean(beanName);
 				}
 			}
 		}
 
-		// Demo不涉及，暂不讲解
+		/** Demo不涉及-start */
 		// 使用场景：如果使用者定义了实现 SmartInitializingSingleton 接口的bean的话，本代码会在所有bean实例化后被执行
 		// 代码作用：调用 SmartInitializingSingleton 的 afterSingletonsInstantiated 方法
 		for (String beanName : beanNames) {
@@ -788,6 +793,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 				}
 			}
 		}
+		/** Demo不涉及-end */
 	}
 
 
@@ -799,7 +805,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	 * 将bean定义存储(注册)到bean工厂里
 	 *
 	 * @param beanName 指代bean的名字,一般指的是xml文件中bean的id
-	 * @param beanDefinition xml文件中对应的bean定义实体
+	 * @param beanDefinition xml文件中对应的bean定义实体 GenericBeanDefinition
 	 * @throws BeanDefinitionStoreException
 	 */
 	@Override
@@ -809,11 +815,11 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 		Assert.hasText(beanName, "Bean name must not be empty");
 		Assert.notNull(beanDefinition, "BeanDefinition must not be null");
 
+		/** Demo不涉及-start */
 		// 如果 beanDefinition 继承 AbstractBeanDefinition
 		// beanDefinition是GenericBeanDefinition类,继承AbstractBeanDefinition,所以走本分支
 		if (beanDefinition instanceof AbstractBeanDefinition) {
 			try {
-				// Demo不涉及,暂不讲解
 				// 当前方法只有<bean/>对应的class属性为Class类型时才起作用，比如XXX.class
 				((AbstractBeanDefinition) beanDefinition).validate();
 			}
@@ -822,12 +828,14 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 						"Validation of bean definition failed", ex);
 			}
 		}
+		/** Demo不涉及-end */
 
-		// 先尝试根据bean定义的id(beanName)从beanDefinitionMap中获取bean定义实体
+		// 先尝试根据bean定义的beanName(id)从beanDefinitionMap中获取bean定义实体 GenericBeanDefinition
 		BeanDefinition existingDefinition = this.beanDefinitionMap.get(beanName);
 
 		// 如果已经注册过id为beanName的bean定义实体,也就是说定义了重复的<bean id=""/>,判断是否允许覆盖（默认允许）；
-		// 如果不允许则抛出异常；允许的话，直接在bean工厂的beanDefinitionMap，使用相同的key(beanName)覆盖即可
+		// 如果不允许则抛出异常；
+		// 允许的话，直接在bean工厂的beanDefinitionMap，使用相同的key(beanName)覆盖即可
 		if (existingDefinition != null) {
 			if (!isAllowBeanDefinitionOverriding()) {
 				throw new BeanDefinitionStoreException(beanDefinition.getResourceDescription(), beanName,
@@ -861,9 +869,9 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 		}
 		// 如果没有注册过id为beanName的bean定义
 		else {
+			/** Demo不涉及-start */
 			// 校验 alreadyCreated 集合是否已经存在元素，alreadyCreated 表示 已经被实例化的bean定义集合
 			// 只有当spring在启动并且已经有bean定义被实例化时，又调用了refresh方法（进行刷新bean定义操作）；才会执行当前代码块
-			// Demo不涉及 Spring启动后的再刷新，暂不讲解
 			if (hasBeanCreationStarted()) {
 				// Cannot modify startup-time collection elements anymore (for stable iteration)
 				synchronized (this.beanDefinitionMap) {
@@ -879,23 +887,30 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 					}
 				}
 			}
+			/** Demo不涉及-end */
+
 			// 如果还没有创建过bean，走本分支
 			else {
-				// 以键值对的方式{bean标签中的id->BeanDefinition},存放从xml文件中解析出来的bean配置
+				/** 主线-start */
+				// 以键值对的方式{bean标签中的id->BeanDefinition},存放从xml文件中解析出来的bean配置，用于后续逻辑根据beanName获取GenericBeanDefinition实例
 				this.beanDefinitionMap.put(beanName, beanDefinition);
 				// beanDefinitionNames 表示通过调用当前方法得到的bean定义的名字（beanName）
 				this.beanDefinitionNames.add(beanName);
-				// Demo不涉及，为空集合
+				/** 主线-end */
+
+				/** Demo不涉及 */
 				// manualSingletonNames 表示通过调用 DefaultListableBeanFactory.registerSingleton(String beanName, Object singletonObject) 方法手动注册的单例bean定义的名字（beanName）,例如：new ClassPathXmlApplicationContext("classpath:applicationContext.xml").getBeanFactory().registerSingleton("testName", new Test());
 				// 因为Spring通过当前方法注册了该beanName，所以根据beanName将 manualSingletonNames 里的删除了
 				this.manualSingletonNames.remove(beanName);
 			}
-			// 初始化 frozenBeanDefinitionNames 变量，用于后期扩展，现在没有实质用处;
+			/** 无用逻辑 */
+			// 初始化 frozenBeanDefinitionNames 变量，用于后期扩展;
 			// 初始化时为空；解析完所有的bean定义后，实例化bean定义前，从 beanDefinitionNames 中获取一份保存起来
 			this.frozenBeanDefinitionNames = null;
 		}
 
-		// 在使用Spring时，应该将允许定义重复beanName（id）的配置设置为false，所以正常情况不会执行本代码，暂不讲解
+		/** Demo不涉及 */
+		// 在应用系统使用Spring时，应该将允许定义重复beanName（id）的配置设置为false，
 		// 如果已经执行过当前方法，注册过相同beanName的bean定义；
 		// 或者调用了DefaultListableBeanFactory.registerSingleton(String beanName, Object singletonObject)方法，实例化了相同beanName的单例bean
 		// existingDefinition 表示是否执行了当前方法，注册了相同 beanName（beanName一般指的是<bean/>相同的id值）的bean定义

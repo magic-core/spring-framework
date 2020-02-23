@@ -563,11 +563,18 @@ public abstract class AbstractEnvironment implements ConfigurableEnvironment {
 		return this.propertyResolver.resolvePlaceholders(text);
 	}
 
+	/**
+	 * 替换text占位符操作 例如: "${user.dir}"
+	 *
+	 * @param text
+	 * @return
+	 * @throws IllegalArgumentException
+	 */
 	@Override
 	public String resolveRequiredPlaceholders(String text) throws IllegalArgumentException {
 		// 替换占位符操作 例如: "${user.dir}"
-		// propertyResolver 代表PropertySourcesPropertyResolver 实例
-		// 调用 AbstractPropertyResolver 的 resolveRequiredPlaceholders 方法
+		// propertyResolver 代表 PropertySourcesPropertyResolver 实例
+		// 调用从 AbstractPropertyResolver 继承的 resolveRequiredPlaceholders 方法
 		return this.propertyResolver.resolveRequiredPlaceholders(text);
 	}
 

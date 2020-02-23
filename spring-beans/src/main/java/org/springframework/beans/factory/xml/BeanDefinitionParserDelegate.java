@@ -283,7 +283,7 @@ public class BeanDefinitionParserDelegate {
 		// 对 defaults变量（DocumentDefaultsDefinition实例） 设置配置的属性，如果没有设置则设置默认值，或者设置从父xml文件<beans>继承来的配置
 		// this.defaults代表DocumentDefaultsDefinition实例
 		populateDefaults(this.defaults, (parent != null ? parent.defaults : null), root);
-		// 空实现
+		/** 空实现 */
 		this.readerContext.fireDefaultsRegistered(this.defaults);
 	}
 
@@ -304,7 +304,6 @@ public class BeanDefinitionParserDelegate {
 			lazyInit = (parentDefaults != null ? parentDefaults.getLazyInit() : FALSE_VALUE);
 		}
 		// 对 DocumentDefaultsDefinition 设置懒加载属性
-		// DocumentDefaultsDefinition：setLazyInit
 		defaults.setLazyInit(lazyInit);
 
 		// 获得xml中<beans>标签配置的"default-merge"属性,表示全局是否开启集合合并
@@ -316,7 +315,6 @@ public class BeanDefinitionParserDelegate {
 			merge = (parentDefaults != null ? parentDefaults.getMerge() : FALSE_VALUE);
 		}
 		// 对 DocumentDefaultsDefinition 设置merge属性
-		// DocumentDefaultsDefinition：setMerge
 		defaults.setMerge(merge);
 
 		// 获得xml中配置的"default-autowire"属性，默认no；
@@ -328,7 +326,6 @@ public class BeanDefinitionParserDelegate {
 			autowire = (parentDefaults != null ? parentDefaults.getAutowire() : AUTOWIRE_NO_VALUE);
 		}
 		// 对 DocumentDefaultsDefinition 设置 autowire 属性
-		// DocumentDefaultsDefinition：setAutowire
 		defaults.setAutowire(autowire);
 
 		// 如果xml配置了"default-autowire-candidates"属性，默认不会被定义；全局生效
@@ -360,9 +357,8 @@ public class BeanDefinitionParserDelegate {
 			defaults.setDestroyMethod(parentDefaults.getDestroyMethod());
 		}
 
-		// 设置xml配置源
+		/** 空变量 */
 		// readerContext 表示 XmlReaderContext 实例
-		// extractSource 方法 返回空
 		defaults.setSource(this.readerContext.extractSource(root));
 	}
 
@@ -425,7 +421,7 @@ public class BeanDefinitionParserDelegate {
 		// 获得<bean/>节点的id属性，例：persion
 		String id = ele.getAttribute(ID_ATTRIBUTE);
 
-		// 获得<bean/>节点的name属性，一般Spring的使用不定义name属性，所以暂不讲解本内容
+		// 获得<bean/>节点的name属性，一般Spring的使用不定义name属性，所以暂不深解本内容
 		String nameAttr = ele.getAttribute(NAME_ATTRIBUTE);
 		List<String> aliases = new ArrayList<>();
 		if (StringUtils.hasLength(nameAttr)) {
@@ -435,7 +431,7 @@ public class BeanDefinitionParserDelegate {
 
 		// beanName表示<bean/>标签的id属性
 		String beanName = id;
-		// 没有设置<bean/>中的id和name,会走本分支,一般都指定id，所以暂不讲解本代码
+		// 没有设置<bean/>中的id和name,会走本分支,一般都指定id，所以暂不深解本代码
 		if (!StringUtils.hasText(beanName) && !aliases.isEmpty()) {
 			beanName = aliases.remove(0);
 			if (logger.isDebugEnabled()) {
@@ -455,7 +451,7 @@ public class BeanDefinitionParserDelegate {
 		// 解析ele(<bean/>)节点,初始化bd（GenericBeanDefinition）实例
 		AbstractBeanDefinition beanDefinition = parseBeanDefinitionElement(ele, beanName, containingBean);
 		if (beanDefinition != null) {
-			// 如果没有指定<bean/>中的id或name，则会走当前分支，但是一般都会指定id，所以暂不讲解本代码块
+			// 如果没有指定<bean/>中的id或name，则会走当前分支，但是一般都会指定id，所以暂不深解本代码块
 			if (!StringUtils.hasText(beanName)) {
 				try {
 					if (containingBean != null) {
@@ -561,13 +557,13 @@ public class BeanDefinitionParserDelegate {
 			// 当前Demo,extractSource没有实现逻辑,直接返回空
 			bd.setSource(extractSource(ele));
 
-			/**Demo不涉及,暂不讲解*/
+			/**Demo不涉及,暂不深解*/
 			// 获得bean标签里的"description"节点,用于告诉开发人员关于bean的描述;
 			bd.setDescription(DomUtils.getChildElementValueByTagName(ele, DESCRIPTION_ELEMENT));
 			// 用于解析<bean/>下的<meta key="" value=""/>标签,set到bd里;
 			parseMetaElements(ele, bd);
-			// 用于解析<bean/>下的"lookup-method"标签,set到bd里;一般并使用,暂不讲解
-			// 例:<lookup-method name="getLatestBean" bean="latestBean"/>,name指的是作用的方法（getLatestBean）,bean指的是返回的bean实例;
+			// Demo不涉及,暂不深解
+			// 用于解析<bean/>下的"lookup-method"标签,set到bd里;例:<lookup-method name="getLatestBean" bean="latestBean"/>,name指的是作用的方法（getLatestBean）,bean指的是返回的bean实例;
 			// getLatestBean返回的是latestBean的父类，也就是说在调用getLatestBean方法时,返回值向上转型为指定的bean属性
 			parseLookupOverrideSubElements(ele, bd.getMethodOverrides());
 			// 用于解析<bean/>下的"replaced-method"标签,set到bd里
@@ -940,9 +936,9 @@ public class BeanDefinitionParserDelegate {
 			}
 			// 解析xml中<bean/>里的<property/>配置的值
 			Object val = parsePropertyValue(ele, bd, propertyName);
-			// 将<property/>中的name和值封装到pv(PropertyValue)里
+			// 将<property/>中的name和值封装到pv(PropertyValue)里，（例：<property name="P" ref="persion_B"/>,name是p，值是封装了ref信息的RuntimeBeanReference实例）
 			PropertyValue pv = new PropertyValue(propertyName, val);
-			// 如果<property/>里配置了<meta key="" value=""/>标签,则也解析到pv里,基本不用,暂不讲解
+			// 如果<property/>里配置了<meta key="" value=""/>标签,则也解析到pv里,基本不用,暂不深解
 			parseMetaElements(ele, pv);
 			// 当前Demo,extractSource没有实现逻辑,直接返回空
 			pv.setSource(extractSource(ele));
@@ -1002,12 +998,16 @@ public class BeanDefinitionParserDelegate {
 	 */
 	@Nullable
 	public Object parsePropertyValue(Element ele, BeanDefinition bd, @Nullable String propertyName) {
+		// propertyName 代表 <property>的id值，例："p"
+		// elementName 代表 <property> element for property p
 		String elementName = (propertyName != null ?
 				"<property> element for property '" + propertyName + "'" :
 				"<constructor-arg> element");
 
-		// Should only have one child element: ref, value, list, etc.
+		// Demo不涉及，暂不深解
+		// nl 表示 <property>的子元素，只会有一个，例：list
 		NodeList nl = ele.getChildNodes();
+		// subElement 表示<property>的子元素
 		Element subElement = null;
 		for (int i = 0; i < nl.getLength(); i++) {
 			Node node = nl.item(i);
@@ -1023,31 +1023,46 @@ public class BeanDefinitionParserDelegate {
 			}
 		}
 
+		// hasRefAttribute 表示<property>是否配置了"ref"属性
 		boolean hasRefAttribute = ele.hasAttribute(REF_ATTRIBUTE);
+		// hasRefAttribute 表示<property>是否配置了"value"属性
 		boolean hasValueAttribute = ele.hasAttribute(VALUE_ATTRIBUTE);
+
+		// 如果<property />同时包含ref=""和value="" ，则报错
+		// 如果<property />包含ref="" 或 value=""，同时包含子元素， 则报错
 		if ((hasRefAttribute && hasValueAttribute) ||
 				((hasRefAttribute || hasValueAttribute) && subElement != null)) {
 			error(elementName +
 					" is only allowed to contain either 'ref' attribute OR 'value' attribute OR sub-element", ele);
 		}
 
+		// 如果是<property ref=""/>
 		if (hasRefAttribute) {
+			// refName表示ref配置的值
 			String refName = ele.getAttribute(REF_ATTRIBUTE);
 			if (!StringUtils.hasText(refName)) {
 				error(elementName + " contains empty 'ref' attribute", ele);
 			}
+			// 将ref指代的bean封装成 RuntimeBeanReference 实例
 			RuntimeBeanReference ref = new RuntimeBeanReference(refName);
+			// extractSource(ele) 作用是提取ele中的元数据
+			// 当前Demo，extractSource直接返回null
 			ref.setSource(extractSource(ele));
 			return ref;
 		}
+		// Demo不涉及，不深解
+		// 如果是<property value=""/>
 		else if (hasValueAttribute) {
 			TypedStringValue valueHolder = new TypedStringValue(ele.getAttribute(VALUE_ATTRIBUTE));
 			valueHolder.setSource(extractSource(ele));
 			return valueHolder;
 		}
+		// Demo不涉及，不深解
+		// 如果是<property ><子标签/></property>
 		else if (subElement != null) {
 			return parsePropertySubElement(subElement, bd);
 		}
+		// 如果不是以上三种模式，则报异常
 		else {
 			// Neither child element nor "ref" or "value" attribute found.
 			error(elementName + " must specify a ref or value", ele);

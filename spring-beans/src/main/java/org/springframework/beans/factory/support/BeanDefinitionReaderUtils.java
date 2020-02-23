@@ -155,11 +155,12 @@ public class BeanDefinitionReaderUtils {
 
 		// 获得beanName,一般是<bean/>的id属性
 		String beanName = definitionHolder.getBeanName();
-
-		/**将bean定义存储(注册)到bean工厂里*/
+		/** 主线 */
+		// 将bean定义存储(注册)到bean工厂里
+		// registry是 DefaultListableBeanFactory 实例
 		registry.registerBeanDefinition(beanName, definitionHolder.getBeanDefinition());
 
-		// Demo不涉及,暂不讲解
+		/** Demo不涉及 */
 		// 注册别名,别名一般是<bean/>里的name属性
 		String[] aliases = definitionHolder.getAliases();
 		if (aliases != null) {
