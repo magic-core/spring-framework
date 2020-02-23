@@ -479,7 +479,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 		try {
 
-			/** 主线 */
+			// tofix 主线
 			// 创建真正的实例，例：Persion对象
 			Object beanInstance = doCreateBean(beanName, mbdToUse, args);
 
@@ -1168,7 +1168,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		}
 		/** Demo不涉及-end */
 
-		/** 主线 */
+		// tofix 主线
 		// 调用无参构造函数实例化bean，封装到BeanWrapperImpl对象里
 		return instantiateBean(beanName, mbd);
 	}

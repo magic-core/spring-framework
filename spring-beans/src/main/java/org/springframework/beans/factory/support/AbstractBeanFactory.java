@@ -335,7 +335,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 
 				// 如果Bean指定的作用域（scope）为单例
 				if (mbd.isSingleton()) {
-					/** 主线 */
+					// tofix 主线
 					sharedInstance = getSingleton(beanName, () -> {
 						try {
 							return createBean(beanName, mbd, args);

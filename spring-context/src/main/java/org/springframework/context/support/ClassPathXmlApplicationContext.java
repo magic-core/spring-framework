@@ -148,7 +148,7 @@ public class ClassPathXmlApplicationContext extends AbstractXmlApplicationContex
 		setConfigLocations(configLocations);
 		// 默认true，表示允许启动或刷新Spring
 		if (refresh) {
-			/** 主线 */
+			// tofix 主线
 			refresh();
 		}
 	}

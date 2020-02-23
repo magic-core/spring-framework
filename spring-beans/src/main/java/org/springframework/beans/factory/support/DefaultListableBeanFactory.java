@@ -768,7 +768,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 				}
 				/** Demo不涉及-end */
 				else {
-					/** 主线 */
+					// tofix 主线
 					// 实例化Bean
 					getBean(beanName);
 				}

@@ -101,7 +101,7 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 
 		// 获得代表xml配置文件的Document实例根节点root,即<beans/>节点
 		Element root = doc.getDocumentElement();
-		/** 主线 */
+		// tofix 主线
 		// 根据xml根节点，即<beans/>节点，加载xml中所有的bean定义
 		doRegisterBeanDefinitions(root);
 	}
@@ -160,7 +160,7 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 		// 模版模式,默认空实现,用于子类继承，自定义逻辑
 		preProcessXml(root);/** 空实现 */
 
-		/** 主线 */
+		// tofix 主线
 		// 根据xml文件的root节点，即<beans/>节点，加载xml中所有的bean定义
 		parseBeanDefinitions(root, this.delegate);
 
@@ -208,7 +208,7 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 					Element ele = (Element) node;
 					// 如果当前元素是不存在命名空间或者属于"http://www.springframework.org/schema/beans"命名空间，走本分支；例：<bean/>、<import/>等
 					if (delegate.isDefaultNamespace(ele)) {
-						/** 主线 */
+						// tofix 主线
 						// 解析当前的ele节点，根据节点类型，做不同操作；如果是<bean/>,注册到bean工厂里；如果是<import/>,则将resource，递归重新调用AbstractBeanDefinitionReader#loadBeanDefinitions方法，解析指定的xml资源路径
 						parseDefaultElement(ele, delegate);
 					}
@@ -237,7 +237,6 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 	 * @param delegate BeanDefinitionParserDelegate 实例(bean定义的解析委托类),定义了解析XML文件（Doc形式）的一系列方法，是核心解析器
 	 */
 	private void parseDefaultElement(Element ele, BeanDefinitionParserDelegate delegate) {
-		/** 主线-副 */
 		// 如果节点名是'import'
 		if (delegate.nodeNameEquals(ele, IMPORT_ELEMENT)) {
 			// 如果是<import/>,则根据配置项resource，递归重新调用AbstractBeanDefinitionReader#loadBeanDefinitions方法，解析指定路径的xml资源
@@ -247,7 +246,7 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 		else if (delegate.nodeNameEquals(ele, ALIAS_ELEMENT)) {
 			processAliasRegistration(ele);
 		}
-		/** 主线 */
+		// tofix 主线
 		// 如果节点名是'bean'
 		else if (delegate.nodeNameEquals(ele, BEAN_ELEMENT)) {
 			// 如果是<bean/>,注册到bean工厂里;
@@ -377,7 +376,7 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 			bdHolder = delegate.decorateBeanDefinitionIfRequired(ele, bdHolder);
 
 			try {
-				/** 主线 */
+				// tofix 主线
 				// 将最终解析成的bean定义,存储到(注册)bean工厂里
 				// getReaderContext()返回 XmlReaderContext 实例，通过 XmlReaderContext 获取所需的公用实例
 				BeanDefinitionReaderUtils.registerBeanDefinition(bdHolder, getReaderContext().getRegistry());

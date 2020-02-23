@@ -247,7 +247,7 @@ public abstract class AbstractBeanDefinitionReader implements EnvironmentCapable
 				// getResources方法调用的是从继承 AbstractApplicationContext 来的
 				Resource[] resources = ((ResourcePatternResolver) resourceLoader).getResources(location);
 
-				/** 主线 */
+				// tofix 主线
 				//根据Resource数组解析bean定义,注册到bean工厂里
 				int loadCount = loadBeanDefinitions(resources);
 
@@ -299,7 +299,7 @@ public abstract class AbstractBeanDefinitionReader implements EnvironmentCapable
 		int counter = 0;
 		// 循环遍历用户指定的xml配置路径（比如"classpath*:applicationContext.xml"），解析xml中bean的定义到bean工厂里
 		for (String location : locations) {
-			/** 主线 */
+			// tofix 主线
 			counter += loadBeanDefinitions(location);
 		}
 		return counter;

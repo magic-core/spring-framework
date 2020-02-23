@@ -98,7 +98,7 @@ public abstract class AbstractXmlApplicationContext extends AbstractRefreshableC
 		/** 无用逻辑-end */
 
 
-		/** 主线 */
+		// tofix 主线
 		// 真正的加载bean定义操作
 		loadBeanDefinitions(beanDefinitionReader);
 	}
@@ -139,7 +139,7 @@ public abstract class AbstractXmlApplicationContext extends AbstractRefreshableC
 		// 调用AbstractXmlApplicationContext的getConfigLocations方法
 		String[] configLocations = getConfigLocations();
 		if (configLocations != null) {
-			/** 主线 */
+			// tofix 主线
 			// 解析xml中bean的定义到bean工厂里
 			reader.loadBeanDefinitions(configLocations);
 		}

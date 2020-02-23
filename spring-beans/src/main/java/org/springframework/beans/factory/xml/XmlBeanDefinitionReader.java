@@ -349,7 +349,7 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 				if (encodedResource.getEncoding() != null) {
 					inputSource.setEncoding(encodedResource.getEncoding());
 				}
-				/** 主线 */
+				// tofix 主线
 				// 根据inputSource，解析xml文件中所有的bean定义，存储到bean工厂里
 				return doLoadBeanDefinitions(inputSource, encodedResource.getResource());
 			}
@@ -411,7 +411,7 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 			/** 非主要 */
 			// 将代表xml文件的inputSource对象解析为document实例
 			Document doc = doLoadDocument(inputSource, resource);
-			/** 主线 */
+			// tofix 主线
 			// 再根据doc实例，将xml中所有的bean定义，存储到bean工厂里
 			return registerBeanDefinitions(doc, resource);
 		}
@@ -537,7 +537,7 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 		// getRegistry 返回DefaultListableBeanFactory实例（bean工厂）
 		int countBefore = getRegistry().getBeanDefinitionCount();
 
-		/** 主线 */
+		// tofix 主线
 		// 根据xml文件解析的doc实例，加载所有bean定义
 		// createReaderContext 创建 XmlReaderContext 实例，为了将XmlBeanDefinitionReader实例、代表xml资源的Resource实例等统一封装到一个对象里（即Xml读取器上下文），向后传递使用
 		documentReader.registerBeanDefinitions(doc, createReaderContext(resource));

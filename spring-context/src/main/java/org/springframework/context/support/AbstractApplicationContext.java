@@ -542,7 +542,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				// 实例化所有没有实例化的(没有设置“懒加载”)单例
 				finishBeanFactoryInitialization(beanFactory);
 
-				// 最后一步:发布相应的事件。
+				/** Demo不涉及 */
+				// 发布相应的事件。
 				finishRefresh();
 			}
 
@@ -626,7 +627,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 * @see #getBeanFactory()
 	 */
 	protected ConfigurableListableBeanFactory obtainFreshBeanFactory() {
-		/** 主线 */
+		// tofix 主线
 		// 创建新的beanfactory bean工厂，根据配置文件中的标签解析为bean定义，以map的方式放到beanfactory实例中
 		// 调用的是从 AbstractRefreshableApplicationContext 继承过来的方法
 		refreshBeanFactory();
@@ -905,12 +906,12 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		beanFactory.setTempClassLoader(null);
 		/** Demo不涉及-end */
 
-		/** 无用逻辑 */
+		/** Demo不涉及 */
 		// 将 configurationFrozen 赋值为true、frozenBeanDefinitionNames记录当前已加载的所有bean的beanName；
 		// 作用：为了标记在实例化步骤前，配置的bean定义（xml/注解）已经全部加载解析完毕；
 		beanFactory.freezeConfiguration();
 
-		/** 主线 */
+		// tofix 主线
 		// 实例化所有没有实例化的(非“懒加载”、非抽象)单例Bean
 		beanFactory.preInstantiateSingletons();
 	}
@@ -921,18 +922,23 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 * {@link org.springframework.context.event.ContextRefreshedEvent}.
 	 */
 	protected void finishRefresh() {
+		/** Demo不涉及 */
 		// Clear context-level resource caches (such as ASM metadata from scanning).
 		clearResourceCaches();
 
+		/** Demo不涉及 */
 		// Initialize lifecycle processor for this context.
 		initLifecycleProcessor();
 
+		/** Demo不涉及 */
 		// Propagate refresh to lifecycle processor first.
 		getLifecycleProcessor().onRefresh();
 
+		/** Demo不涉及 */
 		// Publish the final event.
 		publishEvent(new ContextRefreshedEvent(this));
 
+		/** Demo不涉及 */
 		// Participate in LiveBeansView MBean, if active.
 		LiveBeansView.registerApplicationContext(this);
 	}
