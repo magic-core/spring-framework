@@ -1338,6 +1338,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	 * @param bw       the BeanWrapper with bean instance
 	 */
 	protected void populateBean(String beanName, RootBeanDefinition mbd, @Nullable BeanWrapper bw) {
+
 		/** Demo不涉及-start */
 		if (bw == null) {
 			if (mbd.hasPropertyValues()) {
@@ -1688,7 +1689,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 				String propertyName = pv.getName();
 				// 例：<property name="P" ref="persion_B"/>，originalValue 表示封装了ref信息的RuntimeBeanReference实例
 				Object originalValue = pv.getValue();
-				// tofix 主线
+				// tofix 主线-副
 				// 如果有必要，则对<property>中的值进行转换，（例：<property name="P" ref="persion_B"/>,值是封装了ref信息的RuntimeBeanReference实例，转换成真正的Persion对象）
 				// resolvedValue 表示转换后的值
 				Object resolvedValue = valueResolver.resolveValueIfNecessary(pv, originalValue);
@@ -1735,6 +1736,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 		// Set our (possibly massaged) deep copy.
 		try {
+			// tofix 主线
 			// 将解析后的<property/>放到bw（BeanWrapper）的PropertyValues属性里
 			bw.setPropertyValues(new MutablePropertyValues(deepCopy));
 		} catch (BeansException ex) {

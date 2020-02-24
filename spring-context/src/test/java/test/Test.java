@@ -10,7 +10,7 @@ public class Test {
 		ApplicationContext context = new ClassPathXmlApplicationContext("classpath*:applicationContext.xml");
 //		context.getParentBeanFact
 		Persion persion = (Persion) context.getBean("persion");
-		System.out.println(persion.getP());
+		System.out.println(persion.getPersionB());
 //		for (String s : persion.getName()) {
 //
 //		System.out.println(s);

@@ -11,7 +11,7 @@
 
 	<!--	<import resource="classpath:test.xml"/>-->
 	<bean id="persion"  class="org.springframework.Persion" >
-		<property name="p" ref="children">
+		<property name="persionB" ref="children">
 			<!--			<list  merge="true">-->
 			<!--				<value>Java Core</value>-->
 			<!--				<value>Java Concurrency</value>-->

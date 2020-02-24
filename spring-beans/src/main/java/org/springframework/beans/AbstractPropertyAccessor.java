@@ -16,12 +16,12 @@
 
 package org.springframework.beans;
 
+import org.springframework.lang.Nullable;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-
-import org.springframework.lang.Nullable;
 
 /**
  * Abstract implementation of the {@link PropertyAccessor} interface.
@@ -82,18 +82,32 @@ public abstract class AbstractPropertyAccessor extends TypeConverterSupport impl
 		setPropertyValues(pvs, ignoreUnknown, false);
 	}
 
+	/**
+	 *
+	 *
+	 * @param pvs PropertyValues to set on the target object
+	 * @param ignoreUnknown should we ignore unknown properties (not found in the bean)
+	 * @param ignoreInvalid should we ignore invalid properties (found but not accessible)
+	 * @throws BeansException
+	 */
 	@Override
 	public void setPropertyValues(PropertyValues pvs, boolean ignoreUnknown, boolean ignoreInvalid)
 			throws BeansException {
 
 		List<PropertyAccessException> propertyAccessExceptions = null;
+		// 获得pvs里包含的属性集合 propertyValueList
+		// pvs 属于 MutablePropertyValues
 		List<PropertyValue> propertyValues = (pvs instanceof MutablePropertyValues ?
 				((MutablePropertyValues) pvs).getPropertyValueList() : Arrays.asList(pvs.getPropertyValues()));
+		// 遍历属性集合 propertyValueList
 		for (PropertyValue pv : propertyValues) {
 			try {
 				// This method may throw any BeansException, which won't be caught
 				// here, if there is a critical failure such as no matching field.
 				// We can attempt to deal only with less serious exceptions.
+
+				// tofix 主线
+				// 执行的是从 AbstractNestablePropertyAccessor 继承来的 setPropertyValue
 				setPropertyValue(pv);
 			}
 			catch (NotWritablePropertyException ex) {
