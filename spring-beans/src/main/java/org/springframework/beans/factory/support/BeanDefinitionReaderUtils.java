@@ -58,13 +58,11 @@ public class BeanDefinitionReaderUtils {
 	 */
 	public static AbstractBeanDefinition createBeanDefinition(
 			@Nullable String parentName, @Nullable String className, @Nullable ClassLoader classLoader) throws ClassNotFoundException {
-		// 初始化GenericBeanDefinition(bean定义实例)
-		// GenericBeanDefinition；
+		// 初始化 GenericBeanDefinition (bean定义实例)
 		GenericBeanDefinition bd = new GenericBeanDefinition();
-		// 设置GenericBeanDefinition
-		// GenericBeanDefinition：setParentName
+		// 设置 GenericBeanDefinition
 		bd.setParentName(parentName);
-		// 设置GenericBeanDefinition的BeanClassName属性
+		// 设置 GenericBeanDefinition 的BeanClassName属性
 		if (className != null) {
 			// 当前流程classLoader为空，不走本分支
 			if (classLoader != null) {
@@ -72,7 +70,7 @@ public class BeanDefinitionReaderUtils {
 			}
 			// 走当前分支
 			else {
-				// GenericBeanDefinition：setBeanClassName
+				// 设置 GenericBeanDefinition 的beanClass属性为class设置的值（即<bean class=“”/>）
 				bd.setBeanClassName(className);
 			}
 		}
@@ -146,6 +144,7 @@ public class BeanDefinitionReaderUtils {
 
 	/**
 	 * 将bean定义存储(注册)到bean工厂里
+	 *
 	 * @param definitionHolder 持有bean定义实体的对象,即通过xml解析成的beanDefinition是本对象的一个成员变量
 	 * @param registry bean工厂 DefaultListableBeanFactory实例
 	 * @throws BeanDefinitionStoreException if registration failed
@@ -156,11 +155,12 @@ public class BeanDefinitionReaderUtils {
 
 		// 获得beanName,一般是<bean/>的id属性
 		String beanName = definitionHolder.getBeanName();
-
-		/**将bean定义存储(注册)到bean工厂里*/
+		// tofix 主线
+		// 将bean定义存储(注册)到bean工厂里
+		// registry是 DefaultListableBeanFactory 实例
 		registry.registerBeanDefinition(beanName, definitionHolder.getBeanDefinition());
 
-		// 一般不使用,不讲解
+		/** Demo不涉及 */
 		// 注册别名,别名一般是<bean/>里的name属性
 		String[] aliases = definitionHolder.getAliases();
 		if (aliases != null) {

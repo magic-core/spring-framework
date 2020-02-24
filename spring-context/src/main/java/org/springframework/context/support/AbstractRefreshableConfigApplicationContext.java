@@ -70,6 +70,8 @@ public abstract class AbstractRefreshableConfigApplicationContext extends Abstra
 	}
 
 	/**
+	 * 解析并设置applicaiton.xml（如果存在占位符，则解析并替换掉，例: "${user.dir}"）的路径到 configLocations 属性
+	 *
 	 * Set the config locations for this application context.
 	 * <p>If not set, the implementation may use a default as appropriate.
 	 */
@@ -77,6 +79,7 @@ public abstract class AbstractRefreshableConfigApplicationContext extends Abstra
 		if (locations != null) {
 			Assert.noNullElements(locations, "Config locations must not be null");
 			this.configLocations = new String[locations.length];
+			// 循环遍历locations（用户配置的多个application.xml路径，一般只有一个），解析占位符，并设置到configLocations属性上
 			for (int i = 0; i < locations.length; i++) {
 				this.configLocations[i] = resolvePath(locations[i]).trim();
 			}
@@ -116,6 +119,8 @@ public abstract class AbstractRefreshableConfigApplicationContext extends Abstra
 	}
 
 	/**
+	 * 替换text占位符操作 例如: "${user.dir}"
+	 *
 	 * Resolve the given path, replacing placeholders with corresponding
 	 * environment property values if necessary. Applied to config locations.
 	 * @param path the original file path
@@ -123,6 +128,7 @@ public abstract class AbstractRefreshableConfigApplicationContext extends Abstra
 	 * @see org.springframework.core.env.Environment#resolveRequiredPlaceholders(String)
 	 */
 	protected String resolvePath(String path) {
+		// getEnvironment 是 StandardEnvironment 实例
 		return getEnvironment().resolveRequiredPlaceholders(path);
 	}
 

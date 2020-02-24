@@ -206,7 +206,7 @@ public class ReaderContext {
 	 */
 	@Nullable
 	public Object extractSource(Object sourceCandidate) {
-		// sourceExtractor 代表 NullSourceExtractor 实例
+		// sourceExtractor 代表 NullSourceExtractor 实例,extractSource返回null
 		// sourceExtractor 在初始化 XmlReaderContext 实例时，进行的赋值
 		return this.sourceExtractor.extractSource(sourceCandidate, this.resource);
 	}

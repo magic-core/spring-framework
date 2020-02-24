@@ -76,11 +76,12 @@ public class ClassPathXmlApplicationContext extends AbstractXmlApplicationContex
 	}
 
 	/**
-	 * 创建一个新的ClassPathXmlApplicationContext，构造函数里执行了所有操作：构造函数中解析XML文件中bean定义，并将bean定义加载成Spring内部的实体，并根据实体中的信息实例化使用者定义的类
+	 * 实例化ClassPathXmlApplicationContext，构造函数里执行了所有操作：构造函数中解析XML文件中bean定义，并将bean定义加载成Spring内部的实体，并根据实体中的信息实例化使用者定义的类
 	 *
 	 * Create a new ClassPathXmlApplicationContext, loading the definitions
 	 * from the given XML file and automatically refreshing the context.
-	 * @param configLocation resource location
+	 *
+	 * @param configLocation application.xml 资源路径的地址
 	 * @throws BeansException if context creation failed
 	 */
 	public ClassPathXmlApplicationContext(String configLocation) throws BeansException {
@@ -126,10 +127,11 @@ public class ClassPathXmlApplicationContext extends AbstractXmlApplicationContex
 	}
 
 	/**
-	 * 创建一个新的ClassPathXmlApplicationContext，构造函数里执行了所有操作：构造函数中解析XML文件中bean定义，并将bean定义加载成Spring内部的实体，并根据实体中的信息实例化使用者定义的类
+	 * 实例化ClassPathXmlApplicationContext，构造函数里执行了所有操作：构造函数中解析XML文件中bean定义，并将bean定义加载成Spring内部的实体，并根据实体中的信息实例化使用者定义的类
 	 *
 	 * Create a new ClassPathXmlApplicationContext with the given parent,
 	 * loading the definitions from the given XML files.
+	 *
 	 * @param configLocations array of resource locations
 	 * @param refresh whether to automatically refresh the context,
 	 * loading all bean definitions and creating all singletons.
@@ -142,11 +144,11 @@ public class ClassPathXmlApplicationContext extends AbstractXmlApplicationContex
 			String[] configLocations, boolean refresh, @Nullable ApplicationContext parent)
 			throws BeansException {
 		super(parent);
-		// 设置application配置文件，企业编程不是执行当前方式设置，暂时不讲解
+		// 设置application.xml配置文件路径，到configLocations
 		setConfigLocations(configLocations);
-		// 默认true，表示允许启动刷新Spring
+		// 默认true，表示允许启动或刷新Spring
 		if (refresh) {
-			/**执行所有操作*/
+			// tofix 主线
 			refresh();
 		}
 	}
