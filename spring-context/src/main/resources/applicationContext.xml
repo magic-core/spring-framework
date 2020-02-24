@@ -10,16 +10,16 @@
 		<!--default-merge="true"-->
 
 	<!--	<import resource="classpath:test.xml"/>-->
-	<bean  class="org.springframework.Persion" >
-		<property name="p" >
-			<bean id="children" class="org.springframework.Persion1"></bean>
+	<bean id="persion"  class="org.springframework.Persion" >
+		<property name="p" ref="children">
 			<!--			<list  merge="true">-->
 			<!--				<value>Java Core</value>-->
 			<!--				<value>Java Concurrency</value>-->
 			<!--			</list>-->
 		</property>
 	</bean>
-	<context:property-placeholder location="classpath:application.properties"/>
+			<bean id="children" class="org.springframework.Persion1"></bean>
+<!--	<context:property-placeholder location="classpath:application.properties"/>-->
 <!--	<bean  id="persion" class="org.springframework.Persion" >-->
 <!--		<description></description>-->
 <!--		<meta key="" value=""/>-->
