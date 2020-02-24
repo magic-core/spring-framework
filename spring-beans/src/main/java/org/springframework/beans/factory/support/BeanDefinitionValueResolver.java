@@ -74,8 +74,9 @@ class BeanDefinitionValueResolver {
 
 
 	/**
-	 * PropertyValue
+	 * 对<property>中的值进行转换，（例：<property name="P" ref="persion_B"/>,值是封装了ref信息的RuntimeBeanReference实例，转换成真正的Persion对象）
 	 *
+	 * PropertyValue
 	 * Given a PropertyValue, return a value, resolving any references to other
 	 * beans in the factory if necessary. The value could be:
 	 * <li>A BeanDefinition, which leads to the creation of a corresponding
@@ -89,8 +90,8 @@ class BeanDefinitionValueResolver {
 	 * <li>A ManagedMap. In this case the value may be a RuntimeBeanReference
 	 * or Collection that will need to be resolved.
 	 * <li>An ordinary object or {@code null}, in which case it's left alone.
-	 * @param argName the name of the argument that the value is defined for
-	 * @param value 表示<property>中指代的值（要去解析的值）
+	 * @param argName 例：在<property name="P" ref="persion_B"/>中表示 PropertyValue对象
+	 * @param value 例：在<property name="P" ref="persion_B"/>中，表示封装了ref信息的RuntimeBeanReference实例
 	 * @return the resolved object
 	 */
 	@Nullable
@@ -98,10 +99,11 @@ class BeanDefinitionValueResolver {
 		// 如果value是Spring工厂中另一个bean的引用（例：<property name="P" ref="persion_B"/>中的ref）
 		if (value instanceof RuntimeBeanReference) {
 			RuntimeBeanReference ref = (RuntimeBeanReference) value;
+			// tofix 主线
 			// 把ref解析为id为persion_B的真正bean实例
 			return resolveReference(argName, ref);
 		}
-		// Demo不涉及，暂不深解-start
+		/** Demo不涉及-start */
 		else if (value instanceof RuntimeBeanNameReference) {
 			String refName = ((RuntimeBeanNameReference) value).getBeanName();
 			refName = String.valueOf(doEvaluate(refName));
@@ -204,7 +206,7 @@ class BeanDefinitionValueResolver {
 		else {
 			return evaluate(value);
 		}
-		// Demo不涉及，暂不深解-end
+		/** Demo不涉及-end */
 	}
 
 	/**
@@ -292,7 +294,7 @@ class BeanDefinitionValueResolver {
 			// 如果refName包含#{},则进行解析为真正的值
 			refName = String.valueOf(doEvaluate(refName));
 
-			// Demo不涉及，不深解
+			/** Demo不涉及-start */
 			if (ref.isToParent()) {
 				if (this.beanFactory.getParentBeanFactory() == null) {
 					throw new BeanCreationException(
@@ -302,9 +304,12 @@ class BeanDefinitionValueResolver {
 				}
 				bean = this.beanFactory.getParentBeanFactory().getBean(refName);
 			}
-			// Demo走本分支
+			/** Demo不涉及-end */
+
+			// 走本分支
 			else {
-				// 在bean工厂中获取beanName为refName的bean对象
+				// tofix 主线
+				// 在bean工厂中获取beanName为refName的bean对象（例：PersionB对象）
 				bean = this.beanFactory.getBean(refName);
 				// 在bean工厂中记录bean之间的依赖关系（为了保证：销毁指定Bean之前，需要先销毁它所依赖的Bean）
 				this.beanFactory.registerDependentBean(refName, this.beanName);
