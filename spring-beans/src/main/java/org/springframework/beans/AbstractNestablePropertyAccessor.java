@@ -250,14 +250,16 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 			AbstractNestablePropertyAccessor nestedPa;
 			try {
 
-				/** Demo不涉及 nestedPa 就是 this（BeanWrapperImpl实例）*/
+				/** 没有产生实际效果 */
+				// nestedPa 就是 this（BeanWrapperImpl实例）
 				nestedPa = getPropertyAccessorForPropertyPath(propertyName);
 			}
 			catch (NotReadablePropertyException ex) {
 				throw new NotWritablePropertyException(getRootClass(), this.nestedPath + propertyName,
 						"Nested property in path '" + propertyName + "' does not exist", ex);
 			}
-			/** Demo不涉及 tokens 就是 封装了propertyName的 PropertyTokenHolder 实例*/
+			/** 没有产生实际效果 */
+			// tokens 就是 封装了propertyName的 PropertyTokenHolder 实例
 			tokens = getPropertyNameTokens(getFinalPath(nestedPa, propertyName));
 
 			if (nestedPa == this) {
@@ -424,6 +426,7 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 		// 执行 BeanWrapperImpl 的getLocalPropertyHandler方法
 		PropertyHandler ph = getLocalPropertyHandler(tokens.actualName);
 
+		/** Demo不涉及-start */
 		if (ph == null || !ph.isWritable()) {
 			if (pv.isOptional()) {
 				if (logger.isDebugEnabled()) {
@@ -436,16 +439,20 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 				throw createNotWritablePropertyException(tokens.canonicalName);
 			}
 		}
+		/** Demo不涉及-end */
 
 		Object oldValue = null;
 		try {
 			Object originalValue = pv.getValue();
 			Object valueToApply = originalValue;
+			// pv.conversionNecessary 默认为null，表示有转换<property/>的必要
 			if (!Boolean.FALSE.equals(pv.conversionNecessary)) {
+				// converted 默认为false，表示需要转换
 				if (pv.isConverted()) {
 					valueToApply = pv.getConvertedValue();
 				}
 				else {
+					/** Demo不涉及-start */
 					if (isExtractOldValueForEditor() && ph.isReadable()) {
 						try {
 							oldValue = ph.getValue();
@@ -460,12 +467,17 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 							}
 						}
 					}
+
+					// 没有产生实际效果
+					// 转换属性值，Demo中，originalValue就是valueToApply
 					valueToApply = convertForProperty(
 							tokens.canonicalName, oldValue, originalValue, ph.toTypeDescriptor());
+					/** Demo不涉及-end */
 				}
+				// 执行转换逻辑后，原值与新值相等，所以表示没有必要进行转换<property/>，故conversionNecessary设置为false
 				pv.getOriginalPropertyValue().conversionNecessary = (valueToApply != originalValue);
 			}
-			// 执行的是BeanWrapperImpl中的内部类 BeanPropertyHandler
+			// 执行的是 BeanPropertyHandler 的setValue方法
 			ph.setValue(valueToApply);
 		}
 		catch (TypeMismatchException ex) {
