@@ -16,25 +16,8 @@
 
 package org.springframework.beans;
 
-import java.beans.PropertyChangeEvent;
-import java.lang.reflect.Array;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Modifier;
-import java.lang.reflect.UndeclaredThrowableException;
-import java.security.PrivilegedActionException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.springframework.core.CollectionFactory;
 import org.springframework.core.ResolvableType;
 import org.springframework.core.convert.ConversionException;
@@ -44,6 +27,11 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
+
+import java.beans.PropertyChangeEvent;
+import java.lang.reflect.*;
+import java.security.PrivilegedActionException;
+import java.util.*;
 
 /**
  * A basic {@link ConfigurablePropertyAccessor} that provides the necessary
@@ -246,23 +234,40 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 		nestedPa.setPropertyValue(tokens, new PropertyValue(propertyName, value));
 	}
 
+	/**
+	 *
+	 *
+	 * @param pv
+	 * @throws BeansException
+	 */
 	@Override
 	public void setPropertyValue(PropertyValue pv) throws BeansException {
+		// tokens 默认为空
 		PropertyTokenHolder tokens = (PropertyTokenHolder) pv.resolvedTokens;
 		if (tokens == null) {
+			// propertyName 表示属性名字，例：<property name="p" ref="persion_B">中的“p”
 			String propertyName = pv.getName();
 			AbstractNestablePropertyAccessor nestedPa;
 			try {
+
+				/** 没有产生实际效果 */
+				// nestedPa 就是 this（BeanWrapperImpl实例）
 				nestedPa = getPropertyAccessorForPropertyPath(propertyName);
 			}
 			catch (NotReadablePropertyException ex) {
 				throw new NotWritablePropertyException(getRootClass(), this.nestedPath + propertyName,
 						"Nested property in path '" + propertyName + "' does not exist", ex);
 			}
+			/** 没有产生实际效果 */
+			// tokens 就是 封装了propertyName的 PropertyTokenHolder 实例
 			tokens = getPropertyNameTokens(getFinalPath(nestedPa, propertyName));
+
 			if (nestedPa == this) {
+				/** 无用逻辑 */
 				pv.getOriginalPropertyValue().resolvedTokens = tokens;
 			}
+
+			// tofix 主线
 			nestedPa.setPropertyValue(tokens, pv);
 		}
 		else {
@@ -271,9 +276,13 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 	}
 
 	protected void setPropertyValue(PropertyTokenHolder tokens, PropertyValue pv) throws BeansException {
+		/** Demo不涉及-start */
+		// tokens.keys 为 null
 		if (tokens.keys != null) {
 			processKeyedProperty(tokens, pv);
 		}
+		/** Demo不涉及-end */
+
 		else {
 			processLocalProperty(tokens, pv);
 		}
@@ -412,8 +421,17 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 		return propValue;
 	}
 
+	/**
+	 *
+	 * @param tokens 持有属性名的类，例：<property name="persionB" >中的“persionB”
+	 * @param pv pv对象，对应<property/>
+	 */
 	private void processLocalProperty(PropertyTokenHolder tokens, PropertyValue pv) {
+		// ph（BeanPropertyHandler 实例）包含了<property/>的相关信息，是一个Pojo对象
+		// 执行 BeanWrapperImpl 的getLocalPropertyHandler方法
 		PropertyHandler ph = getLocalPropertyHandler(tokens.actualName);
+
+		/** Demo不涉及-start */
 		if (ph == null || !ph.isWritable()) {
 			if (pv.isOptional()) {
 				if (logger.isDebugEnabled()) {
@@ -426,16 +444,21 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 				throw createNotWritablePropertyException(tokens.canonicalName);
 			}
 		}
+		/** Demo不涉及-end */
 
 		Object oldValue = null;
 		try {
 			Object originalValue = pv.getValue();
 			Object valueToApply = originalValue;
+			// pv.conversionNecessary 默认为null，表示有转换<property/>的必要
 			if (!Boolean.FALSE.equals(pv.conversionNecessary)) {
+				// converted 默认为false，表示需要转换
 				if (pv.isConverted()) {
+					/** Demo不涉及 */
 					valueToApply = pv.getConvertedValue();
 				}
 				else {
+					/** Demo不涉及-start */
 					if (isExtractOldValueForEditor() && ph.isReadable()) {
 						try {
 							oldValue = ph.getValue();
@@ -450,11 +473,17 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 							}
 						}
 					}
+					/** Demo不涉及-end */
+
+					/** 没有产生实际效果 */
+					// 转换属性值，Demo中，valueToApply 就是 originalValue
 					valueToApply = convertForProperty(
 							tokens.canonicalName, oldValue, originalValue, ph.toTypeDescriptor());
 				}
+				// 执行转换逻辑后，原值与新值相等，所以表示没有必要进行转换<property/>，故conversionNecessary设置为false
 				pv.getOriginalPropertyValue().conversionNecessary = (valueToApply != originalValue);
 			}
+			// 执行的是 BeanPropertyHandler 的setValue方法
 			ph.setValue(valueToApply);
 		}
 		catch (TypeMismatchException ex) {
@@ -926,6 +955,7 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 	 * @return representation of the parsed property tokens
 	 */
 	private PropertyTokenHolder getPropertyNameTokens(String propertyName) {
+		/** Demo不涉及-start */
 		String actualName = null;
 		List<String> keys = new ArrayList<>(2);
 		int searchIndex = 0;
@@ -948,13 +978,19 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 				}
 			}
 		}
+		/** Demo不涉及-end */
+
 		PropertyTokenHolder tokens = new PropertyTokenHolder(actualName != null ? actualName : propertyName);
+
+		/** Demo不涉及-start */
 		if (!keys.isEmpty()) {
 			tokens.canonicalName += PROPERTY_KEY_PREFIX +
 					StringUtils.collectionToDelimitedString(keys, PROPERTY_KEY_SUFFIX + PROPERTY_KEY_PREFIX) +
 					PROPERTY_KEY_SUFFIX;
 			tokens.keys = StringUtils.toStringArray(keys);
 		}
+		/** Demo不涉及-end */
+
 		return tokens;
 	}
 

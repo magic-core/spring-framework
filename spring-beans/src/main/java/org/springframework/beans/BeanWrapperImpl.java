@@ -16,19 +16,15 @@
 
 package org.springframework.beans;
 
-import java.beans.PropertyDescriptor;
-import java.lang.reflect.Method;
-import java.security.AccessControlContext;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
-import java.security.PrivilegedActionException;
-import java.security.PrivilegedExceptionAction;
-
 import org.springframework.core.ResolvableType;
 import org.springframework.core.convert.Property;
 import org.springframework.core.convert.TypeDescriptor;
 import org.springframework.lang.Nullable;
 import org.springframework.util.ReflectionUtils;
+
+import java.beans.PropertyDescriptor;
+import java.lang.reflect.Method;
+import java.security.*;
 
 /**
  * Default {@link BeanWrapper} implementation that should be sufficient
@@ -309,11 +305,19 @@ public class BeanWrapperImpl extends AbstractNestablePropertyAccessor implements
 			}
 		}
 
+		/**
+		 *
+		 * @param value
+		 * @throws Exception
+		 */
 		@Override
 		public void setValue(final @Nullable Object value) throws Exception {
+			// 获得set<property/>的Method对象，例：public void setPersionB(PersionB persionB)
+			// pd就是 GenericTypeAwarePropertyDescriptor 实例
 			final Method writeMethod = (this.pd instanceof GenericTypeAwarePropertyDescriptor ?
 					((GenericTypeAwarePropertyDescriptor) this.pd).getWriteMethodForActualAccess() :
 					this.pd.getWriteMethod());
+			/** Demo不涉及-start */
 			if (System.getSecurityManager() != null) {
 				AccessController.doPrivileged((PrivilegedAction<Object>) () -> {
 					ReflectionUtils.makeAccessible(writeMethod);
@@ -327,8 +331,11 @@ public class BeanWrapperImpl extends AbstractNestablePropertyAccessor implements
 					throw ex.getException();
 				}
 			}
+			/** Demo不涉及-end */
 			else {
+				// 表示让程序有权限对private修饰的属性做操作
 				ReflectionUtils.makeAccessible(writeMethod);
+				// 利用反射，调用setPersionB方法，将persionB的value值set到persion对象里去
 				writeMethod.invoke(getWrappedInstance(), value);
 			}
 		}

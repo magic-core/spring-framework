@@ -500,7 +500,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 			// 初始化 AbstractApplicationContext 部分属性，对后续逻辑没有影响
 			prepareRefresh();
 
-			/** 主线逻辑 */
+			// tofix 主线
 			// 创建beanfactory bean工厂，根据配置文件中的标签解析为Spring的Bean定义对象，以map的方式存放到beanfactory实例中
 			ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();
 
@@ -538,7 +538,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				// 对应 initApplicationEventMulticaster
 				registerListeners();
 
-				/** 主线逻辑 */
+				// tofix 主线
 				// 实例化所有没有实例化的(没有设置“懒加载”)单例
 				finishBeanFactoryInitialization(beanFactory);
 

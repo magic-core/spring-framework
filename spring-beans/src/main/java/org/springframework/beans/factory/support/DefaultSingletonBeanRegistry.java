@@ -410,14 +410,15 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	 *
 	 * Register a dependent bean for the given bean,
 	 * to be destroyed before the given bean is destroyed.
-	 * @param beanName the name of the bean
-	 * @param dependentBeanName the name of the dependent bean
+	 * @param beanName 被依赖的<bean/> 例：“persionB”
+	 * @param dependentBeanName 当前的<bean/> 例：“persion”
 	 */
 	public void registerDependentBean(String beanName, String dependentBeanName) {
+
 		// canonicalName就是beanName（只有设置别名才有效）
 		String canonicalName = canonicalName(beanName);
 
-		// dependentBeanMap：Map类型，{被依赖的beanNameA->依赖beanNameA的其它Bean的beanNameB Set集合}
+		// dependentBeanMap：Map类型，{beanName("persion")->Set集合[依赖"persion"的其它bean的beanName]}
 		synchronized (this.dependentBeanMap) {
 			Set<String> dependentBeans =
 					this.dependentBeanMap.computeIfAbsent(canonicalName, k -> new LinkedHashSet<>(8));
@@ -426,7 +427,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 			}
 		}
 
-		// dependenciesForBeanMap：Map类型，{beanNameB->beanNameB代表的Bean依赖的其它Bean的beanNameA Set集合}
+		// dependenciesForBeanMap：Map类型，{beanName（"persionB"） -> Set集合["persionB"依赖的其它Bean的beanName]}
 		synchronized (this.dependenciesForBeanMap) {
 			Set<String> dependenciesForBean =
 					this.dependenciesForBeanMap.computeIfAbsent(dependentBeanName, k -> new LinkedHashSet<>(8));

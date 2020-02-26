@@ -522,7 +522,8 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			instanceWrapper = this.factoryBeanInstanceCache.remove(beanName);
 		}
 		if (instanceWrapper == null) {
-			/** 实例化Bean真正指代的对象，例：Persion */
+			// tofix 主线
+			// 实例化Bean真正指代的对象，例：Persion
 			instanceWrapper = createBeanInstance(beanName, mbd, args);
 		}
 		// bean 表示<bean/>所代表的真正对象，例：Persion对象
@@ -567,6 +568,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		// exposedObject 表示bean实例
 		Object exposedObject = bean;
 		try {
+			// tofix 主线-副
 			// 填充bean的属性
 			populateBean(beanName, mbd, instanceWrapper);
 			/** Demo不涉及 */
@@ -1336,6 +1338,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	 * @param bw       the BeanWrapper with bean instance
 	 */
 	protected void populateBean(String beanName, RootBeanDefinition mbd, @Nullable BeanWrapper bw) {
+
 		/** Demo不涉及-start */
 		if (bw == null) {
 			if (mbd.hasPropertyValues()) {
@@ -1626,11 +1629,12 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		if (pvs.isEmpty()) {
 			return;
 		}
-		/**Demo不涉及，暂时不深解*/
+		/** Demo不涉及-start */
 		// System.getSecurityManager()不为空，则说明使用者通过”-Djava.security.manager“启动了安全管理器（SecurityManager），安全管理器为了防止恶意代码对系统产生影响，可以对运行的代码进行权限控制
 		if (System.getSecurityManager() != null && bw instanceof BeanWrapperImpl) {
 			((BeanWrapperImpl) bw).setSecurityContext(getAccessControlContext());
 		}
+		/** Demo不涉及-end */
 
 		// mpvs 表示装载pvs的临时变量
 		MutablePropertyValues mpvs = null;
@@ -1640,8 +1644,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		// pvs对应RootBeanDefinition的propertyValues属性，本身就是MutablePropertyValues类型
 		if (pvs instanceof MutablePropertyValues) {
 			mpvs = (MutablePropertyValues) pvs;
-			// tofix 默认false，作用？
-			/** Demo不涉及，暂不深解-start*/
+			/** Demo不涉及-start */
 			if (mpvs.isConverted()) {
 				// Shortcut: use the pre-converted values as-is.
 				try {
@@ -1652,41 +1655,48 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 							mbd.getResourceDescription(), beanName, "Error setting property values", ex);
 				}
 			}
-			/** Demo不涉及，暂不深解-end*/
+			/** Demo不涉及-end */
 
 			// 获取bean下<property>标签的集合
 			original = mpvs.getPropertyValueList();
 
 		} else {
-			/**Demo不涉及，暂不深解*/
+			/** Demo不涉及 */
 			original = Arrays.asList(pvs.getPropertyValues());
 		}
 
+		/** 无用逻辑-start */
 		// 如果没有指定TypeConverter（用于类型转化）,bw作为converter
 		TypeConverter converter = getCustomTypeConverter();
 		if (converter == null) {
 			converter = bw;
 		}
+		/** 无用逻辑-end */
+
 		BeanDefinitionValueResolver valueResolver = new BeanDefinitionValueResolver(this, beanName, mbd, converter);
 
 		// Create a deep copy, resolving any references for values.
-		// tofix 作用是什么
+		// deepCopy 表示<property/>集合（集合中的一个元素对应一个<property/>标签）
 		List<PropertyValue> deepCopy = new ArrayList<>(original.size());
 		boolean resolveNecessary = false;
 		for (PropertyValue pv : original) {
+				/** Demo不涉及 */
 			if (pv.isConverted()) {
-				/**Demo不涉及，暂不深解*/
 				deepCopy.add(pv);
 			} else {
+
+				// 例：<property name="P" ref="persion_B"/>，propertyName 表示 "p"
 				String propertyName = pv.getName();
+				// 例：<property name="P" ref="persion_B"/>，originalValue 表示封装了ref信息的RuntimeBeanReference实例
 				Object originalValue = pv.getValue();
+				// tofix 主线-副
 				// 如果有必要，则对<property>中的值进行转换，（例：<property name="P" ref="persion_B"/>,值是封装了ref信息的RuntimeBeanReference实例，转换成真正的Persion对象）
 				// resolvedValue 表示转换后的值
 				Object resolvedValue = valueResolver.resolveValueIfNecessary(pv, originalValue);
 				// convertedValue 代表resolvedValue
 				Object convertedValue = resolvedValue;
 
-				/** Demo不涉及，暂不深解-start*/
+				/** Demo不涉及-start */
 				// convertible 表示propertyName指代的属性可转化
 				// isWritableProperty 方法用于判断propertyName在当前Bean中是否有set方法（即写入方法）
 				// isNestedOrIndexedProperty 方法用于判断propertyName是否包含'.'、'['；例：<property name=""/>中的name可以填写"person.name"、"array[1]"等形式
@@ -1696,10 +1706,8 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 				if (convertible) {
 					convertedValue = convertForProperty(resolvedValue, propertyName, bw, converter);
 				}
-				/** Demo不涉及，暂不深解-end*/
 				// Possibly store converted value in merged bean definition,
 				// in order to avoid re-conversion for every created bean instance.
-				/**  Demo不涉及，暂不深解-start*/
 				// property指代的值不需要解析转化，走本分支
 				if (resolvedValue == originalValue) {
 					if (convertible) {
@@ -1711,7 +1719,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 						!(convertedValue instanceof Collection || ObjectUtils.isArray(convertedValue))) {
 					pv.setConvertedValue(convertedValue);
 					deepCopy.add(pv);
-				/**  Demo不涉及，暂不深解-end*/
+				/**  Demo不涉及-end */
 
 				} else {
 					resolveNecessary = true;
@@ -1721,13 +1729,14 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			}
 		}
 
-		/**Demo不涉及，暂不深解*/
+		/** Demo不涉及 */
 		if (mpvs != null && !resolveNecessary) {
 			mpvs.setConverted();
 		}
 
 		// Set our (possibly massaged) deep copy.
 		try {
+			// tofix 主线
 			// 将解析后的<property/>放到bw（BeanWrapper）的PropertyValues属性里
 			bw.setPropertyValues(new MutablePropertyValues(deepCopy));
 		} catch (BeansException ex) {

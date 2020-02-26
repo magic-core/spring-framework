@@ -5,7 +5,7 @@ import java.util.List;
 public  class Persion {
 
 	private List<String> name;
-	private Persion1 p;
+	private PersionB persionB;
 	public void test() {
 		System.out.println("hello world!");
 	}
@@ -18,11 +18,11 @@ public  class Persion {
 		this.name = name;
 	}
 
-	public Persion1 getP() {
-		return p;
+	public PersionB getPersionB() {
+		return persionB;
 	}
 
-	public void setP(Persion1 p) {
-		this.p = p;
+	public void setPersionB(PersionB persionB) {
+		this.persionB = persionB;
 	}
 }
