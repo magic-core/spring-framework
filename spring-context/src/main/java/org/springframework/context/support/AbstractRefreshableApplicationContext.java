@@ -133,7 +133,8 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 		try {
 			// 创建 DefaultListableBeanFactory 实例 bean工厂
 			DefaultListableBeanFactory beanFactory = createBeanFactory();
-			beanFactory.setSerializationId(getId());/** 无用逻辑 */
+			/** 无用逻辑 */
+			beanFactory.setSerializationId(getId());
 
 			// 对beanFactory 的 AllowCircularReferences 和 AllowBeanDefinitionOverriding 属性赋值
 			// allowCircularReferences 表示允许bean循环引用,默认true

@@ -1282,6 +1282,8 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			}
 			// 将bean的对象封装到BeanWrapperImpl里
 			BeanWrapper bw = new BeanWrapperImpl(beanInstance);
+			/** 无用逻辑 */
+			// 初始化bw的一些属性
 			initBeanWrapper(bw);
 			return bw;
 		} catch (Throwable ex) {

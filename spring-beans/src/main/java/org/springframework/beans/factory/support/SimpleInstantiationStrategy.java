@@ -102,6 +102,7 @@ public class SimpleInstantiationStrategy implements InstantiationStrategy {
 			// 利用无参构造函数实例化bean
 			return BeanUtils.instantiateClass(constructorToUse);
 		}
+		/** Demo不涉及 */
 		else {
 			// 通过CGLIB
 			return instantiateWithMethodInjection(bd, beanName, owner);

@@ -267,6 +267,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 			bean = getObjectForBeanInstance(sharedInstance, name, beanName, null);
 		}
 
+		// tofix 主线
 		// 如果是方法级注释的场景1，走本分支
 		else {
 			// Fail if we're already creating this bean instance:

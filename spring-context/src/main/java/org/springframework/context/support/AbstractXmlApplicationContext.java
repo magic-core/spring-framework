@@ -87,8 +87,8 @@ public abstract class AbstractXmlApplicationContext extends AbstractRefreshableC
 		// this表示当前对象 ClassPathXmlApplicationContext 实例，继承自ResourceLoader
 		beanDefinitionReader.setResourceLoader(this);
 
-		/** 非主要 */
-		// ResourceEntityResolver，后面的逻辑将作为Document类中的一个成员变量，用于解析dom形式的application.xml文件
+		/** 非主要逻辑 */
+		// ResourceEntityResolver，在后面的 非主要逻辑 里，将作为Document类中的一个成员变量，用于解析dom形式的application.xml文件
 		beanDefinitionReader.setEntityResolver(new ResourceEntityResolver(this));
 		/** 无用逻辑-start */
 		// getEnvironment返回StandardEnvironment实例
