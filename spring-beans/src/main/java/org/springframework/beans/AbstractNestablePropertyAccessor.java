@@ -421,6 +421,11 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 		return propValue;
 	}
 
+	/**
+	 *
+	 * @param tokens 持有属性名的类，例：<property name="persionB" >中的“persionB”
+	 * @param pv pv对象，对应<property/>
+	 */
 	private void processLocalProperty(PropertyTokenHolder tokens, PropertyValue pv) {
 		// ph（BeanPropertyHandler 实例）包含了<property/>的相关信息，是一个Pojo对象
 		// 执行 BeanWrapperImpl 的getLocalPropertyHandler方法
@@ -449,6 +454,7 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 			if (!Boolean.FALSE.equals(pv.conversionNecessary)) {
 				// converted 默认为false，表示需要转换
 				if (pv.isConverted()) {
+					/** Demo不涉及 */
 					valueToApply = pv.getConvertedValue();
 				}
 				else {
@@ -467,12 +473,12 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 							}
 						}
 					}
+					/** Demo不涉及-end */
 
-					// 没有产生实际效果
-					// 转换属性值，Demo中，originalValue就是valueToApply
+					/** 没有产生实际效果 */
+					// 转换属性值，Demo中，valueToApply 就是 originalValue
 					valueToApply = convertForProperty(
 							tokens.canonicalName, oldValue, originalValue, ph.toTypeDescriptor());
-					/** Demo不涉及-end */
 				}
 				// 执行转换逻辑后，原值与新值相等，所以表示没有必要进行转换<property/>，故conversionNecessary设置为false
 				pv.getOriginalPropertyValue().conversionNecessary = (valueToApply != originalValue);
