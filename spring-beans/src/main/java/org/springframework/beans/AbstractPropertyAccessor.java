@@ -83,7 +83,7 @@ public abstract class AbstractPropertyAccessor extends TypeConverterSupport impl
 	}
 
 	/**
-	 *
+	 * 将解析后的<property/>的属性值，使用反射，通过setter方法设置到目标对象的属性里
 	 *
 	 * @param pvs PropertyValues to set on the target object
 	 * @param ignoreUnknown should we ignore unknown properties (not found in the bean)
@@ -107,6 +107,7 @@ public abstract class AbstractPropertyAccessor extends TypeConverterSupport impl
 				// We can attempt to deal only with less serious exceptions.
 
 				// tofix 主线
+				// 将解析后的<property/>的属性值，使用反射，通过setter方法设置到目标对象的属性里
 				// 执行的是从 AbstractNestablePropertyAccessor 继承来的 setPropertyValue
 				setPropertyValue(pv);
 			}
