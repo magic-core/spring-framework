@@ -235,7 +235,7 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 	}
 
 	/**
-	 *
+	 * 将解析后的<property/>的属性值，使用反射，通过setter方法设置到目标对象的属性里
 	 *
 	 * @param pv
 	 * @throws BeansException
@@ -268,6 +268,7 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 			}
 
 			// tofix 主线
+			// 将解析后的<property/>的属性值，使用反射，通过setter方法设置到目标对象的属性里
 			nestedPa.setPropertyValue(tokens, pv);
 		}
 		else {

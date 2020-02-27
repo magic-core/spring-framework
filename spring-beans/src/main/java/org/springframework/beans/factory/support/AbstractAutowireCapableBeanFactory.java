@@ -1418,7 +1418,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		/** Demo不涉及-end */
 
 
-		// 如果设置了<property/>，则把<property/>总的属性值，set到bw(BeanWrapper)里
+		// 如果设置了<property/>，则把<property/>的属性值，使用反射，通过setter方法设置到目标对象的属性里
 		if (pvs != null) {
 			applyPropertyValues(beanName, mbd, bw, pvs);
 		}
@@ -1739,7 +1739,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		// Set our (possibly massaged) deep copy.
 		try {
 			// tofix 主线
-			// 将解析后的<property/>放到bw（BeanWrapper）的PropertyValues属性里
+			// 将解析后的<property/>的属性值，使用反射，通过setter方法设置到目标对象的属性里
 			bw.setPropertyValues(new MutablePropertyValues(deepCopy));
 		} catch (BeansException ex) {
 			throw new BeanCreationException(
