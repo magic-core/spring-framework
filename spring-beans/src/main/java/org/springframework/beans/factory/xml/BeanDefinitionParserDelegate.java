@@ -1027,7 +1027,7 @@ public class BeanDefinitionParserDelegate {
 				"<property> element for property '" + propertyName + "'" :
 				"<constructor-arg> element");
 
-		// Demo不涉及，暂不深解
+		/** Demo不涉及 */
 		// nl 表示 <property>的子元素，只会有一个，例：list
 		NodeList nl = ele.getChildNodes();
 		// subElement 表示<property>的子元素

@@ -644,7 +644,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		// 获取mbd指代的类型，即<bean/>中的class
 		Class<?> targetType = determineTargetType(beanName, mbd, typesToMatch);
 
-		// Demo不涉及，暂不深解
+		/** Demo不涉及 */
 		// 如果mbd的synthetic为false（默认为false，与AOP切面相关），并且 hasInstantiationAwareBeanPostProcessors 为true，才会执行本代码
 		// hasInstantiationAwareBeanPostProcessors 表示是否有注册了实现 InstantiationAwareBeanPostProcessor 的Bean（默认没有）；
 		if (targetType != null && !mbd.isSynthetic() && hasInstantiationAwareBeanPostProcessors()) {
@@ -677,7 +677,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	protected Class<?> determineTargetType(String beanName, RootBeanDefinition mbd, Class<?>... typesToMatch) {
 		// targetType 代表mbd指代bean定义的类
 		Class<?> targetType = mbd.getTargetType();
-		// Demo不涉及，暂不深解
+		/** Demo不涉及 */
 		// 如果获得的 targetType 等于空，则说明使用factory-bean生成的实例，所以没有指定<bean/>中的class
 		// targetType 来自 mbd 的 resolvedTargetType 属性
 		if (targetType == null) {
@@ -1064,7 +1064,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		Object bean = null;
 		//beforeInstantiationResolved默认为null，不执行本分支
 		if (!Boolean.FALSE.equals(mbd.beforeInstantiationResolved)) {
-			// Demo不涉及，暂不深解
+			/** Demo不涉及 */
 			// 如果mbd的synthetic为false（默认为false，与AOP切面相关），并且 hasInstantiationAwareBeanPostProcessors 为true，才会执行本代码
 			// hasInstantiationAwareBeanPostProcessors 表示是否有注册了实现 InstantiationAwareBeanPostProcessor 的Bean（默认没有）；
 			if (!mbd.isSynthetic() && hasInstantiationAwareBeanPostProcessors()) {
@@ -1236,7 +1236,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	@Nullable
 	protected Constructor<?>[] determineConstructorsFromBeanPostProcessors(@Nullable Class<?> beanClass, String beanName)
 			throws BeansException {
-		// Demo不涉及，暂不深解
+		/** Demo不涉及 */
 		// hasInstantiationAwareBeanPostProcessors 表示是否有注册了实现 InstantiationAwareBeanPostProcessor 的Bean（默认没有）；
 		if (beanClass != null && hasInstantiationAwareBeanPostProcessors()) {
 			for (BeanPostProcessor bp : getBeanPostProcessors()) {
