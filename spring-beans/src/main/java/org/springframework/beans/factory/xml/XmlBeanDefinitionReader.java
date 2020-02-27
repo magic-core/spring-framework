@@ -408,7 +408,7 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 	protected int doLoadBeanDefinitions(InputSource inputSource, Resource resource)
 			throws BeanDefinitionStoreException {
 		try {
-			/** 非主要 */
+			/** 非主要逻辑 */
 			// 将代表xml文件的inputSource对象解析为document实例
 			Document doc = doLoadDocument(inputSource, resource);
 			// tofix 主线

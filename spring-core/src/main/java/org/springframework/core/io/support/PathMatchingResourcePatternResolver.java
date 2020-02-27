@@ -268,22 +268,22 @@ public class PathMatchingResourcePatternResolver implements ResourcePatternResol
 		Assert.notNull(locationPattern, "Location pattern must not be null");
 		// 如果locationPattern以"classpath*:"开头
 		if (locationPattern.startsWith(CLASSPATH_ALL_URL_PREFIX)) {
-			// tofix 不常用，本Demo不涉及，暂不细讲
+			/** Demo不涉及 */
 			// 截取"classpath*:applicationContext.xml"的"classpath*:"后的部分
 			// 如果包含"*"或者"？"
 			// getPathMatcher()方法返回 AntPathMatcher 实例
 			if (getPathMatcher().isPattern(locationPattern.substring(CLASSPATH_ALL_URL_PREFIX.length()))) {
 				return findPathMatchingResources(locationPattern);
 			}
-			/**当前Demo 走本分支*/
 			// 截取"classpath*:applicationContext.xml"的"classpath*:"后的部分
 			// 如果不包含"*"或者"？"
 			else {
+			    /**当前Demo 走本分支*/
 				// 读取解析xml文件，返回Resource文件资源数组
 				return findAllClassPathResources(locationPattern.substring(CLASSPATH_ALL_URL_PREFIX.length()));
 			}
 		}
-		// tofix 不常用，本Demo不涉及，暂不细讲
+		/** Demo不涉及-start */
 		// 如果locationPattern不以"classpath*:"开头
 		else {
 			// Generally only look for a pattern after a prefix here,
@@ -299,6 +299,7 @@ public class PathMatchingResourcePatternResolver implements ResourcePatternResol
 				return new Resource[] {getResourceLoader().getResource(locationPattern)};
 			}
 		}
+		/** Demo不涉及-end */
 	}
 
 	/**

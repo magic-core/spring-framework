@@ -239,7 +239,8 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	@SuppressWarnings("unchecked")
 	protected <T> T doGetBean(final String name, @Nullable final Class<T> requiredType,
 							  @Nullable final Object[] args, boolean typeCheckOnly) throws BeansException {
-		/** Demo不涉及 */
+		/** 没有产生实际效果 */
+		// beanName 就是 name
 		// 如果beanName开头带有"&",去掉"&"（beanName开头带有"&"，和factory-bean的Bean生成方式有关）
 		final String beanName = transformedBeanName(name);
 
@@ -267,6 +268,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 			bean = getObjectForBeanInstance(sharedInstance, name, beanName, null);
 		}
 
+		// tofix 主线
 		// 如果是方法级注释的场景1，走本分支
 		else {
 			// Fail if we're already creating this bean instance:
@@ -510,7 +512,8 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	 */
 	@Override
 	public boolean isTypeMatch(String name, ResolvableType typeToMatch) throws NoSuchBeanDefinitionException {
-		// Demo不涉及factory-bean，暂不深解
+		/** 没有产生实际效果 */
+		// beanName 就是 name
 		// 如果beanName开头带有"&",去掉"&"（beanName开头带有"&"，是获取通过factory-bean方式生成的）
 		String beanName = transformedBeanName(name);
 
@@ -553,7 +556,6 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 			return false;
 		}
 		// 如果没获取到实例，则判断singletonObjects是否包含beanName，beanDefinitionMap是否包含beanName
-		// tofix 怎么可能，包含beanName的实例，但是不包含注册的beanName
 		else if (containsSingleton(beanName) && !containsBeanDefinition(beanName)) {
 			// null instance registered
 			return false;
@@ -579,7 +581,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 				new Class<?>[]{classToMatch} : new Class<?>[]{FactoryBean.class, classToMatch});
 
 
-		// Demo不涉及，暂不深解
+		/** Demo不涉及*/
 		// 只有<bean/>中的<property/>包含子<bean/>这种情况，dbd 才有值
 		// dbd代表 RootBeanDefinition 装饰的 BeanDefinitionHolder 实例，子<bean/>；
 		BeanDefinitionHolder dbd = mbd.getDecoratedDefinition();
@@ -598,7 +600,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 			return false;
 		}
 
-		// Demo不涉及FactoryBean来创建bean的实例，暂不深解
+		/** Demo不涉及 */
 		// 如果beanType是FactoryBean的子类，即使用FactoryBean来创建bean的实例
 		if (FactoryBean.class.isAssignableFrom(beanType)) {
 			if (!BeanFactoryUtils.isFactoryDereference(name) && beanInstance == null) {
@@ -609,7 +611,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 				}
 			}
 		}
-		// Demo不涉及FactoryBean来创建bean的实例，暂不深解
+		/** Demo不涉及 */
 		// 如果beanType不是FactoryBean的子类，但beanName以 "&" 开头
 		else if (BeanFactoryUtils.isFactoryDereference(name)) {
 			// Special case: A SmartInstantiationAwareBeanPostProcessor returned a non-FactoryBean
@@ -620,7 +622,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 				return false;
 			}
 		}
-		// 当前案例，不会被执行，暂不深解
+		/** Demo不涉及 */
 		// mbd.targetType 调用无参构造函数，初始化时不会被赋值，所以为空
 		ResolvableType resolvableType = mbd.targetType;
 		// factoryMethodReturnType 没有使用FactoryBean来创建bean的实例，也为空

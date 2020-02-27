@@ -421,17 +421,21 @@ public class BeanDefinitionParserDelegate {
 		// 获得<bean/>节点的id属性，例：persion
 		String id = ele.getAttribute(ID_ATTRIBUTE);
 
-		// 获得<bean/>节点的name属性，一般Spring的使用不定义name属性，所以暂不深解本内容
+		/** Demo不涉及-start */
+		// 获得<bean/>节点的name属性，一般Spring的使用不定义name属性
 		String nameAttr = ele.getAttribute(NAME_ATTRIBUTE);
 		List<String> aliases = new ArrayList<>();
 		if (StringUtils.hasLength(nameAttr)) {
 			String[] nameArr = StringUtils.tokenizeToStringArray(nameAttr, MULTI_VALUE_ATTRIBUTE_DELIMITERS);
 			aliases.addAll(Arrays.asList(nameArr));
 		}
+		/** Demo不涉及-end */
 
 		// beanName表示<bean/>标签的id属性
 		String beanName = id;
-		// 没有设置<bean/>中的id和name,会走本分支,一般都指定id，所以暂不深解本代码
+
+		/** Demo不涉及-start */
+		// 没有设置<bean/>中的id和name,会走本分支,一般都指定id
 		if (!StringUtils.hasText(beanName) && !aliases.isEmpty()) {
 			beanName = aliases.remove(0);
 			if (logger.isDebugEnabled()) {
@@ -439,6 +443,8 @@ public class BeanDefinitionParserDelegate {
 						"' as bean name and " + aliases + " as aliases");
 			}
 		}
+		/** Demo不涉及-end */
+
 
 		// 如果containingBean等于null，则校验beanName是否已经被定义过了,如果被定义了,则抛出异常
 		//解释:
@@ -448,10 +454,13 @@ public class BeanDefinitionParserDelegate {
 			checkNameUniqueness(beanName, aliases, ele);
 		}
 
+		// tofix 主线
 		// 解析ele(<bean/>)节点,初始化bd（GenericBeanDefinition）实例
 		AbstractBeanDefinition beanDefinition = parseBeanDefinitionElement(ele, beanName, containingBean);
+
 		if (beanDefinition != null) {
-			// 如果没有指定<bean/>中的id或name，则会走当前分支，但是一般都会指定id，所以暂不深解本代码块
+			/** Demo不涉及-start */
+			// 如果没有指定<bean/>中的id或name，则会走当前分支，但是一般都会指定id
 			if (!StringUtils.hasText(beanName)) {
 				try {
 					if (containingBean != null) {
@@ -480,8 +489,13 @@ public class BeanDefinitionParserDelegate {
 					return null;
 				}
 			}
+			/** Demo不涉及-end */
+
+			/** 空变量 */
 			// 只指定<bean/>的id，aliasesArray为空
 			String[] aliasesArray = StringUtils.toStringArray(aliases);
+
+			// tofix 主线-副
 			// 创建BeanDefinitionHolder实例，向构造器传入GenericBeanDefinition、beanName
 			return new BeanDefinitionHolder(beanDefinition, beanName, aliasesArray);
 		}
@@ -538,26 +552,34 @@ public class BeanDefinitionParserDelegate {
 			className = ele.getAttribute(CLASS_ATTRIBUTE).trim();
 		}
 
-		// parent表示当前<bean/>设置的"parent"属性（如果设置了），Demo不涉及
+		/** Demo不涉及-start */
+		// parent表示当前<bean/>设置的"parent"属性（如果设置了）
 		String parent = null;
 		if (ele.hasAttribute(PARENT_ATTRIBUTE)) {
 			parent = ele.getAttribute(PARENT_ATTRIBUTE);
 		}
+		/** Demo不涉及-end */
 
 		try {
 			// 创建 GenericBeanDefinition 实例,继承自AbstractBeanDefinition，代表bean定义的对应实体
 			AbstractBeanDefinition bd = createBeanDefinition(className, parent);
+
+			/** 无用逻辑 */
 			// 将使用者在<bean/>上配置的属性(如果<bean/>没有配置,尝试从<beans/>读取相关全局配置（如果使用者配置了）)，set到bd(GenericBeanDefinition)实例里
 			parseBeanDefinitionAttributes(ele, beanName, containingBean, bd);
+
+			// tofix 主线
 			// 将使用者在<bean/>里配置的子标签<property/>，解析到bd(GenericBeanDefinition)实例里
 			parsePropertyElements(ele, bd);
+
+			/** 无用逻辑 */
 			// readerContext表示XmlReaderContext实例
-			// Resource代表application.xml资源文件的UrlResource实例
+			// resource代表application.xml资源文件的UrlResource实例
 			bd.setResource(this.readerContext.getResource());
+			/** 空实现 */
 			// 当前Demo,extractSource没有实现逻辑,直接返回空
 			bd.setSource(extractSource(ele));
-
-			/**Demo不涉及,暂不深解*/
+			/** Demo不涉及-start */
 			// 获得bean标签里的"description"节点,用于告诉开发人员关于bean的描述;
 			bd.setDescription(DomUtils.getChildElementValueByTagName(ele, DESCRIPTION_ELEMENT));
 			// 用于解析<bean/>下的<meta key="" value=""/>标签,set到bd里;
@@ -575,6 +597,7 @@ public class BeanDefinitionParserDelegate {
 			parseConstructorArgElements(ele, bd);
 			// 用于解析<bean/>下的"qualifier"标签,set到bd里
 			parseQualifierElements(ele, bd);
+			/** Demo不涉及-end */
 
 			return bd;
 		}
@@ -1004,7 +1027,7 @@ public class BeanDefinitionParserDelegate {
 				"<property> element for property '" + propertyName + "'" :
 				"<constructor-arg> element");
 
-		// Demo不涉及，暂不深解
+		/** Demo不涉及 */
 		// nl 表示 <property>的子元素，只会有一个，例：list
 		NodeList nl = ele.getChildNodes();
 		// subElement 表示<property>的子元素
