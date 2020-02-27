@@ -222,11 +222,11 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 
 	/**
 	 * 含义&执行场景：
-	 * 1.Spring启动过程中，会调用本方法，实例化所有的非懒加载-单例Bean，放在缓存里
+	 * 1.Spring启动过程中，会调用本方法，获取单例Bean
 	 * 2.应用系统获取Spring管理的单例Bean（例：在Demo中的`context.getBean("persion");`）会调用本方法获取
 	 *
 	 * Return an instance, which may be shared or independent, of the specified bean.
-	 * @param name          the name of the bean to retrieve
+	 * @param name          需要操作的beanName
 	 * @param requiredType  the required type of the bean to retrieve
 	 * @param args          arguments to use when creating a bean instance using explicit arguments
 	 *                      (only applied when creating a new instance as opposed to retrieving an existing one)
@@ -246,13 +246,14 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 
 		// 根据beanName，尝试在bean工厂获取已经保存的单例bean实例,sharedInstance表示单例实例，例：Persion
 		// 执行场景：
-		// 1.如果是方法级注释的场景1，则会返回空
-		// 2.如果是方法级注释的场景2，则会直接返回bean实例，例：Persion对象
+		// 1.如果是Spring启动过程中，会调用本方法，获取单例Bean
+		//	1.1.bean没有被实例化过，返回null
+		//	1.2.bean被实例化过，返回实例化的bean（可能会发生属性还没有被注入的情况）
+		// 2.如果是应用系统在Spring启动成功后，想要获取Spring管理的单例Bean（例：在Demo中的`context.getBean("persion");`），则会直接返回完整的bean实例，例：Persion对象
 		Object sharedInstance = getSingleton(beanName);
 		Object bean;
 
-		// 如果是方法级注释的场景2，走本分支
-		// 直接在 singletonObjects 获取到了bean实例
+		// 从缓存（1级或2级或3级缓存）中获取到了bean实例
 		if (sharedInstance != null && args == null) {
 			if (logger.isDebugEnabled()) {
 				if (isSingletonCurrentlyInCreation(beanName)) {
@@ -269,7 +270,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 		}
 
 		// tofix 主线
-		// 如果是方法级注释的场景1，走本分支
+		// 从缓存（1级或2级或3级缓存）中没有获取到了bean实例
 		else {
 			// Fail if we're already creating this bean instance:
 			// We're assumably within a circular reference.
@@ -335,7 +336,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 				/** Demo不涉及-end*/
 
 
-				// 如果Bean指定的作用域（scope）为单例
+				// 如果Bean指定的作用域（scope）为单例，则进入本分支，实例化<bean/>指代的目标对象
 				if (mbd.isSingleton()) {
 					// tofix 主线
 					sharedInstance = getSingleton(beanName, () -> {
@@ -396,6 +397,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 
 		}
 
+		/** Demo不涉及-start */
 		// 用于检查所需的类型是否与实际bean实例的类型匹配
 		if (requiredType != null && !requiredType.isInstance(bean)) {
 			try {
@@ -412,6 +414,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 				throw new BeanNotOfRequiredTypeException(name, requiredType, bean.getClass());
 			}
 		}
+		/** Demo不涉及-end */
 
 
 		return (T) bean;

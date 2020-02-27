@@ -155,9 +155,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	}
 
 	/**
-	 *
-	 * 执行场景：
-	 * 1.
+	 * 作用：依次从一级缓存、二级缓存、三级缓存获取指定beanName的bean实例
 	 *
 	 * Return the (raw) singleton object registered under the given name.
 	 * <p>Checks already instantiated singletons and also allows for an early
@@ -168,17 +166,19 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	 */
 	@Nullable
 	protected Object getSingleton(String beanName, boolean allowEarlyReference) {
-		// 尝试从 singletonObjects 中获取bean实例
+		// 尝试从 一级缓存中获取指定bean实例（只有已经实例化完成的bean才会在一级缓存找到）
 		Object singletonObject = this.singletonObjects.get(beanName);
-		// 如果没获取到并且当前bean处在 正在创建中，就
+		// 如果没有从一级缓存获取到指定bean 并且 当前bean处在 正在创建中，就尝试从二级缓存获取指定bean（只有被其它bean依赖并且没有实例化结束的bean才会在二级缓存里找到）
 		if (singletonObject == null && isSingletonCurrentlyInCreation(beanName)) {
 			synchronized (this.singletonObjects) {
 				singletonObject = this.earlySingletonObjects.get(beanName);
-				if (singletonObject == null && allowEarlyReference) {
-
+				// 如果没有从二级缓存获取到指定bean，则尝试从三级缓存获取bean（实例化bean一开始就会先保存在三级存里了）
+				if (singletonObject == null && allowEarlyReference) {// allowEarlyReference 表示是否从三级缓存中取值，本Demo调用当前逻辑时，传值为true
 					ObjectFactory<?> singletonFactory = this.singletonFactories.get(beanName);
 					if (singletonFactory != null) {
 						singletonObject = singletonFactory.getObject();
+						// 含义：将三级缓存中的bean挪出，放入二级缓存
+						// 作用：表示当前指定的bean被其它bean依赖，所以需要提前暴露
 						this.earlySingletonObjects.put(beanName, singletonObject);
 						this.singletonFactories.remove(beanName);
 					}

@@ -99,6 +99,7 @@ public class SimpleInstantiationStrategy implements InstantiationStrategy {
 					}
 				}
 			}
+			// tofix 主线
 			// 利用无参构造函数实例化bean
 			return BeanUtils.instantiateClass(constructorToUse);
 		}
