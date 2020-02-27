@@ -1,13 +1,13 @@
 package org.springframework;
 
 public class PersionB {
-	private Persion p;
+	private Persion persion;
 
-	public Persion getP() {
-		return p;
+	public Persion getPersion() {
+		return persion;
 	}
 
-	public void setP(Persion p) {
-		this.p = p;
+	public void setPersion(Persion persion) {
+		this.persion = persion;
 	}
 }
