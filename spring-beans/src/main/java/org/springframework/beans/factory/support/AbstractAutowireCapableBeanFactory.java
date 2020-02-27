@@ -1275,9 +1275,10 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			}
 			/** Demo不涉及-end */
 
-			// Demo走本分支
-			// 使用无参构造函数实例化bean
 			else {
+				// tofix 主线
+				// Demo走本分支
+				// 使用无参构造函数实例化bean
 				beanInstance = getInstantiationStrategy().instantiate(mbd, beanName, parent);
 			}
 			// 将bean的对象封装到BeanWrapperImpl里

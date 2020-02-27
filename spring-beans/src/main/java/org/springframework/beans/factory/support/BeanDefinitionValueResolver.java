@@ -291,10 +291,10 @@ class BeanDefinitionValueResolver {
 			Object bean;
 			// refName 表示<property name="P" ref="persion_B"/>中的"persion_B"
 			String refName = ref.getBeanName();
-			// 如果refName包含#{},则进行解析为真正的值
-			refName = String.valueOf(doEvaluate(refName));
 
 			/** Demo不涉及-start */
+			// 如果refName包含#{},则进行解析为真正的值
+			refName = String.valueOf(doEvaluate(refName));
 			if (ref.isToParent()) {
 				if (this.beanFactory.getParentBeanFactory() == null) {
 					throw new BeanCreationException(

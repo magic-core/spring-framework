@@ -246,13 +246,13 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 
 		// 根据beanName，尝试在bean工厂获取已经保存的单例bean实例,sharedInstance表示单例实例，例：Persion
 		// 执行场景：
-		// 1.如果是方法级注释的场景1，则会返回空
-		// 2.如果是方法级注释的场景2，则会直接返回bean实例，例：Persion对象
+		// 1.如果是Spring启动过程中，想要实例化所有的非懒加载-单例Bean，本方法会返回空
+		// 2.如果是应用系统在Spring启动成功后，想要获取Spring管理的单例Bean（例：在Demo中的`context.getBean("persion");`），则会直接返回bean实例，例：Persion对象
 		Object sharedInstance = getSingleton(beanName);
 		Object bean;
 
-		// 如果是方法级注释的场景2，走本分支
-		// 直接在 singletonObjects 获取到了bean实例
+		// 执行场景：应用系统在Spring启动成功后，想要获取Spring管理的单例Bean（例：在Demo中的`context.getBean("persion");`），走本分支
+		// 含义：直接在 singletonObjects 获取到了bean实例
 		if (sharedInstance != null && args == null) {
 			if (logger.isDebugEnabled()) {
 				if (isSingletonCurrentlyInCreation(beanName)) {
@@ -269,7 +269,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 		}
 
 		// tofix 主线
-		// 如果是方法级注释的场景1，走本分支
+		// 执行场景：Spring启动过程中，想要实例化所有的非懒加载-单例Bean，走本分支
 		else {
 			// Fail if we're already creating this bean instance:
 			// We're assumably within a circular reference.
@@ -335,7 +335,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 				/** Demo不涉及-end*/
 
 
-				// 如果Bean指定的作用域（scope）为单例
+				// 如果Bean指定的作用域（scope）为单例，则进入本分支，实例化<bean/>指代的目标对象
 				if (mbd.isSingleton()) {
 					// tofix 主线
 					sharedInstance = getSingleton(beanName, () -> {
