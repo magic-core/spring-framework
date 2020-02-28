@@ -1,20 +1,13 @@
 package test;
 
-import org.springframework.Persion;
+import org.springframework.demo.PersionA;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class Test {
 	public static void main(String[] args) {
-//		ApplicationContext context = new ClassPathXmlApplicationContext(new String[] {"classpath*:applicationContext.xml"/*,"classpath*:applicationContext.xml","classpath*:test.xml"*/}, true, null);
 		ApplicationContext context = new ClassPathXmlApplicationContext("classpath*:applicationContext.xml");
-//		context.getParentBeanFact
-		Persion persion = (Persion) context.getBean("persion");
-		System.out.println(persion.getPersionB());
-//		for (String s : persion.getName()) {
-//
-//		System.out.println(s);
-//		}
-//		persion.test();
+		PersionA persion = (PersionA) context.getBean("persionA");
+		System.out.println(persion.getPb());
 	}
 }

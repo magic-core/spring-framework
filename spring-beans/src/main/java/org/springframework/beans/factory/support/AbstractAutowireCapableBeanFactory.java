@@ -568,7 +568,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		// exposedObject 表示bean实例
 		Object exposedObject = bean;
 		try {
-			// tofix 主线-副
+			// tofix 主线
 			// 填充bean的属性
 			populateBean(beanName, mbd, instanceWrapper);
 			/** Demo不涉及 */
@@ -589,7 +589,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 		// true：mbd是单例的 并且 允许循环依赖 并且 当前正在创建本bean，没有结束；否则为false
 		if (earlySingletonExposure) {
-			// 尝试从三级缓存里获取Persion实例
+			// 尝试依次从一级、二级、三级缓存里获取Persion实例
 			Object earlySingletonReference = getSingleton(beanName, false);
 			if (earlySingletonReference != null) {
 				if (exposedObject == bean) {
@@ -1683,7 +1683,8 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		List<PropertyValue> deepCopy = new ArrayList<>(original.size());
 		boolean resolveNecessary = false;
 		for (PropertyValue pv : original) {
-				/** Demo不涉及 */
+			/** Demo不涉及 */
+			// true表示已经转换过值了；false：表示值仍然需要转换
 			if (pv.isConverted()) {
 				deepCopy.add(pv);
 			} else {
@@ -1692,7 +1693,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 				String propertyName = pv.getName();
 				// 例：<property name="P" ref="persion_B"/>，originalValue 表示封装了ref信息的RuntimeBeanReference实例
 				Object originalValue = pv.getValue();
-				// tofix 主线-副
+				// tofix 主线
 				// 如果有必要，则对<property>中的值进行转换，（例：<property name="P" ref="persion_B"/>,值是封装了ref信息的RuntimeBeanReference实例，转换成真正的Persion对象）
 				// resolvedValue 表示转换后的值
 				Object resolvedValue = valueResolver.resolveValueIfNecessary(pv, originalValue);

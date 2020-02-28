@@ -141,7 +141,7 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 			// allowBeanDefinitionOverriding 表示xml中相同beanId的bean定义允许覆盖,默认true
 			customizeBeanFactory(beanFactory);
 
-			/**核心方法*/
+			// tofix 核心方法
 			// 执行从 AbstractXmlApplicationContext 继承的 loadBeanDefinitions 方法
 			loadBeanDefinitions(beanFactory);
 

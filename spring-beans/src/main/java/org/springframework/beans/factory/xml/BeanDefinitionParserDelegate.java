@@ -495,7 +495,7 @@ public class BeanDefinitionParserDelegate {
 			// 只指定<bean/>的id，aliasesArray为空
 			String[] aliasesArray = StringUtils.toStringArray(aliases);
 
-			// tofix 主线-副
+			// tofix 主线
 			// 创建BeanDefinitionHolder实例，向构造器传入GenericBeanDefinition、beanName
 			return new BeanDefinitionHolder(beanDefinition, beanName, aliasesArray);
 		}

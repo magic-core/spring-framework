@@ -259,6 +259,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 				}
 				// 如果是新创建的单例bean，则修改bean工厂中的缓存,例：singletonObjects、singletonFactories、earlySingletonObjects、registeredSingletons
 				if (newSingleton) {
+					// tofix 主线
 					addSingleton(beanName, singletonObject);
 				}
 			}

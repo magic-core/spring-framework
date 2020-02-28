@@ -1,48 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
 	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	   xmlns:context="http://www.springframework.org/schema/context"
-	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd"
-	   profile=""
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd"
 >
-<!--	   default-merge="true"-->
-<!--&gt;-->
-		<!--default-merge="true"-->
-
-	<!--	<import resource="classpath:test.xml"/>-->
-	<bean id="p"  class="org.springframework.Persion" >
-		<property name="persionB" ref="pb">
-			<!--			<list  merge="true">-->
-			<!--				<value>Java Core</value>-->
-			<!--				<value>Java Concurrency</value>-->
-			<!--			</list>-->
-		</property>
+	<bean id="persionA" class="org.springframework.demo.PersionA">
+		<property name="pb" ref="persionB"/>
 	</bean>
-			<bean id="pb" class="org.springframework.PersionB">
-				<property name="persion" ref="p">
-					<!--			<list  merge="true">-->
-					<!--				<value>Java Core</value>-->
-					<!--				<value>Java Concurrency</value>-->
-					<!--			</list>-->
-				</property>
-			</bean>
-<!--	<context:property-placeholder location="classpath:application.properties"/>-->
-<!--	<bean  id="persion" class="org.springframework.Persion" >-->
-<!--		<description></description>-->
-<!--		<meta key="" value=""/>-->
-<!--		<lookup-method name="getLatestBean" bean="latestBean"/>-->
-<!--		<property name="name" >-->
-<!--			<list  merge="true">-->
-<!--				<value>Java Core</value>-->
-<!--				<value>Java Concurrency</value>-->
-<!--			</list>-->
-<!--		</property>	</bean>-->
-<!--	<bean id="children"  parent="persion">-->
-<!--		<property name="name">-->
-<!--			<list>-->
-<!--				<value>EJB</value>-->
-<!--				<value>Servlet</value>-->
-<!--			</list>-->
-<!--		</property>-->
-<!--	</bean>-->
+	<bean id="persionB" class="org.springframework.demo.PersionB">
+		<property name="pa" ref="persionA"/>
+	</bean>
+
 </beans>

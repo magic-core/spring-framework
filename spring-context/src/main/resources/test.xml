@@ -5,6 +5,6 @@
 
 	<import resource="classpath:test.xml"/>
 
-	<bean id="persion" class="org.springframework.Persion"/>
+	<bean id="persion" class="org.springframework.demo.PersionA"/>
 
 </beans>
