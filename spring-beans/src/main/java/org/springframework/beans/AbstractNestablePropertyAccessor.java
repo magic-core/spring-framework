@@ -242,7 +242,7 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 	 */
 	@Override
 	public void setPropertyValue(PropertyValue pv) throws BeansException {
-		// tokens 默认为空
+		/** 空变量 */
 		PropertyTokenHolder tokens = (PropertyTokenHolder) pv.resolvedTokens;
 		if (tokens == null) {
 			// propertyName 表示属性名字，例：<property name="p" ref="persion_B">中的“p”
@@ -423,13 +423,15 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 	}
 
 	/**
+	 * 将<property/>中指代的值转换后（本Demo无需转换），设置到目标对象里（例：Persion对象）
 	 *
-	 * @param tokens 持有属性名的类，例：<property name="persionB" >中的“persionB”
-	 * @param pv pv对象，对应<property/>
+	 * @param tokens
+	 * @param pv pv对象，对应<property/>，PropertyValue实例
 	 */
 	private void processLocalProperty(PropertyTokenHolder tokens, PropertyValue pv) {
-		// ph（BeanPropertyHandler 实例）包含了<property/>的相关信息，是一个Pojo对象
-		// 执行 BeanWrapperImpl 的getLocalPropertyHandler方法
+		// ph（BeanPropertyHandler 实例）Bean属性处理器，负责管理`<property/>`属性；本Demo中，主要负责通过持有的`pd`对象获取目标的setter方法，然后利用反射，调用setter方法，对`<bean/>`设置`<property/>`指定的值
+		// 执行的是 BeanWrapperImpl 中的getLocalPropertyHandler方法
+		// tokens.actualName就是<property name="persionB" >中的“persionB”
 		PropertyHandler ph = getLocalPropertyHandler(tokens.actualName);
 
 		/** Demo不涉及-start */
@@ -449,8 +451,10 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 
 		Object oldValue = null;
 		try {
+			// originalValue 表示`<property/>`指代的值;例：在<property ref="p"/>中就是为Persion对象
 			Object originalValue = pv.getValue();
 			Object valueToApply = originalValue;
+			// 执行本分支
 			// pv.conversionNecessary 默认为null，表示有转换<property/>的必要
 			if (!Boolean.FALSE.equals(pv.conversionNecessary)) {
 				// converted 默认为false，表示需要转换
@@ -458,6 +462,7 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 					/** Demo不涉及 */
 					valueToApply = pv.getConvertedValue();
 				}
+				// 执行本分支
 				else {
 					/** Demo不涉及-start */
 					if (isExtractOldValueForEditor() && ph.isReadable()) {
@@ -475,6 +480,7 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 						}
 					}
 					/** Demo不涉及-end */
+
 
 					/** 没有产生实际效果 */
 					// 转换属性值，Demo中，valueToApply 就是 originalValue
