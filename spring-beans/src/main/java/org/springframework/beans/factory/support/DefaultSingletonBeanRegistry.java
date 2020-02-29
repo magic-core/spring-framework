@@ -190,7 +190,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	}
 
 	/**
-	 * 含义&执行场景：Spring启动过程中，会调用本方法，实例化所有的非懒加载-单例Bean，放在缓存里
+	 * 含义&执行场景：Spring启动过程中，会调用本方法，实例化beanName代表的单例Bean,以beanName为key，放到一级缓存里
 	 *
 	 * Return the (raw) singleton object registered under the given name,
 	 * creating and registering a new one if none registered yet.
@@ -226,7 +226,8 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 					this.suppressedExceptions = new LinkedHashSet<>();
 				}
 				try {
-					/** 获得bean真正的实例，例：Persion对象 */
+					// tofix 主线
+					// 获得beanName代表的真正目标对象
 					singletonObject = singletonFactory.getObject();
 					// 标记是新创建的单例bean
 					newSingleton = true;
@@ -257,7 +258,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 					// 在 singletonsCurrentlyInCreation （表示正在创建的单例BeanName集合）中删除当前beanName
 					afterSingletonCreation(beanName);
 				}
-				// 如果是新创建的单例bean，则修改bean工厂中的缓存,例：singletonObjects、singletonFactories、earlySingletonObjects、registeredSingletons
+				// 如果是新创建的单例bean，则加入一级缓存，尝试从二级缓存和三级缓存删除当前beanName代表的目标对象
 				if (newSingleton) {
 					// tofix 主线
 					addSingleton(beanName, singletonObject);

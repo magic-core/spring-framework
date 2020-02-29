@@ -276,6 +276,13 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 		}
 	}
 
+	/**
+	 * 将解析后的<property/>的属性值，使用反射，通过setter方法设置到目标对象的属性里
+	 *
+	 * @param tokens
+	 * @param pv
+	 * @throws BeansException
+	 */
 	protected void setPropertyValue(PropertyTokenHolder tokens, PropertyValue pv) throws BeansException {
 		/** Demo不涉及-start */
 		// tokens.keys 为 null
@@ -423,7 +430,7 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 	}
 
 	/**
-	 * 将<property/>中指代的值转换后（本Demo无需转换），设置到目标对象里（例：Persion对象）
+	 * 将<property/>中指代的值后（本Demo无需转换），设置到目标对象里
 	 *
 	 * @param tokens
 	 * @param pv pv对象，对应<property/>，PropertyValue实例
@@ -490,7 +497,9 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 				// 执行转换逻辑后，原值与新值相等，所以表示没有必要进行转换<property/>，故conversionNecessary设置为false
 				pv.getOriginalPropertyValue().conversionNecessary = (valueToApply != originalValue);
 			}
+			// tofix 主线
 			// 执行的是 BeanPropertyHandler 的setValue方法
+			// 将解析后的<property/>的属性值，使用反射，通过setter方法设置到目标对象的属性里
 			ph.setValue(valueToApply);
 		}
 		catch (TypeMismatchException ex) {

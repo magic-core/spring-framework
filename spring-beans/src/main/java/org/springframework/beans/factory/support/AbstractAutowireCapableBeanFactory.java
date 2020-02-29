@@ -428,7 +428,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	//---------------------------------------------------------------------
 
 	/**
-	 * 创建单例目标对象
+	 * 创建beanName代表的单例目标对象
 	 *
 	 * Central method of this class: creates a bean instance,
 	 * populates the bean instance, applies post-processors, etc.
@@ -480,7 +480,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		try {
 
 			// tofix 主线
-			// 创建真正的实例，例：Persion对象
+			// 创建beanName代表的真正目标对象
 			Object beanInstance = doCreateBean(beanName, mbdToUse, args);
 
 			if (logger.isDebugEnabled()) {
@@ -498,11 +498,12 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	}
 
 	/**
+	 * 创建beanName代表的真正目标对象
+	 *
 	 * Actually create the specified bean. Pre-creation processing has already happened
 	 * at this point, e.g. checking {@code postProcessBeforeInstantiation} callbacks.
 	 * <p>Differentiates between default bean instantiation, use of a
 	 * factory method, and autowiring a constructor.
-	 *
 	 * @param beanName the name of the bean
 	 * @param mbd      the merged bean definition for the bean
 	 * @param args     explicit arguments to use for constructor or factory method invocation
@@ -569,7 +570,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		Object exposedObject = bean;
 		try {
 			// tofix 主线
-			// 填充bean的属性
+			// 根据<property/>,填充目标对象的属性
 			populateBean(beanName, mbd, instanceWrapper);
 			/** Demo不涉及 */
 			/*
@@ -1109,7 +1110,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	}
 
 	/**
-	 * 根据无参构造函数实例化bean（Persion对象），封装到BeanWrapperImpl对象里
+	 * 根据无参构造函数实例化目标对象，封装到BeanWrapperImpl对象里
 	 *
 	 * Create a new instance for the specified bean, using an appropriate instantiation strategy:
 	 * factory method, constructor autowiring, or simple instantiation.
@@ -1124,7 +1125,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	 * @see #instantiateBean
 	 */
 	protected BeanWrapper createBeanInstance(String beanName, RootBeanDefinition mbd, @Nullable Object[] args) {
-		// 获得此时bean的Class对象，例：<bean class/>中的class
+		// 获得此时bean的Class对象，例：<bean class=""/>中的class
 		Class<?> beanClass = resolveBeanClass(mbd, beanName);
 
 		// 如果此时bean的class对象不是public修饰的，并且不允许访问非public的构造函数和方法（默认允许），则抛出异常
@@ -1253,7 +1254,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	}
 
 	/**
-	 * 调用无参构造函数实例化bean，封装到BeanWrapperImpl对象里
+	 * 调用无参构造函数实例化目标对象，封装到BeanWrapperImpl对象里
 	 *
 	 * Instantiate the given bean using its default constructor.
 	 * @param beanName the name of the bean
@@ -1333,9 +1334,10 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	}
 
 	/**
+	 * 根据<property/>,填充目标对象的属性
+	 *
 	 * Populate the bean instance in the given BeanWrapper with the property values
 	 * from the bean definition.
-	 *
 	 * @param beanName the name of the bean
 	 * @param mbd      the bean definition for the bean
 	 * @param bw       the BeanWrapper with bean instance
@@ -1619,10 +1621,11 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	}
 
 	/**
+	 * 如果设置了<property/>，则把<property/>的属性值，使用反射，通过setter方法设置到目标对象的属性里
+	 *
 	 * Apply the given property values, resolving any runtime references
 	 * to other beans in this bean factory. Must use deep copy, so we
 	 * don't permanently modify this property.
-	 *
 	 * @param beanName the bean name passed for better exception information
 	 * @param mbd      the merged bean definition
 	 * @param bw       the BeanWrapper wrapping the target object

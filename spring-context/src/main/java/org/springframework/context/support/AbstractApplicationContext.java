@@ -912,7 +912,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		beanFactory.freezeConfiguration();
 
 		// tofix 主线
-		// 实例化所有没有实例化的(非“懒加载”、非抽象)单例Bean
+		// 实例化所有没有实例化的(非“懒加载”、非抽象)单例Bean,以beanName为key，放到一级缓存里
 		beanFactory.preInstantiateSingletons();
 	}
 

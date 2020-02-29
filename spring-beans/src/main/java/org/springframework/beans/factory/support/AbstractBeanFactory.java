@@ -189,6 +189,14 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	// Implementation of BeanFactory interface
 	//---------------------------------------------------------------------
 
+
+	/**
+	 *  实例化beanName代表的单例Bean,以beanName为key，放到一级缓存里
+	 *
+	 * @param name the name of the bean to retrieve
+	 * @return
+	 * @throws BeansException
+	 */
 	@Override
 	public Object getBean(String name) throws BeansException {
 		return doGetBean(name, null, null, false);
@@ -221,8 +229,8 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	}
 
 	/**
-	 * 含义&执行场景：
-	 * 1.Spring启动过程中，会调用本方法，获取单例Bean
+	 * 执行场景：
+	 * 1.Spring启动过程中，会调用本方法，实例化name代表的单例Bean,以name为key，放到一级缓存里
 	 * 2.应用系统获取Spring管理的单例Bean（例：在Demo中的`context.getBean("persionA");`）会调用本方法获取
 	 *
 	 * Return an instance, which may be shared or independent, of the specified bean.
@@ -336,7 +344,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 				/** Demo不涉及-end*/
 
 
-				// 如果Bean指定的作用域（scope）为单例，则进入本分支，实例化<bean/>指代的目标对象
+				// 如果Bean指定的作用域（scope）为单例，则进入本分支，实例化<bean/>指代的目标对象，以beanName为key，放到一级缓存里
 				if (mbd.isSingleton()) {
 					// tofix 主线
 					sharedInstance = getSingleton(beanName, () -> {

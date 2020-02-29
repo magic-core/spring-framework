@@ -711,7 +711,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	}
 
 	/**
-	 * 实例化所有还没有实例化的(非“懒加载”、非抽象)单例Bean
+	 * 实例化所有还没有实例化的(非“懒加载”、非抽象)单例Bean,以beanName为key，放到一级缓存里
 	 *
 	 * @throws BeansException
 	 */
@@ -760,7 +760,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 				/** Demo不涉及-end */
 				else {
 					// tofix 主线
-					// 实例化Bean
+					// 实例化beanName代表的单例Bean,以beanName为key，放到一级缓存里
 					getBean(beanName);
 				}
 			}

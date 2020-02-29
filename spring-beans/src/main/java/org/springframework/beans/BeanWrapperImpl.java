@@ -306,6 +306,7 @@ public class BeanWrapperImpl extends AbstractNestablePropertyAccessor implements
 		}
 
 		/**
+		 * 将解析后的<property/>的属性值，使用反射，通过setter方法设置到目标对象的属性里
 		 *
 		 * @param value
 		 * @throws Exception

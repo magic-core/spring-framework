@@ -74,7 +74,7 @@ class BeanDefinitionValueResolver {
 
 
 	/**
-	 * 对<property>中的值进行转换，（例：<property ref=""/>,值是封装了ref信息的RuntimeBeanReference实例，转换成真正的PersionB对象）
+	 * 对<property>中的值进行转换，（例：<property ref=""/>,值是封装了ref信息的RuntimeBeanReference实例，转换成真正的目标对象）
 	 *
 	 * PropertyValue
 	 * Given a PropertyValue, return a value, resolving any references to other

@@ -72,6 +72,12 @@ public abstract class AbstractPropertyAccessor extends TypeConverterSupport impl
 		setPropertyValues(new MutablePropertyValues(map));
 	}
 
+	/**
+	 * 将解析后的<property/>的属性值，使用反射，通过setter方法设置到目标对象的属性里
+	 *
+	 * @param pvs PropertyValues to set on the target object
+	 * @throws BeansException
+	 */
 	@Override
 	public void setPropertyValues(PropertyValues pvs) throws BeansException {
 		setPropertyValues(pvs, false, false);
