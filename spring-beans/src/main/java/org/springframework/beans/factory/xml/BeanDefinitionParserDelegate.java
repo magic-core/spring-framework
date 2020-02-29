@@ -418,7 +418,7 @@ public class BeanDefinitionParserDelegate {
 	 */
 	@Nullable
 	public BeanDefinitionHolder parseBeanDefinitionElement(Element ele, @Nullable BeanDefinition containingBean) {
-		// 获得<bean/>节点的id属性，例：persion
+		// 获得<bean/>节点的id属性
 		String id = ele.getAttribute(ID_ATTRIBUTE);
 
 		/** Demo不涉及-start */
@@ -959,7 +959,7 @@ public class BeanDefinitionParserDelegate {
 			}
 			// 解析xml中<bean/>里的<property/>配置的值
 			Object val = parsePropertyValue(ele, bd, propertyName);
-			// 将<property/>中的name和值封装到pv(PropertyValue)里，（例：<property name="P" ref="persion_B"/>,name是p，值是封装了ref信息的RuntimeBeanReference实例）
+			// 将<property/>中的name和值封装到pv(PropertyValue)里，（例：<property name="pb" ref="persionB"/>,name是pb，值是封装了ref信息的RuntimeBeanReference实例）
 			PropertyValue pv = new PropertyValue(propertyName, val);
 			// 如果<property/>里配置了<meta key="" value=""/>标签,则也解析到pv里,基本不用,暂不深解
 			parseMetaElements(ele, pv);

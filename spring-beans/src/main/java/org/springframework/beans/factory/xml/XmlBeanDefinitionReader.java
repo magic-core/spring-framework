@@ -539,7 +539,7 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 
 		// tofix 主线
 		// 根据xml文件解析的doc实例，加载所有bean定义
-		// createReaderContext 创建 XmlReaderContext 实例，为了将XmlBeanDefinitionReader实例、代表xml资源的Resource实例等统一封装到一个对象里（即Xml读取器上下文），向后传递使用
+		// createReaderContext 创建 XmlReaderContext 实例，为了将XmlBeanDefinitionReader实例、代表xml资源的Resource实例等 统一封装到一个对象里（XmlReaderContext即Xml读取器上下文），向后传递使用
 		documentReader.registerBeanDefinitions(doc, createReaderContext(resource));
 
 		// 返回当前线程刚加载了多少个bean定义

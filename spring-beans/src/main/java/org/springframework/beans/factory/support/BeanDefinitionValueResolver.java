@@ -74,7 +74,7 @@ class BeanDefinitionValueResolver {
 
 
 	/**
-	 * 对<property>中的值进行转换，（例：<property name="P" ref="persion_B"/>,值是封装了ref信息的RuntimeBeanReference实例，转换成真正的Persion对象）
+	 * 对<property>中的值进行转换，（例：<property ref=""/>,值是封装了ref信息的RuntimeBeanReference实例，转换成真正的PersionB对象）
 	 *
 	 * PropertyValue
 	 * Given a PropertyValue, return a value, resolving any references to other
@@ -90,17 +90,17 @@ class BeanDefinitionValueResolver {
 	 * <li>A ManagedMap. In this case the value may be a RuntimeBeanReference
 	 * or Collection that will need to be resolved.
 	 * <li>An ordinary object or {@code null}, in which case it's left alone.
-	 * @param argName 例：在<property name="P" ref="persion_B"/>中表示 PropertyValue对象
-	 * @param value 例：在<property name="P" ref="persion_B"/>中，表示封装了ref信息的RuntimeBeanReference实例
+	 * @param argName 例：解析<property name="" ref=""/>时，表示 PropertyValue对象
+	 * @param value 例：解析<property name="" ref=""/>时，表示封装了ref信息的RuntimeBeanReference实例
 	 * @return the resolved object
 	 */
 	@Nullable
 	public Object resolveValueIfNecessary(Object argName, @Nullable Object value) {
-		// 如果value是Spring工厂中另一个bean的引用（例：<property name="P" ref="persion_B"/>中的ref）
+		// 如果value是Spring工厂中另一个bean的引用（例：<property ref=""/>中的ref）
 		if (value instanceof RuntimeBeanReference) {
 			RuntimeBeanReference ref = (RuntimeBeanReference) value;
 			// tofix 主线
-			// 把ref解析为id为persion_B的真正bean实例
+			// 把ref解析为的真正目标对象
 			return resolveReference(argName, ref);
 		}
 		/** Demo不涉及-start */
@@ -278,18 +278,18 @@ class BeanDefinitionValueResolver {
 	}
 
 	/**
-	 * 将ref解析为真正的对象
+	 * 将ref解析为真正的目标对象
 	 *
 	 * Resolve a reference to another bean in the factory.
-	 * @param argName ref的所属对象，例：ref是<property name="P" ref="persion_B"/>中的ref，argName就是代表<property/>的PropertyValue实例
+	 * @param argName ref的所属对象，例：ref是<property name="" ref=""/>中的ref，argName就是代表<property/>的PropertyValue实例
 	 * @param ref 封装ref信息的RuntimeBeanReference对象
-	 * @return 例：persion对象
+	 * @return
 	 */
 	@Nullable
 	private Object resolveReference(Object argName, RuntimeBeanReference ref) {
 		try {
 			Object bean;
-			// refName 表示<property name="P" ref="persion_B"/>中的"persion_B"
+			// refName 表示<property ref=""/>中的ref
 			String refName = ref.getBeanName();
 
 			/** Demo不涉及-start */

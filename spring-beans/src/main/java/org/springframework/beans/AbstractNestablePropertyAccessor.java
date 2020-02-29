@@ -245,7 +245,7 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 		/** 空变量 */
 		PropertyTokenHolder tokens = (PropertyTokenHolder) pv.resolvedTokens;
 		if (tokens == null) {
-			// propertyName 表示属性名字，例：<property name="p" ref="persion_B">中的“p”
+			// propertyName 表示属性名字，例：<property name="" />中的name
 			String propertyName = pv.getName();
 			AbstractNestablePropertyAccessor nestedPa;
 			try {
@@ -431,7 +431,7 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 	private void processLocalProperty(PropertyTokenHolder tokens, PropertyValue pv) {
 		// ph（BeanPropertyHandler 实例）Bean属性处理器，负责管理`<property/>`属性；本Demo中，主要负责通过持有的`pd`对象获取目标的setter方法，然后利用反射，调用setter方法，对`<bean/>`设置`<property/>`指定的值
 		// 执行的是 BeanWrapperImpl 中的getLocalPropertyHandler方法
-		// tokens.actualName就是<property name="persionB" >中的“persionB”
+		// tokens.actualName就是<property name="" >中的name
 		PropertyHandler ph = getLocalPropertyHandler(tokens.actualName);
 
 		/** Demo不涉及-start */

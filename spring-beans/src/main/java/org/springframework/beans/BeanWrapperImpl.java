@@ -335,7 +335,7 @@ public class BeanWrapperImpl extends AbstractNestablePropertyAccessor implements
 			else {
 				// 表示让程序有权限对private修饰的属性做操作
 				ReflectionUtils.makeAccessible(writeMethod);
-				// 利用反射，调用setPersionB方法，将persionB的value值set到persion对象里去
+				// 利用反射，调用setter方法，将value值set到目标对象里去
 				writeMethod.invoke(getWrappedInstance(), value);
 			}
 		}

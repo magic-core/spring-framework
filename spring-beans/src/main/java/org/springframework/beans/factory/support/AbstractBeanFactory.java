@@ -223,7 +223,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	/**
 	 * 含义&执行场景：
 	 * 1.Spring启动过程中，会调用本方法，获取单例Bean
-	 * 2.应用系统获取Spring管理的单例Bean（例：在Demo中的`context.getBean("persion");`）会调用本方法获取
+	 * 2.应用系统获取Spring管理的单例Bean（例：在Demo中的`context.getBean("persionA");`）会调用本方法获取
 	 *
 	 * Return an instance, which may be shared or independent, of the specified bean.
 	 * @param name          需要操作的beanName
@@ -249,7 +249,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 		// 1.如果是Spring启动过程中，会调用本方法，获取单例Bean
 		//	1.1.bean没有被实例化过，返回null
 		//	1.2.bean被实例化过，返回实例化的bean（可能会发生属性还没有被注入的情况）
-		// 2.如果是应用系统在Spring启动成功后，想要获取Spring管理的单例Bean（例：在Demo中的`context.getBean("persion");`），则会直接返回完整的bean实例，例：Persion对象
+		// 2.如果是应用系统在Spring启动成功后，想要获取Spring管理的单例Bean（例：在Demo中的`context.getBean("persionA");`），则会直接返回完整的bean实例，例：Persion对象
 		Object sharedInstance = getSingleton(beanName);
 		Object bean;
 
@@ -1285,19 +1285,10 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	}
 
 	/**
-	 * 根据传入的bd（GenericBeanDefinition实例），返回RootBeanDefinition实例，有以下情况:
-	 * 1.如果当前传入的bean定义指定了parent属性，则会将parent指定的bean的指定的属性覆盖到本bean中，但是如果本bean指定了属性，则本bean的该属性值不被覆盖，如例1
-	 * 例1：	<bean id="persion"  class="org.springframework.Persion" parent="parent" >
-	 * <bean id="parent" class="org.springframework.Parent"/>
-	 * <property name="属性1" value="值1（会覆盖到persion的相同属性里，但如果persion中该属性有值，不会被覆盖）">
-	 * </property>
-	 * <p>
-	 * 2.如果当前传入的bean定义是普通的<bean/>，则会直接转化为RootBeanDefinition实例，如例2
-	 * 例2：	<bean id="persion"  class="org.springframework.Persion" />
-	 * <p>
+	 * 根据传入的bd（GenericBeanDefinition实例），返回RootBeanDefinition实例
+	 *
 	 * Return a RootBeanDefinition for the given top-level bean, by merging with
 	 * the parent if the given bean's definition is a child bean definition.
-	 *
 	 * @param beanName the name of the bean definition
 	 * @param bd       the original bean definition (Root/ChildBeanDefinition)
 	 * @return a (potentially merged) RootBeanDefinition for the given bean
@@ -1310,28 +1301,29 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 
 	/**
 	 * 根据传入的bd（GenericBeanDefinition实例），返回RootBeanDefinition实例，有以下情况:
-	 * 1.如果当前传入的bean定义是<bean/>中的<property/>里的子<bean/>（例子中的Child），则会直接转化为RootBeanDefinition实例，如例1
-	 * 例1：	<bean id="persion"  class="org.springframework.Persion" >
-	 * <property name="child（Persion的child类型属性名）" >
-	 * <bean  class="org.springframework.Child"/>
+	 * 1.如果当前传入的bean定义是<bean/>中的<property/>里的子<bean/>（例子中的 B），则会直接转化为RootBeanDefinition实例，如例1
+	 * 例1：	<bean id="A" >
+	 * <property name="" >
+	 * <bean id="B"/>
 	 * </property>
 	 * </bean>
 	 * <p>
-	 * 2.如果当前传入的bean定义指定了parent属性，则会将parent指定的bean的指定的属性覆盖到本bean中，但是如果本bean指定了属性，则本bean的该属性值不被覆盖，如例2
-	 * 例2：	<bean id="persion"  class="org.springframework.Persion" parent="parent" >
-	 * <bean id="parent" class="org.springframework.Parent"/>
-	 * <property name="属性1" value="值1（会覆盖到persion的相同属性里，但如果persion中该属性有值，不会被覆盖）">
+	 * 2.如果当前传入的bean定义指定了parent属性，则会将parent指定bean的有值属性覆盖到本bean中，但是如果本bean指定了属性，则本bean的该属性值不被覆盖，如例2
+	 * 例2：	<bean id="child"  class="" parent="parent" />
+	 * <bean id="parent" class="">
+	 * <property name="属性1" value="值1（会覆盖到child的相同属性里，但如果 child 中该属性有值，不会被覆盖）">
 	 * </property>
+	 * </bean>
 	 * <p>
 	 * 3.如果当前传入的bean定义是普通的<bean/>，则会直接转化为RootBeanDefinition实例，如例3
-	 * 例3：	<bean id="persion"  class="org.springframework.Persion" />
-	 * <p>
+	 * 例3：<bean id="persionA" class="org.springframework.demo.PersionA"/>
+	 *
+	 *
 	 * Return a RootBeanDefinition for the given bean, by merging with the
 	 * parent if the given bean's definition is a child bean definition.
-	 *
 	 * @param beanName     bean定义的名字，一般指的是<bean/>中的id属性
 	 * @param bd           当前处理的bean定义实例 GenericBeanDefinition 实例
-	 * @param containingBd containingBean不为空,则代表当前的Bean定义是<bean/>中的<property/>里的子<bean/>;而containingBean就代表外层的<bean id="persion"/>
+	 * @param containingBd containingBean不为空,则代表当前的Bean定义是<bean/>中的<property/>里的子<bean/>;而containingBean就代表外层的<bean/>
 	 *                     containingBean为空,则表示当前的Bean定义是普通的<bean/>，也就是<beans/>里的一个<bean/>标签
 	 * @return RootBeanDefinition实例，是Spring在运行时统一的bean定义实体
 	 * @throws BeanDefinitionStoreException in case of an invalid bean definition

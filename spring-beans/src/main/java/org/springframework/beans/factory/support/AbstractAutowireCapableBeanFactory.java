@@ -380,7 +380,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	/**
 	 * 循环调用后置处理器，对bean进行加工，并返回
 	 *
-	 * @param existingBean 真实的Bean对象，例：persion对象
+	 * @param existingBean 真实的Bean对象
 	 * @param beanName the name of the bean, to be passed to it if necessary
 	 * (only passed to {@link BeanPostProcessor BeanPostProcessors})
 	 * @return
@@ -428,7 +428,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	//---------------------------------------------------------------------
 
 	/**
-	 * 创建单例Bean的实例，例：persion对象
+	 * 创建单例目标对象
 	 *
 	 * Central method of this class: creates a bean instance,
 	 * populates the bean instance, applies post-processors, etc.
@@ -1689,12 +1689,12 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 				deepCopy.add(pv);
 			} else {
 
-				// 例：<property name="P" ref="persion_B"/>，propertyName 表示 "p"
+				// 表示<property name="" />中的name
 				String propertyName = pv.getName();
-				// 例：<property name="P" ref="persion_B"/>，originalValue 表示封装了ref信息的RuntimeBeanReference实例
+				// 例：<property name="" ref=""/>，originalValue 表示封装了ref信息的RuntimeBeanReference实例
 				Object originalValue = pv.getValue();
 				// tofix 主线
-				// 如果有必要，则对<property>中的值进行转换，（例：<property name="P" ref="persion_B"/>,值是封装了ref信息的RuntimeBeanReference实例，转换成真正的Persion对象）
+				// 如果有必要，则对<property>中的值进行转换，（例：<property ref=""/>,值是封装了ref信息的RuntimeBeanReference实例，转换成真正的PersionB对象）
 				// resolvedValue 表示转换后的值
 				Object resolvedValue = valueResolver.resolveValueIfNecessary(pv, originalValue);
 				// convertedValue 代表resolvedValue

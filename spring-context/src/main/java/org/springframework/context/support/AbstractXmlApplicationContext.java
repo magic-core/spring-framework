@@ -83,7 +83,7 @@ public abstract class AbstractXmlApplicationContext extends AbstractRefreshableC
 		// 创建 XmlBeanDefinitionReader 实例,用于读取application.xml配置文件
 		XmlBeanDefinitionReader beanDefinitionReader = new XmlBeanDefinitionReader(beanFactory);
 
-		// resourceLoader在 XmlBeanDefinitionReader 中负责读取application.xml配置文件
+		// resourceLoader在 XmlBeanDefinitionReader 中负责真正读取application.xml配置文件
 		// this表示当前对象 ClassPathXmlApplicationContext 实例，继承自ResourceLoader
 		beanDefinitionReader.setResourceLoader(this);
 
@@ -116,7 +116,7 @@ public abstract class AbstractXmlApplicationContext extends AbstractRefreshableC
 	}
 
 	/**
-	 * 获取使用者配置的xml路径，解析bean的定义到bean工厂里
+	 * 获取用户配置的xml路径，解析bean的定义到bean工厂里
 	 *
 	 * @param reader the XmlBeanDefinitionReader to use
 	 * @throws BeansException in case of bean registration errors
