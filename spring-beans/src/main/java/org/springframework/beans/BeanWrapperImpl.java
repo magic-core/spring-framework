@@ -313,7 +313,7 @@ public class BeanWrapperImpl extends AbstractNestablePropertyAccessor implements
 		 */
 		@Override
 		public void setValue(final @Nullable Object value) throws Exception {
-			// 获得set<property/>的Method对象，例：public void setPersionB(PersionB)
+			// 获得set<property/>的Method对象
 			// pd就是 GenericTypeAwarePropertyDescriptor 实例
 			final Method writeMethod = (this.pd instanceof GenericTypeAwarePropertyDescriptor ?
 					((GenericTypeAwarePropertyDescriptor) this.pd).getWriteMethodForActualAccess() :
