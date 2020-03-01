@@ -877,7 +877,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	}
 
 	/**
-	 * 实例化所有没有实例化的(没有设置“懒加载”)单例
+	 * 实例化所有没有实例化的(没有设置“懒加载”)单例，并以beanName为key，保存在bean工厂的一级缓存singletonObjects里；执行context.getBean("persionA");时，从一级缓存里取
 	 *
 	 * Finish the initialization of this context's bean factory,
 	 * initializing all remaining singleton beans.

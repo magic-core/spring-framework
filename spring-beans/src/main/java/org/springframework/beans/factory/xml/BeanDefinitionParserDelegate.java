@@ -961,10 +961,13 @@ public class BeanDefinitionParserDelegate {
 			Object val = parsePropertyValue(ele, bd, propertyName);
 			// 将<property/>中的name和值封装到pv(PropertyValue)里，（例：<property name="pb" ref="persionB"/>,name是pb，值是封装了ref信息的RuntimeBeanReference实例）
 			PropertyValue pv = new PropertyValue(propertyName, val);
+			/** Demo不涉及 */
 			// 如果<property/>里配置了<meta key="" value=""/>标签,则也解析到pv里,基本不用,暂不深解
 			parseMetaElements(ele, pv);
+			/** 空实现 */
 			// 当前Demo,extractSource没有实现逻辑,直接返回空
 			pv.setSource(extractSource(ele));
+			// tofix 主线
 			// 将pv放到bd里的PropertyValues属性里
 			bd.getPropertyValues().addPropertyValue(pv);
 		}
@@ -1016,21 +1019,22 @@ public class BeanDefinitionParserDelegate {
 	}
 
 	/**
+	 * 解析<property/>的值，比如：将ref指代的bean封装成 RuntimeBeanReference 实例
+	 *
 	 * Get the value of a property element. May be a list etc.
 	 * Also used for constructor arguments, "propertyName" being null in this case.
 	 */
 	@Nullable
 	public Object parsePropertyValue(Element ele, BeanDefinition bd, @Nullable String propertyName) {
-		// propertyName 代表 <property>的id值，例："p"
-		// elementName 代表 <property> element for property p
+		// propertyName 代表 <property/>的id值
 		String elementName = (propertyName != null ?
 				"<property> element for property '" + propertyName + "'" :
 				"<constructor-arg> element");
 
-		/** Demo不涉及 */
-		// nl 表示 <property>的子元素，只会有一个，例：list
+		/** Demo不涉及-start */
+		// nl 表示 <property/>的子元素，只会有一个，例：list
 		NodeList nl = ele.getChildNodes();
-		// subElement 表示<property>的子元素
+		// subElement 表示<property/>的子元素
 		Element subElement = null;
 		for (int i = 0; i < nl.getLength(); i++) {
 			Node node = nl.item(i);
@@ -1045,6 +1049,7 @@ public class BeanDefinitionParserDelegate {
 				}
 			}
 		}
+		/** Demo不涉及-end */
 
 		// hasRefAttribute 表示<property>是否配置了"ref"属性
 		boolean hasRefAttribute = ele.hasAttribute(REF_ATTRIBUTE);
@@ -1073,14 +1078,13 @@ public class BeanDefinitionParserDelegate {
 			ref.setSource(extractSource(ele));
 			return ref;
 		}
-		// Demo不涉及，不深解
+		/** Demo不涉及-start */
 		// 如果是<property value=""/>
 		else if (hasValueAttribute) {
 			TypedStringValue valueHolder = new TypedStringValue(ele.getAttribute(VALUE_ATTRIBUTE));
 			valueHolder.setSource(extractSource(ele));
 			return valueHolder;
 		}
-		// Demo不涉及，不深解
 		// 如果是<property ><子标签/></property>
 		else if (subElement != null) {
 			return parsePropertySubElement(subElement, bd);
@@ -1091,6 +1095,7 @@ public class BeanDefinitionParserDelegate {
 			error(elementName + " must specify a ref or value", ele);
 			return null;
 		}
+		/** Demo不涉及-end */
 	}
 
 	/**

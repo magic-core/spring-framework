@@ -1423,6 +1423,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 		// 如果设置了<property/>，则把<property/>的属性值，使用反射，通过setter方法设置到目标对象的属性里
 		if (pvs != null) {
+			// tofix 主线
 			applyPropertyValues(beanName, mbd, bw, pvs);
 		}
 	}

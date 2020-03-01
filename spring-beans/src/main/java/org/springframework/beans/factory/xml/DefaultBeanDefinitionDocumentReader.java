@@ -368,8 +368,8 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 	 * @param delegate BeanDefinitionParserDelegate 实例(bean定义的解析委托类),定义了解析XML文件（Doc形式）的一系列方法，是核心解析器
 	 */
 	protected void processBeanDefinition(Element ele, BeanDefinitionParserDelegate delegate) {
-		// 解析ele所代表的bean节点信息,创建BeanDefinitionHolder实例
 		// tofix 主线
+		// 解析ele所代表的bean节点信息,创建BeanDefinitionHolder实例
 		BeanDefinitionHolder bdHolder = delegate.parseBeanDefinitionElement(ele);
 		if (bdHolder != null) {
 			/** Demo不涉及 */
