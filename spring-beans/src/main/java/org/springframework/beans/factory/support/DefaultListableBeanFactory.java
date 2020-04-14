@@ -395,7 +395,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 			if (!isAlias(beanName)) {
 				try {
 					// 获得beanName的bean定义（RootBeanDefinition实例）；
-					// 因为Spring有parent属性等相关功能，所以会进行对父子bean进行类似合并操作，所以会最后合并成RootBeanDefinition实例，区分GenericBeanDefinition实例（没有进行合并操作）
+					// < bean/> 有 继承的能力（< bean parent=""/> ），所以 Spring 会进行对父子 < bean/> 进行合并操作，最后合并成 RootBeanDefinition 实例，区分 GenericBeanDefinition 实例（没有进行合并操作的 < bean/> ）
 					RootBeanDefinition mbd = getMergedLocalBeanDefinition(beanName);
 					if (!mbd.isAbstract() && (allowEagerInit ||
 							(mbd.hasBeanClass() || !mbd.isLazyInit() || isAllowEagerClassLoading()) &&
