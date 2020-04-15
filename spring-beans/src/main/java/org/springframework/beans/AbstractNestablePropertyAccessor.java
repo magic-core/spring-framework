@@ -244,6 +244,7 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 	public void setPropertyValue(PropertyValue pv) throws BeansException {
 		/** 空变量 */
 		PropertyTokenHolder tokens = (PropertyTokenHolder) pv.resolvedTokens;
+
 		if (tokens == null) {
 			// propertyName 表示属性名字，例：<property name="" />中的name
 			String propertyName = pv.getName();

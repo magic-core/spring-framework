@@ -562,7 +562,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 				logger.debug("Eagerly caching bean '" + beanName +
 						"' to allow for resolving potential circular references");
 			}
-			// 向Map<String, ObjectFactory<?>> singletonFactories 添加单例实例
+			// 向Map<String, ObjectFactory<?>> singletonFactories 三级缓存添加单例实例
 			// 向Set<String> registeredSingletons 添加单例beanName
 			addSingletonFactory(beanName, () -> getEarlyBeanReference(beanName, mbd, bean));
 		}
@@ -1172,7 +1172,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		/** Demo不涉及-end */
 
 		// tofix 主线
-		// 调用无参构造函数实例化bean，封装到BeanWrapperImpl对象里
+		// 调用无参构造函数实例化bean，封装到 BeanWrapperImpl 对象里
 		return instantiateBean(beanName, mbd);
 	}
 

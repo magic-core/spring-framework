@@ -401,11 +401,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 				cleanupAfterBeanCreationFailure(beanName);
 				throw ex;
 			}
-		    /** Demo不涉及-end */
-
 		}
-
-		/** Demo不涉及-start */
 		// 用于检查所需的类型是否与实际bean实例的类型匹配
 		if (requiredType != null && !requiredType.isInstance(bean)) {
 			try {
