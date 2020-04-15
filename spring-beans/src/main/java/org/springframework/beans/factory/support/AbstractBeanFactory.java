@@ -247,7 +247,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	@SuppressWarnings("unchecked")
 	protected <T> T doGetBean(final String name, @Nullable final Class<T> requiredType,
 							  @Nullable final Object[] args, boolean typeCheckOnly) throws BeansException {
-		/** 没有产生实际效果 */
+		/** 无效果 */
 		// beanName 就是 name
 		// 如果beanName开头带有"&",去掉"&"（beanName开头带有"&"，和factory-bean的Bean生成方式有关）
 		final String beanName = transformedBeanName(name);
@@ -519,7 +519,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	 */
 	@Override
 	public boolean isTypeMatch(String name, ResolvableType typeToMatch) throws NoSuchBeanDefinitionException {
-		/** 没有产生实际效果 */
+		/** 无效果 */
 		// beanName 就是 name
 		// 如果beanName开头带有"&",去掉"&"（beanName开头带有"&"，是获取通过factory-bean方式生成的）
 		String beanName = transformedBeanName(name);

@@ -251,7 +251,7 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 			AbstractNestablePropertyAccessor nestedPa;
 			try {
 
-				/** 没有产生实际效果 */
+				/** 无效果 */
 				// nestedPa 就是 this（BeanWrapperImpl实例）
 				nestedPa = getPropertyAccessorForPropertyPath(propertyName);
 			}
@@ -259,7 +259,7 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 				throw new NotWritablePropertyException(getRootClass(), this.nestedPath + propertyName,
 						"Nested property in path '" + propertyName + "' does not exist", ex);
 			}
-			/** 没有产生实际效果 */
+			/** 无效果 */
 			// tokens 就是 封装了propertyName的 PropertyTokenHolder 实例
 			tokens = getPropertyNameTokens(getFinalPath(nestedPa, propertyName));
 
@@ -490,7 +490,7 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 					/** Demo不涉及-end */
 
 
-					/** 没有产生实际效果 */
+					/** 无效果 */
 					// 转换属性值，Demo中，valueToApply 就是 originalValue
 					valueToApply = convertForProperty(
 							tokens.canonicalName, oldValue, originalValue, ph.toTypeDescriptor());
