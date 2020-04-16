@@ -72,34 +72,29 @@ public abstract class AbstractXmlApplicationContext extends AbstractRefreshableC
 
 
 	/**
-	 * 根据配置文件中的标签解析为bean定义，以map的方式放到beanfactory实例中
-	 *
-	 * @see org.springframework.beans.factory.xml.XmlBeanDefinitionReader
-	 * @see #initBeanDefinitionReader
-	 * @see #loadBeanDefinitions
+	 * 解析 application.xml 文件中的 <bean/> 为 GenericBeanDefinition 实例，以 key 为 beanName，放到 Map<String, BeanDefinition> beanDefinitionMap 里保存
 	 */
 	@Override
 	protected void loadBeanDefinitions(DefaultListableBeanFactory beanFactory) throws BeansException, IOException {
-		// 创建 XmlBeanDefinitionReader 实例,用于读取application.xml配置文件
+		// 创建 XmlBeanDefinitionReader 实例,用于读取 application.xml 配置文件
 		XmlBeanDefinitionReader beanDefinitionReader = new XmlBeanDefinitionReader(beanFactory);
 
-		// resourceLoader在 XmlBeanDefinitionReader 中负责真正读取application.xml配置文件
-		// this表示当前对象 ClassPathXmlApplicationContext 实例，继承自ResourceLoader
+		// resourceLoader 在 XmlBeanDefinitionReader 中负责读取 applicaiton.xml 文件为 Resource 实例
+		// this 表示当前对象 ClassPathXmlApplicationContext 实例，继承自 ResourceLoader
 		beanDefinitionReader.setResourceLoader(this);
 
 		/** 非主要逻辑 */
-		// ResourceEntityResolver，在后面的 非主要逻辑 里，将作为Document类中的一个成员变量，用于解析dom形式的application.xml文件
+		// ResourceEntityResolver，在后面的"非主要逻辑"里，将作为 Document 类中的一个成员变量，用于解析 Document 形式的application.xml文件
 		beanDefinitionReader.setEntityResolver(new ResourceEntityResolver(this));
+
 		/** 无用逻辑-start */
-		// getEnvironment返回StandardEnvironment实例
+		// getEnvironment 返回 StandardEnvironment 实例
 		beanDefinitionReader.setEnvironment(this.getEnvironment());
-		// 设置beanDefinitionReader 验证xml (默认验证)
+		// 设置 beanDefinitionReader 验证xml (默认验证)
 		initBeanDefinitionReader(beanDefinitionReader);
 		/** 无用逻辑-end */
 
-
 		// tofix 主线
-		// 真正的加载bean定义操作
 		loadBeanDefinitions(beanDefinitionReader);
 	}
 
@@ -116,19 +111,13 @@ public abstract class AbstractXmlApplicationContext extends AbstractRefreshableC
 	}
 
 	/**
-	 * 获取用户配置的xml路径，解析bean的定义到bean工厂里
+	 * 解析 application.xml 文件中的 <bean/> 为 GenericBeanDefinition 实例，以 key 为 beanName，放到 Map<String, BeanDefinition> beanDefinitionMap 里保存
 	 *
-	 * @param reader the XmlBeanDefinitionReader to use
-	 * @throws BeansException in case of bean registration errors
-	 * @throws IOException if the required XML document isn't found
-	 * @see #refreshBeanFactory
-	 * @see #getConfigLocations
-	 * @see #getResources
-	 * @see #getResourcePatternResolver
+	 * @param reader XmlBeanDefinitionReader 实例
 	 */
 	protected void loadBeanDefinitions(XmlBeanDefinitionReader reader) throws BeansException, IOException {
 		/** Demo不涉及-start */
-		// 调用AbstractXmlApplicationContext的getConfigResources，返回空
+		// 调用 AbstractXmlApplicationContext 的 getConfigResources，返回空
 		Resource[] configResources = getConfigResources();
 		if (configResources != null) {
 			reader.loadBeanDefinitions(configResources);
@@ -136,11 +125,10 @@ public abstract class AbstractXmlApplicationContext extends AbstractRefreshableC
 		/** Demo不涉及-end */
 
 		// 获取配置文件路径,例：返回["classpath*:applicationContext.xml"]
-		// 调用AbstractXmlApplicationContext的getConfigLocations方法
+		// 调用 AbstractXmlApplicationContext 的 getConfigLocations 方法
 		String[] configLocations = getConfigLocations();
 		if (configLocations != null) {
 			// tofix 主线
-			// 解析xml中bean的定义到bean工厂里
 			reader.loadBeanDefinitions(configLocations);
 		}
 	}

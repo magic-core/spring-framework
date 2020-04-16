@@ -185,7 +185,7 @@ public abstract class AbstractBeanDefinitionReader implements EnvironmentCapable
 
 
 	/**
-	 * 循环所有xml配置文件资源，加载bean定义
+	 * 遍历每个 Resource （本 Demo 只有一个），解析 Resource 中的 <bean/> 为 GenericBeanDefinition 实例，以 key 为 beanName，放到 Map<String, BeanDefinition> beanDefinitionMap 里保存
 	 *
 	 * @param resources the resource descriptors
 	 * @return
@@ -194,9 +194,9 @@ public abstract class AbstractBeanDefinitionReader implements EnvironmentCapable
 	@Override
 	public int loadBeanDefinitions(Resource... resources) throws BeanDefinitionStoreException {
 		Assert.notNull(resources, "Resource array must not be null");
-		// 表示加载到的bean定义个数
+		// 表示加载到的有效 <bean/> 个数
 		int counter = 0;
-		// 循环遍历resources（xml文件资源）
+		// 遍历 resources（xml 文件资源）
 		for (Resource resource : resources) {
 			// 调用从 XmlBeanDefinitionReader 实现的 loadBeanDefinitions 方法
 			counter += loadBeanDefinitions(resource);
@@ -205,10 +205,9 @@ public abstract class AbstractBeanDefinitionReader implements EnvironmentCapable
 	}
 
 	/**
-	 * 根据locations获取xml文件信息，解析bean的定义到bean工厂里
+	 * 根据 locations 获取 application.xml 文件，解析 application.xml 文件中的 <bean/> 为 GenericBeanDefinition 实例，以 key 为 beanName，放到 Map<String, BeanDefinition> beanDefinitionMap 里保存
 	 *
-	 * @param location the resource location, to be loaded with the ResourceLoader
-	 * (or ResourcePatternResolver) of this bean definition reader
+	 * @param location 配置文件路径,例："classpath*:applicationContext.xml"
 	 * @return
 	 * @throws BeanDefinitionStoreException
 	 */
@@ -218,22 +217,19 @@ public abstract class AbstractBeanDefinitionReader implements EnvironmentCapable
 	}
 
 	/**
-	 *  根据locations获取xml文件信息，解析bean的定义到bean工厂里
+	 *  解析 application.xml 文件中的 <bean/> 为 GenericBeanDefinition 实例，以 key 为 beanName，放到 Map<String, BeanDefinition> beanDefinitionMap 里保存
 	 *
-	 * @param location xml配置资源路径
+	 * @param location xml 配置资源路径
 	 * @param actualResources
-	 * 作用：根据actualResources中是否存在重复资源而判断是否循环<import/>xml配置文件了
+	 * 作用：根据 actualResources 中是否存在重复资源而判断是否循环 <import/> application.xml 配置文件
 	 * 使用场景：
-	 * 		  如果正常解析xml配置文件，actualResources为空
-	 * 		  如果解析xml配置文件时遇到import标签，则会递归，再次调用本方法去解析import中指定的xml文件资源，actualResources会传递一个set实例，虽不为空但不包含元素
-	 * @return the number of bean definitions found
+	 * 		  如果正常解析 xml 配置文件，actualResources 为空
+	 * 		  如果解析 xml 配置文件时遇到 <import/>，则会递归，再次调用本方法去解析 <import/>中指定的 xml 文件资源，actualResources 会传递一个 set 实例，虽不为空但不包含元素
+	 * @return 加载到的 GenericBeanDefinition 数量
 	 * @throws BeanDefinitionStoreException in case of loading or parsing errors
-	 * @see #getResourceLoader()
-	 * @see #loadBeanDefinitions(org.springframework.core.io.Resource)
-	 * @see #loadBeanDefinitions(org.springframework.core.io.Resource[])
 	 */
 	public int loadBeanDefinitions(String location, @Nullable Set<Resource> actualResources) throws BeanDefinitionStoreException {
-		// resourceLoader（ClassPathXmlApplicationContext 实例），resourceLoader是XmlBeanDefinitionReader中具体负责读取application.xml配置文件的属性
+		// resourceLoader 表示 ClassPathXmlApplicationContext 实例，是 XmlBeanDefinitionReader 中负责读取 applicaiton.xml 文件为 Resource 实例
 		ResourceLoader resourceLoader = getResourceLoader();
 		if (resourceLoader == null) {
 			throw new BeanDefinitionStoreException(
@@ -243,18 +239,16 @@ public abstract class AbstractBeanDefinitionReader implements EnvironmentCapable
 		// ClassPathXmlApplicationContext 继承 ResourcePatternResolver，所以走本分支
 		if (resourceLoader instanceof ResourcePatternResolver) {
 			try {
-				// 获得配置文件的资源实例，一个Resource实例代表一个application.xml文件
-				// getResources方法调用的是从继承 AbstractApplicationContext 来的
+				// 获得配置文件的资源实例，一个 Resource 实例代表一个 application.xml 文件
+				// getResources 方法调用的是从继承 AbstractApplicationContext 来的
 				Resource[] resources = ((ResourcePatternResolver) resourceLoader).getResources(location);
 
 				// tofix 主线
-				//根据Resource数组解析bean定义,注册到bean工厂里
+				// 解析 Resource 中的 <bean/> 为 GenericBeanDefinition 实例，以 key 为 beanName，放到 Map<String, BeanDefinition> beanDefinitionMap 里保存
 				int loadCount = loadBeanDefinitions(resources);
 
-				// 作用：根据actualResources中是否存在重复资源而判断是否循环<import/>xml配置文件了
-				// 使用场景：和<import/>相关
-				/*如果正常解析xml配置文件，actualResources为空
-				如果解析xml配置文件时遇到import标签，则会递归，再次调用本方法去解析import中指定的xml文件资源，actualResources会传递一个set实例，虽不为空但不包含元素*/
+				// 作用：根据 actualResources 中是否存在重复资源来判断是否循环导入 xml 配置文件了
+				// 使用场景：和 <import/> 相关;如果正常解析 xml 配置文件，actualResources 为空,如果解析 xml 配置文件时,遇到 import 标签，则会递归，再次调用本方法去解析 import 中指定的 xml 文件资源，actualResources 会传递一个 set 实例，虽不为空但不包含元素
 				if (actualResources != null) {
 					for (Resource resource : resources) {
 						actualResources.add(resource);
@@ -285,19 +279,18 @@ public abstract class AbstractBeanDefinitionReader implements EnvironmentCapable
 	}
 
 	/**
-	 * 根据locations获取xml文件信息，解析bean的定义到bean工厂里
+	 * 根据 locations 获取 application.xml 文件，解析 application.xml 文件中的 <bean/> 为 GenericBeanDefinition 实例，以 key 为 beanName，放到 Map<String, BeanDefinition> beanDefinitionMap 里保存
 	 *
-	 * @param locations the resource locations, to be loaded with the ResourceLoader
-	 * (or ResourcePatternResolver) of this bean definition reader
+	 * @param locations 配置文件路径,例：返回["classpath*:applicationContext.xml"]
 	 * @return
 	 * @throws BeanDefinitionStoreException
 	 */
 	@Override
 	public int loadBeanDefinitions(String... locations) throws BeanDefinitionStoreException {
 		Assert.notNull(locations, "Location array must not be null");
-		// counter表示当前操作加载bean定义的数量
+		// counter 表示当前操作加载 <bean/> 的数量
 		int counter = 0;
-		// 循环遍历用户指定的xml配置路径（比如"classpath*:applicationContext.xml"），解析xml中bean的定义到bean工厂里
+		// 遍历用户指定的 application.xml 配置路径（比如"classpath*:applicationContext.xml"），解析 xml 中的 <bean/> 到 DefaultListableBeanFactory 工厂里
 		for (String location : locations) {
 			// tofix 主线
 			counter += loadBeanDefinitions(location);

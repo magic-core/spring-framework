@@ -285,7 +285,7 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 
 
 	/**
-	 * 从指定的XML文件加载bean定义。
+	 * 解析 Resource 文件中的 <bean/> 为 GenericBeanDefinition 实例，以 key 为 beanName，放到 Map<String, BeanDefinition> beanDefinitionMap 里保存
 	 *
 	 * @param resource the resource descriptor for the XML file
 	 * @return the number of bean definitions found
@@ -297,8 +297,7 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 	}
 
 	/**
-	 * 根据指定的XML文件的encodedResource实例，将所有的bean定义，存储到bean工厂里
-	 * 这里还包含了解决<import/>循环依赖的问题
+	 * 解析 EncodedResource 中的 <bean/> 为 GenericBeanDefinition 实例，以 key 为 beanName，放到 Map<String, BeanDefinition> beanDefinitionMap 里保存；同时包含了解决 <import/> 循环依赖的问题
 	 *
 	 * @param encodedResource XML配置文件的资源实例
 	 * @return the number of bean definitions found
@@ -309,32 +308,26 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 		if (logger.isInfoEnabled()) {
 			logger.info("Loading XML bean definitions from " + encodedResource);
 		}
-		/* 作用：
-		 resourcesCurrentlyBeingLoaded 保存当前线程加载的xml配置文件的 EncodedResource 实例Set集合（包括import标签引进的xml资源）*/
-		/* 生命周期：
-		 第一次执行get方法时，currentResources返回空;初始化currentResources，并放到 resourcesCurrentlyBeingLoaded 里
-		 当前xml配置文件解析完毕后，再在finally模块里将当前资源从 currentResources 删除掉*/
+		// 作用：resourcesCurrentlyBeingLoaded 保存当前线程加载的 xml 配置文件的 EncodedResource 实例 Set 集合（包括 import 标签引进的 xml 资源）
+		// 生命周期：第一次执行 resourcesCurrentlyBeingLoaded.get 方法时，currentResources 返回空;初始化 currentResources，并放到 resourcesCurrentlyBeingLoaded 里；当前 xml 配置文件解析完毕后，再在 finally 模块里将当前资源从 currentResources 删除掉
 		Set<EncodedResource> currentResources = this.resourcesCurrentlyBeingLoaded.get();
 		if (currentResources == null) {
 			currentResources = new HashSet<>(4);
 			this.resourcesCurrentlyBeingLoaded.set(currentResources);
 		}
-		// ###逻辑含义:如果 currentResources 集合中已经包含当前要加载的 encodedResource ,则表示xml文件发生了循环<import/>依赖，则抛出异常
+		// ###逻辑含义:如果 currentResources 集合中已经包含当前要加载的 encodedResource ,则表示 xml 文件发生了循环 <import/> ，则抛出异常
 		// ###执行场景:
-		// 1.当解析一个xml文件A时,如果发现文件里import了另一个xml文件B,B文件里又import了A文件,则会发生循环依赖,抛出异常
-		// 2.当解析一个xml文件A时,如果发现文件里import了当前xml文件A,则会发生循环依赖,抛出异常
+		// 1.当解析一个xml文件A时,如果发现文件里 import 了另一个xml文件B,B文件里又 import 了 A 文件,则会发生循环依赖,抛出异常
+		// 2.当解析一个xml文件A时,如果发现文件里 import 了当前xml文件A,则会发生循环 <import/> ,抛出异常
 		// ###实现解释:
 		// 1.当解析一个xml文件A时,如果发现文件里import了另一个xml文件B,会递归调用本方法,解析B文件;
 		// 2.在开始解析一个xml文件时,会将文件的解析内容放到HashSet<EncodedResource> currentResources集合里,如果发现集合里已经存在当前要解析的xml文件资源,则表示发生循环依赖
 		// ###深度解释：
-		// 1. currentResources 是 HashSet 实例,调用HashSet#add方法,如果插入元素的hashcode相等,并且((==)内存地址相等或者(equals)内容相等)
-		// 则判断是重复元素,返回false;
-		// 1.1. encodedResource 是 EncodedResource 实例,EncodedResource重写了hashCode和equals,重写逻辑是返回 成员变量 resource(ClassPathResource类型) 的 hashcode 方法和 equals 方法
-		// 1.1.1. ClassPathResource 的 hashcode 实现是 返回字符串类型的文件名hashcode,如果文件名相同,hashcode则返回true；逻辑代码:org.springframework.core.io.ClassPathResource#equals
-		// 1.1.2. ClassPathResource 的 equals 实现是 如果字符串文件名内容相同,并且加载的ClassLoader 内存地址或者内容相同,则返回true；逻辑代码:org.springframework.core.io.ClassPathResource#equals
-		// 注意:resourcesCurrentlyBeingLoaded 只针对当前实例的当前线程所加载的xml资源，因为resourcesCurrentlyBeingLoaded是成员变量,并会在本方法的finally中清空
-		// 所以假如以类似方式:new ClassPathXmlApplicationContext(new String[] {"classpath*:applicationContext.xml","classpath*:applicationContext.xml"}, true, null);
-		// 配置了多个相同资源的xml文件,不会报循环依赖的问题
+		// 1. currentResources 是 HashSet 实例,调用HashSet#add方法,如果插入元素的hashcode相等,并且((==)内存地址相等或者(equals)内容相等)，则判断是重复元素,返回false;
+		// 1-1. encodedResource 是 EncodedResource 实例,EncodedResource重写了hashCode和equals,重写逻辑是返回 成员变量 resource(ClassPathResource类型) 的 hashcode 方法和 equals 方法
+		// 1-1-1. ClassPathResource 的 hashcode 实现是 返回字符串类型的文件名hashcode,如果文件名相同,hashcode则返回true；逻辑代码:org.springframework.core.io.ClassPathResource#equals
+		// 1-1-2. ClassPathResource 的 equals 实现是 如果字符串文件名内容相同,并且加载的ClassLoader 内存地址或者内容相同,则返回true；逻辑代码:org.springframework.core.io.ClassPathResource#equals
+		// 注意:resourcesCurrentlyBeingLoaded 只针对当前实例的当前线程所加载的xml资源，因为resourcesCurrentlyBeingLoaded是成员变量,并会在本方法的finally中清空，所以假如以类似方式:new ClassPathXmlApplicationContext(new String[] {"classpath*:applicationContext.xml","classpath*:applicationContext.xml"}, true, null);配置了多个相同资源的xml文件,不会报循环依赖的问题
 		if (!currentResources.add(encodedResource)) {
 			throw new BeanDefinitionStoreException(
 					"Detected cyclic loading of " + encodedResource + " - check your import definitions!");
@@ -396,7 +389,7 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 
 
 	/**
-	 * 根据inputSource，解析xml文件中所有的bean定义，存储到bean工厂里
+	 * 解析 InputSource 中的 <bean/> 为 GenericBeanDefinition 实例，以 key 为 beanName，放到 Map<String, BeanDefinition> beanDefinitionMap 里保存
 	 *
 	 * @param inputSource 代表xml文件的inputSource实例
 	 * @param resource 代表xml文件的Resource实例
@@ -412,7 +405,7 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 			// 将代表xml文件的inputSource对象解析为document实例
 			Document doc = doLoadDocument(inputSource, resource);
 			// tofix 主线
-			// 再根据doc实例，将xml中所有的bean定义，存储到bean工厂里
+			// 解析 Document 中的 <bean/> 为 GenericBeanDefinition 实例，以 key 为 beanName，放到 Map<String, BeanDefinition> beanDefinitionMap 里保存
 			return registerBeanDefinitions(doc, resource);
 		}
 		catch (BeanDefinitionStoreException ex) {
@@ -514,19 +507,12 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 	}
 
 	/**
-	 * 根据Document实例，解析xml文件中所有的bean定义，存储到bean工厂里
+	 * 解析 Document 中的 <bean/> 为 GenericBeanDefinition 实例，以 key 为 beanName，放到 Map<String, BeanDefinition> beanDefinitionMap 里保存
 	 *
-	 * Register the bean definitions contained in the given DOM document.
-	 * Called by {@code loadBeanDefinitions}.
-	 * <p>Creates a new instance of the parser class and invokes
-	 * {@code registerBeanDefinitions} on it.
 	 * @param doc the DOM document
 	 * @param resource the resource descriptor (for context information)
 	 * @return the number of bean definitions found
 	 * @throws BeanDefinitionStoreException in case of parsing errors
-	 * @see #loadBeanDefinitions
-	 * @see #setDocumentReaderClass
-	 * @see BeanDefinitionDocumentReader#registerBeanDefinitions
 	 */
 	public int registerBeanDefinitions(Document doc, Resource resource) throws BeanDefinitionStoreException {
 
@@ -534,11 +520,11 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 		BeanDefinitionDocumentReader documentReader = createBeanDefinitionDocumentReader();
 
 		// 获取bean工厂中的当前已经包含的bean定义数量，用于计算当前要加载的bean定义数量（所有的Bean定义的总数减去countBefore）
-		// getRegistry 返回DefaultListableBeanFactory实例（bean工厂）
+		// getRegistry 返回DefaultListableBeanFactory实例
 		int countBefore = getRegistry().getBeanDefinitionCount();
 
 		// tofix 主线
-		// 根据xml文件解析的doc实例，加载所有bean定义
+		// 解析 Document 中的 <bean/> 为 GenericBeanDefinition 实例，以 key 为 beanName，放到 Map<String, BeanDefinition> beanDefinitionMap 里保存
 		// createReaderContext 创建 XmlReaderContext 实例，为了将XmlBeanDefinitionReader实例、代表xml资源的Resource实例等 统一封装到一个对象里（XmlReaderContext即Xml读取器上下文），向后传递使用
 		documentReader.registerBeanDefinitions(doc, createReaderContext(resource));
 

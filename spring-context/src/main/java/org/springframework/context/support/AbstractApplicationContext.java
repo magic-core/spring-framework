@@ -488,8 +488,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	}
 
 	/**
-	 * 核心逻辑：解析 application.xml 文件中 <bean/>，并将 <bean/> 加载成 Spring内部实体，并根据实体信息实例化目标对象
-	 *
+	 * 核心逻辑：解析 application.xml 文件中的 <bean/> 为 GenericBeanDefinition 实例，并根据 GenericBeanDefinition 实例化目标对象（例：PersionA）并注入属性值，放到 Map<String, Object> singletonObjects 里保存
 	 */
 	@Override
 	public void refresh() throws BeansException, IllegalStateException {
@@ -499,45 +498,36 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 			prepareRefresh();
 
 			// tofix 主线
-			// 创建beanfactory bean工厂，根据配置文件中的标签解析为Spring的Bean定义对象，以map的方式存放到beanfactory实例中
+			// 创建 DefaultListableBeanFactory 工厂，并解析 application.xml 文件中的 <bean/> 为 GenericBeanDefinition 对象，放到 Map<String, BeanDefinition> beanDefinitionMap 里保存
 			ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();
 
 			/** 无用逻辑 */
-			// 对beanFactory 的一些属性进行赋值
+			// 对 beanFactory 的一些属性进行赋值
 			prepareBeanFactory(beanFactory);
 
 			try {
 				/** 空实现 */
-				// postProcessBeanFactory方法从 AbstractApplicationContext 继承而来，实现为空;
+				// postProcessBeanFactory 方法从 AbstractApplicationContext 继承而来，实现为空;
 				postProcessBeanFactory(beanFactory);
 
-				/** Demo不涉及 */
-				// Spring将bean工厂对象作为参数，调用所有实现了 BeanDefinitionRegistryPostProcessor、BeanFactoryPostProcessor 的bean的重写方法，这些bean自定义处理逻辑
+				/** Demo不涉及-start */
+				// Spring将 DefaultListableBeanFactory 工厂对象作为参数，调用所有实现了 BeanDefinitionRegistryPostProcessor、BeanFactoryPostProcessor 的 bean 的重写方法，这些 bean 自定义处理逻辑
 				invokeBeanFactoryPostProcessors(beanFactory);
-
-				/** Demo不涉及 */
-				// 向bean工厂注册实现 BeanPostProcessor 接口的bean（后置处理器）
+				// 向 DefaultListableBeanFactory 工厂注册实现 BeanPostProcessor 接口的 bean（后置处理器）
 				registerBeanPostProcessors(beanFactory);
-
-				/** Demo不涉及 */
 				// 用于实现国际化功能，即根据指定的配置，切换不同的显示语言（messageSource）
 				initMessageSource();
-
-				/** Demo不涉及 */
-				// 向bean工厂注册beanName是"applicationEventMulticaster"的bean,用来通知所有的 ApplicationListener 监听者
+				// 向 DefaultListableBeanFactory 工厂注册 beanName 是"applicationEventMulticaster"的 bean,用来通知所有的 ApplicationListener 监听者
 				initApplicationEventMulticaster();
-
-				/** Demo不涉及 */
 				// 模版模式，AbstractApplicationContext#onRefresh()空实现，预留给子类实现
 				onRefresh();
-
-				/** Demo不涉及 */
 				// 注册 ApplicationListener 监听者，用来监听"applicationEventMulticaster"发布的事件
 				// 对应 initApplicationEventMulticaster
 				registerListeners();
+				/** Demo不涉及-end */
 
 				// tofix 主线
-				// 实例化所有没有实例化的(没有设置“懒加载”)单例
+				// 根据 GenericBeanDefinition 实例化目标对象（例：PersionA）并注入属性值，放到 Map<String, Object> singletonObjects 里保存
 				finishBeanFactoryInitialization(beanFactory);
 
 				/** Demo不涉及 */
@@ -550,21 +540,16 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 					logger.warn("Exception encountered during context initialization - " +
 							"cancelling refresh attempt: " + ex);
 				}
-
 				// Destroy already created singletons to avoid dangling resources.
 				destroyBeans();
-
 				// Reset 'active' flag.
 				cancelRefresh(ex);
-
 				// Propagate exception to caller.
 				throw ex;
 			}
-
 			finally {
-				// Reset common introspection caches in Spring's core, since we
-				// might not ever need metadata for singleton beans anymore...
-				// 重置Spring核心中的公共自省缓存，因为我们可能不再需要单例bean的元数据了……
+				/** 非主要逻辑 */
+				// 清空 Spring 中的公共默认缓存，因为不需要单例 <bean/> 的元数据了
 				resetCommonCaches();
 			}
 		}
@@ -617,19 +602,17 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	}
 
 	/**
-	 * 创建新的beanfactory bean工厂，根据配置文件中的标签解析为bean定义，以map的方式放到beanfactory实例中
+	 * 创建 DefaultListableBeanFactory 工厂，根据配置文件中的 <bean/> 解析为 GenericBeanDefinition 对象，放到 Map<String, BeanDefinition> beanDefinitionMap 里保存
 	 *
-	 * Tell the subclass to refresh the internal bean factory.
 	 * @return 返回bean工厂 DefaultListableBeanFactory 实例
-	 * @see #refreshBeanFactory()
-	 * @see #getBeanFactory()
 	 */
 	protected ConfigurableListableBeanFactory obtainFreshBeanFactory() {
 		// tofix 主线
-		// 创建新的beanfactory bean工厂，根据配置文件中的标签解析为bean定义，以map的方式放到beanfactory实例中
+		// 创建 DefaultListableBeanFactory 工厂，并解析 application.xml 文件中的 <bean/> 为 GenericBeanDefinition 实例，放到 Map<String, BeanDefinition> beanDefinitionMap 里保存
 		// 调用的是从 AbstractRefreshableApplicationContext 继承过来的方法
 		refreshBeanFactory();
-		// 获得bean工厂 DefaultListableBeanFactory 实例
+
+		// 从 beanFactory 获取 DefaultListableBeanFactory 实例
 		ConfigurableListableBeanFactory beanFactory = getBeanFactory();
 
 		if (logger.isDebugEnabled()) {

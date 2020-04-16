@@ -84,12 +84,8 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 
 
 	/**
-	 * 通过Document实例的root节点，解析xml文件中所有的bean定义，存储到bean工厂里
+	 * 解析 Document 中的 <bean/> 为 GenericBeanDefinition 实例，以 key 为 beanName，放到 Map<String, BeanDefinition> beanDefinitionMap 里保存
 	 *
-	 * This implementation parses bean definitions according to the "spring-beans" XSD
-	 * (or DTD, historically).
-	 * <p>Opens a DOM Document; then initializes the default settings
-	 * specified at the {@code <beans/>} level; then parses the contained bean definitions.
 	 * @param doc 代表xml配置文件的DOM document实例
 	 * @param readerContext 用于将XmlBeanDefinitionReader实例、xml资源实例等共用实例统一封装到一个对象里，向后传递使用
 	 * (includes the target registry and the resource being parsed)
@@ -125,7 +121,7 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 
 
 	/**
-	 * 根据xml文件的root节点，即<beans/>节点，加载xml中所有的bean定义
+	 * 根据xml文件的root节点，解析 Document 中的 <bean/> 为 GenericBeanDefinition 实例，以 key 为 beanName，放到 Map<String, BeanDefinition> beanDefinitionMap 里保存
 	 *
 	 * @param root
 	 */
@@ -190,7 +186,7 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 	}
 
 	/**
-	 * 根据xml文件的root节点，即<beans/>节点，加载xml中所有的bean定义
+	 * 根据xml文件的root节点，即<beans/>节点，解析 Document 中的 <bean/> 为 GenericBeanDefinition 实例，以 key 为 beanName，放到 Map<String, BeanDefinition> beanDefinitionMap 里保存
 	 *
 	 * @param root xml 的根节点，即<beans/>
 	 * @param delegate BeanDefinitionParserDelegate 实例(bean定义的解析委托类),定义了解析XML文件（Doc形式）的一系列方法，是核心解析器

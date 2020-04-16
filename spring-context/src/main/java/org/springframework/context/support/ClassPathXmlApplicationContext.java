@@ -76,7 +76,7 @@ public class ClassPathXmlApplicationContext extends AbstractXmlApplicationContex
 	}
 
 	/**
-	 * 实例化 ClassPathXmlApplicationContext ，启动 Spring 上下文加载；
+	 * 实例化 ClassPathXmlApplicationContext ，启动 Spring ；
 	 *
 	 * @param configLocation application.xml 资源路径的地址
 	 */
@@ -123,7 +123,7 @@ public class ClassPathXmlApplicationContext extends AbstractXmlApplicationContex
 	}
 
 	/**
-	 * 实例化 ClassPathXmlApplicationContext ，启动 Spring 上下文加载；
+	 * 实例化 ClassPathXmlApplicationContext ，启动 Spring ；
 	 *
 	 * @param configLocations 配置文件的路径，可以配置多个配置文件，例：["classpath*:applicationContext.xml"]
 	 * @param refresh 是否启动 Spring（加载所有bean定义并创建所有单例），或者刷新 Spring （进一步配置Spring后手动调用refresh，刷新Spring）

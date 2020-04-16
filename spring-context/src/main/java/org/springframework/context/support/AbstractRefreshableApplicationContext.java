@@ -117,28 +117,29 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 	}
 
 	/**
-	 * 创建新的beanfactory bean工厂，根据配置文件中的标签解析为bean定义，以map的方式放到beanfactory实例中
+	 * 创建 DefaultListableBeanFactory 工厂，根据配置文件中的 <bean/> 解析为 GenericBeanDefinition 对象，放到 Map<String, BeanDefinition> beanDefinitionMap 里保存
 	 *
 	 * @throws BeansException
 	 */
 	@Override
 	protected final void refreshBeanFactory() throws BeansException {
 		/** Demo不涉及 */
-		// 如果已经存在bean工厂了，则销毁原bean工厂，然后重新创建，也就是说可以启动bean工厂后，再执行当前方法，用于刷新bean工厂
+		// 如果已经存在 DefaultListableBeanFactory 工厂了，则销毁原 DefaultListableBeanFactory 工厂，然后重新创建
 		if (hasBeanFactory()) {
 			destroyBeans();
 			closeBeanFactory();
 		}
 
 		try {
-			// 创建 DefaultListableBeanFactory 实例 bean工厂
+			// 创建 DefaultListableBeanFactory 实例
 			DefaultListableBeanFactory beanFactory = createBeanFactory();
+
 			/** 无用逻辑 */
 			beanFactory.setSerializationId(getId());
 
-			// 对beanFactory 的 AllowCircularReferences 和 AllowBeanDefinitionOverriding 属性赋值
-			// allowCircularReferences 表示允许bean循环引用,默认true
-			// allowBeanDefinitionOverriding 表示xml中相同beanId的bean定义允许覆盖,默认true
+			// 对 DefaultListableBeanFactory的 AllowCircularReferences 和 AllowBeanDefinitionOverriding 属性赋值
+			// allowCircularReferences 表示允许 <bean/> 循环引用,默认 true
+			// allowBeanDefinitionOverriding 表示 application.xml 中相同 id 的 <bean/> 允许覆盖,默认 true
 			customizeBeanFactory(beanFactory);
 
 			// tofix 核心方法
@@ -224,17 +225,13 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 	/**
 	 * 对 allowBeanDefinitionOverriding 和 allowCircularReferences 赋值
 	 * allowCircularReferences 表示允许循环引用
-	 * allowBeanDefinitionOverriding 表示xml中相同beanId的bean定义允许覆盖
+	 * allowBeanDefinitionOverriding 表示 application.xml 中相同 id 的 <bean/> 允许覆盖
 	 *
-	 * @param beanFactory the newly created bean factory for this context
-	 * @see DefaultListableBeanFactory#setAllowBeanDefinitionOverriding
-	 * @see DefaultListableBeanFactory#setAllowCircularReferences
-	 * @see DefaultListableBeanFactory#setAllowRawInjectionDespiteWrapping
-	 * @see DefaultListableBeanFactory#setAllowEagerClassLoading
+	 * @param beanFactory 新创建的 DefaultListableBeanFactory
 	 */
 	protected void customizeBeanFactory(DefaultListableBeanFactory beanFactory) {
-		// 对 allowBeanDefinitionOverriding 进行赋值，allowBeanDefinitionOverriding默认为true
-		// allowBeanDefinitionOverriding 表示xml中相同beanId的bean定义允许覆盖
+		// 对 allowBeanDefinitionOverriding 进行赋值，allowBeanDefinitionOverriding 默认为 true
+		// allowBeanDefinitionOverriding 表示 application.xml 中相同 id 的 <bean/> 允许覆盖
 		if (this.allowBeanDefinitionOverriding != null) {
 			beanFactory.setAllowBeanDefinitionOverriding(this.allowBeanDefinitionOverriding);
 		}
