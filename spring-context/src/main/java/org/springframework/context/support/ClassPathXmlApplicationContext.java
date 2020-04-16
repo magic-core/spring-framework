@@ -76,13 +76,9 @@ public class ClassPathXmlApplicationContext extends AbstractXmlApplicationContex
 	}
 
 	/**
-	 * 实例化ClassPathXmlApplicationContext，构造函数里执行了所有操作：构造函数中解析XML文件中bean定义，并将bean定义加载成Spring内部的实体，并根据实体中的信息实例化使用者定义的类
-	 *
-	 * Create a new ClassPathXmlApplicationContext, loading the definitions
-	 * from the given XML file and automatically refreshing the context.
+	 * 实例化 ClassPathXmlApplicationContext ，启动 Spring 上下文加载；
 	 *
 	 * @param configLocation application.xml 资源路径的地址
-	 * @throws BeansException if context creation failed
 	 */
 	public ClassPathXmlApplicationContext(String configLocation) throws BeansException {
 		this(new String[] {configLocation}, true, null);
@@ -127,26 +123,19 @@ public class ClassPathXmlApplicationContext extends AbstractXmlApplicationContex
 	}
 
 	/**
-	 * 实例化ClassPathXmlApplicationContext，构造函数里执行了所有操作：构造函数中解析XML文件中bean定义，并将bean定义加载成Spring内部的实体，并根据实体中的信息实例化使用者定义的类
+	 * 实例化 ClassPathXmlApplicationContext ，启动 Spring 上下文加载；
 	 *
-	 * Create a new ClassPathXmlApplicationContext with the given parent,
-	 * loading the definitions from the given XML files.
-	 *
-	 * @param configLocations array of resource locations
-	 * @param refresh whether to automatically refresh the context,
-	 * loading all bean definitions and creating all singletons.
-	 * Alternatively, call refresh manually after further configuring the context.
-	 * @param parent the parent context
-	 * @throws BeansException if context creation failed
-	 * @see #refresh()
+	 * @param configLocations 配置文件的路径，可以配置多个配置文件，例：["classpath*:applicationContext.xml"]
+	 * @param refresh 是否启动 Spring（加载所有bean定义并创建所有单例），或者刷新 Spring （进一步配置Spring后手动调用refresh，刷新Spring）
+	 * @param parent 父 ApplicationContext ，默认为空
 	 */
 	public ClassPathXmlApplicationContext(
 			String[] configLocations, boolean refresh, @Nullable ApplicationContext parent)
 			throws BeansException {
 		super(parent);
-		// 设置application.xml配置文件路径，到configLocations
+		// 设置 application.xml 配置文件路径，到 configLocations，例：["classpath*:applicationContext.xml"]
 		setConfigLocations(configLocations);
-		// 默认true，表示允许启动或刷新Spring
+		// 默认 true，表示允许启动或刷新 Spring
 		if (refresh) {
 			// tofix 主线
 			refresh();

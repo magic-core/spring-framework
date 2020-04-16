@@ -488,10 +488,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	}
 
 	/**
-	 * 核心逻辑：解析XML文件中bean定义，并将bean定义加载成Spring内部的实体，并根据实体中的信息实例化使用者定义的类
+	 * 核心逻辑：解析 application.xml 文件中 <bean/>，并将 <bean/> 加载成 Spring内部实体，并根据实体信息实例化目标对象
 	 *
-	 * @throws BeansException
-	 * @throws IllegalStateException
 	 */
 	@Override
 	public void refresh() throws BeansException, IllegalStateException {

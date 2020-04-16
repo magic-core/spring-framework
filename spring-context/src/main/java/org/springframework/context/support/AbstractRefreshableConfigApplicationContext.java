@@ -72,14 +72,14 @@ public abstract class AbstractRefreshableConfigApplicationContext extends Abstra
 	/**
 	 * 解析并设置applicaiton.xml（如果存在占位符，则解析并替换掉，例: "${user.dir}"）的路径到 configLocations 属性
 	 *
-	 * Set the config locations for this application context.
-	 * <p>If not set, the implementation may use a default as appropriate.
+	 * @param locations 配置文件的路径，可以配置多个配置文件，例：["classpath*:applicationContext.xml"]
 	 */
 	public void setConfigLocations(@Nullable String... locations) {
 		if (locations != null) {
 			Assert.noNullElements(locations, "Config locations must not be null");
 			this.configLocations = new String[locations.length];
-			// 循环遍历locations（用户配置的多个application.xml路径，一般只有一个），解析占位符，并设置到configLocations属性上
+
+			// 遍历 locations（用户配置的多个 application.xml 路径，一般只有一个），解析占位符，并设置到 configLocations 属性上
 			for (int i = 0; i < locations.length; i++) {
 				this.configLocations[i] = resolvePath(locations[i]).trim();
 			}
