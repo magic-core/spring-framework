@@ -72,7 +72,7 @@ public abstract class AbstractXmlApplicationContext extends AbstractRefreshableC
 
 
 	/**
-	 * 解析 application.xml 文件中的 <bean/> 为 GenericBeanDefinition 实例，以 key 为 beanName，放到 Map<String, BeanDefinition> beanDefinitionMap 里保存
+	 * 解析 application.xml 文件中的 <bean/> 为 GenericBeanDefinition 实例，以 beanName 为 key，放到 Map<String, BeanDefinition> beanDefinitionMap 里保存
 	 */
 	@Override
 	protected void loadBeanDefinitions(DefaultListableBeanFactory beanFactory) throws BeansException, IOException {
@@ -111,7 +111,7 @@ public abstract class AbstractXmlApplicationContext extends AbstractRefreshableC
 	}
 
 	/**
-	 * 解析 application.xml 文件中的 <bean/> 为 GenericBeanDefinition 实例，以 key 为 beanName，放到 Map<String, BeanDefinition> beanDefinitionMap 里保存
+	 * 解析 application.xml 文件中的 <bean/> 为 GenericBeanDefinition 实例，以 beanName 为 key，放到 Map<String, BeanDefinition> beanDefinitionMap 里保存
 	 *
 	 * @param reader XmlBeanDefinitionReader 实例
 	 */

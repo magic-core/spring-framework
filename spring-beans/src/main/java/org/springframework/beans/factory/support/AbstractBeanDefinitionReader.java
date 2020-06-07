@@ -41,12 +41,14 @@ import java.util.Set;
  *
  * @author Juergen Hoeller
  * @author Chris Beams
- * @since 11.12.2003
  * @see BeanDefinitionReaderUtils
+ * @since 11.12.2003
  */
 public abstract class AbstractBeanDefinitionReader implements EnvironmentCapable, BeanDefinitionReader {
 
-	/** Logger available to subclasses */
+	/**
+	 * Logger available to subclasses
+	 */
 	protected final Log logger = LogFactory.getLog(getClass());
 	// DefaultListableBeanFactory实例,实例化XmlBeanDefinitionReader进行的赋值,XmlBeanDefinitionReader继承AbstractBeanDefinitionReader
 	private final BeanDefinitionRegistry registry;
@@ -74,8 +76,9 @@ public abstract class AbstractBeanDefinitionReader implements EnvironmentCapable
 	 * environment will be used by this reader.  Otherwise, the reader will initialize and
 	 * use a {@link StandardEnvironment}. All ApplicationContext implementations are
 	 * EnvironmentCapable, while normal BeanFactory implementations are not.
+	 *
 	 * @param registry the BeanFactory to load bean definitions into,
-	 * in the form of a BeanDefinitionRegistry
+	 *                 in the form of a BeanDefinitionRegistry
 	 * @see #setResourceLoader
 	 * @see #setEnvironment
 	 */
@@ -86,16 +89,14 @@ public abstract class AbstractBeanDefinitionReader implements EnvironmentCapable
 		// Determine ResourceLoader to use.
 		if (this.registry instanceof ResourceLoader) {
 			this.resourceLoader = (ResourceLoader) this.registry;
-		}
-		else {
+		} else {
 			this.resourceLoader = new PathMatchingResourcePatternResolver();
 		}
 
 		// Inherit Environment if possible
 		if (this.registry instanceof EnvironmentCapable) {
 			this.environment = ((EnvironmentCapable) this.registry).getEnvironment();
-		}
-		else {
+		} else {
 			this.environment = new StandardEnvironment();
 		}
 	}
@@ -124,6 +125,7 @@ public abstract class AbstractBeanDefinitionReader implements EnvironmentCapable
 	 * resource pattern resolving through the ResourcePatternResolver interface.
 	 * <p>Setting this to {@code null} suggests that absolute resource loading
 	 * is not available for this bean definition reader.
+	 *
 	 * @see org.springframework.core.io.support.ResourcePatternResolver
 	 * @see org.springframework.core.io.support.PathMatchingResourcePatternResolver
 	 */
@@ -142,6 +144,7 @@ public abstract class AbstractBeanDefinitionReader implements EnvironmentCapable
 	 * <p>Default is {@code null}, which suggests to not load bean classes
 	 * eagerly but rather to just register bean definitions with class names,
 	 * with the corresponding Classes to be resolved later (or never).
+	 *
 	 * @see Thread#getContextClassLoader()
 	 */
 	public void setBeanClassLoader(@Nullable ClassLoader beanClassLoader) {
@@ -185,7 +188,7 @@ public abstract class AbstractBeanDefinitionReader implements EnvironmentCapable
 
 
 	/**
-	 * 遍历每个 Resource （本 Demo 只有一个），解析 Resource 中的 <bean/> 为 GenericBeanDefinition 实例，以 key 为 beanName，放到 Map<String, BeanDefinition> beanDefinitionMap 里保存
+	 * 遍历每个 Resource （本 Demo 只有一个），解析 Resource 中的 <bean/> 为 GenericBeanDefinition 实例，以 beanName 为 key，放到 Map<String, BeanDefinition> beanDefinitionMap 里保存
 	 *
 	 * @param resources the resource descriptors
 	 * @return
@@ -205,7 +208,7 @@ public abstract class AbstractBeanDefinitionReader implements EnvironmentCapable
 	}
 
 	/**
-	 * 根据 locations 获取 application.xml 文件，解析 application.xml 文件中的 <bean/> 为 GenericBeanDefinition 实例，以 key 为 beanName，放到 Map<String, BeanDefinition> beanDefinitionMap 里保存
+	 * 根据 locations 获取 application.xml 文件，解析 application.xml 文件中的 <bean/> 为 GenericBeanDefinition 实例，以 beanName 为 key，放到 Map<String, BeanDefinition> beanDefinitionMap 里保存
 	 *
 	 * @param location 配置文件路径,例："classpath*:applicationContext.xml"
 	 * @return
@@ -217,14 +220,13 @@ public abstract class AbstractBeanDefinitionReader implements EnvironmentCapable
 	}
 
 	/**
-	 *  解析 application.xml 文件中的 <bean/> 为 GenericBeanDefinition 实例，以 key 为 beanName，放到 Map<String, BeanDefinition> beanDefinitionMap 里保存
+	 * 解析 application.xml 文件中的 <bean/> 为 GenericBeanDefinition 实例，以 beanName 为 key，放到 Map<String, BeanDefinition> beanDefinitionMap 里保存
 	 *
-	 * @param location xml 配置资源路径
-	 * @param actualResources
-	 * 作用：根据 actualResources 中是否存在重复资源而判断是否循环 <import/> application.xml 配置文件
-	 * 使用场景：
-	 * 		  如果正常解析 xml 配置文件，actualResources 为空
-	 * 		  如果解析 xml 配置文件时遇到 <import/>，则会递归，再次调用本方法去解析 <import/>中指定的 xml 文件资源，actualResources 会传递一个 set 实例，虽不为空但不包含元素
+	 * @param location        xml 配置资源路径
+	 * @param actualResources 作用：根据 actualResources 中是否存在重复资源而判断是否循环 <import/> application.xml 配置文件
+	 *                        使用场景：
+	 *                        如果正常解析 xml 配置文件，actualResources 为空
+	 *                        如果解析 xml 配置文件时遇到 <import/>，则会递归，再次调用本方法去解析 <import/>中指定的 xml 文件资源，actualResources 会传递一个 set 实例，虽不为空但不包含元素
 	 * @return 加载到的 GenericBeanDefinition 数量
 	 * @throws BeanDefinitionStoreException in case of loading or parsing errors
 	 */
@@ -244,7 +246,7 @@ public abstract class AbstractBeanDefinitionReader implements EnvironmentCapable
 				Resource[] resources = ((ResourcePatternResolver) resourceLoader).getResources(location);
 
 				// tofix 主线
-				// 解析 Resource 中的 <bean/> 为 GenericBeanDefinition 实例，以 key 为 beanName，放到 Map<String, BeanDefinition> beanDefinitionMap 里保存
+				// 解析 Resource 中的 <bean/> 为 GenericBeanDefinition 实例，以 beanName 为 key，放到 Map<String, BeanDefinition> beanDefinitionMap 里保存
 				int loadCount = loadBeanDefinitions(resources);
 
 				// 作用：根据 actualResources 中是否存在重复资源来判断是否循环导入 xml 配置文件了
@@ -258,8 +260,7 @@ public abstract class AbstractBeanDefinitionReader implements EnvironmentCapable
 					logger.debug("Loaded " + loadCount + " bean definitions from location pattern [" + location + "]");
 				}
 				return loadCount;
-			}
-			catch (IOException ex) {
+			} catch (IOException ex) {
 				throw new BeanDefinitionStoreException(
 						"Could not resolve bean definition resource pattern [" + location + "]", ex);
 			}
@@ -279,7 +280,7 @@ public abstract class AbstractBeanDefinitionReader implements EnvironmentCapable
 	}
 
 	/**
-	 * 根据 locations 获取 application.xml 文件，解析 application.xml 文件中的 <bean/> 为 GenericBeanDefinition 实例，以 key 为 beanName，放到 Map<String, BeanDefinition> beanDefinitionMap 里保存
+	 * 根据 locations 获取 application.xml 文件，解析 application.xml 文件中的 <bean/> 为 GenericBeanDefinition 实例，以 beanName 为 key，放到 Map<String, BeanDefinition> beanDefinitionMap 里保存
 	 *
 	 * @param locations 配置文件路径,例：返回["classpath*:applicationContext.xml"]
 	 * @return

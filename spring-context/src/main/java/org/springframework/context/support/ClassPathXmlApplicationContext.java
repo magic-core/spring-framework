@@ -126,12 +126,13 @@ public class ClassPathXmlApplicationContext extends AbstractXmlApplicationContex
 	 * 实例化 ClassPathXmlApplicationContext ，启动 Spring ；
 	 *
 	 * @param configLocations 配置文件的路径，可以配置多个配置文件，例：["classpath*:applicationContext.xml"]
-	 * @param refresh 是否启动 Spring（加载所有bean定义并创建所有单例），或者刷新 Spring （进一步配置Spring后手动调用refresh，刷新Spring）
+	 * @param refresh 是否启动 Spring，或者刷新 Spring 重新读取配置
 	 * @param parent 父 ApplicationContext ，默认为空
 	 */
 	public ClassPathXmlApplicationContext(
 			String[] configLocations, boolean refresh, @Nullable ApplicationContext parent)
 			throws BeansException {
+		/** 非主要逻辑 */
 		super(parent);
 		// 设置 application.xml 配置文件路径，到 configLocations，例：["classpath*:applicationContext.xml"]
 		setConfigLocations(configLocations);

@@ -84,7 +84,7 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 
 
 	/**
-	 * 解析 Document 中的 <bean/> 为 GenericBeanDefinition 实例，以 key 为 beanName，放到 Map<String, BeanDefinition> beanDefinitionMap 里保存
+	 * 解析 Document 中的 <bean/> 为 GenericBeanDefinition 实例，以 beanName 为 key，放到 Map<String, BeanDefinition> beanDefinitionMap 里保存
 	 *
 	 * @param doc 代表xml配置文件的DOM document实例
 	 * @param readerContext 用于将XmlBeanDefinitionReader实例、xml资源实例等共用实例统一封装到一个对象里，向后传递使用
@@ -121,7 +121,7 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 
 
 	/**
-	 * 根据xml文件的root节点，解析 Document 中的 <bean/> 为 GenericBeanDefinition 实例，以 key 为 beanName，放到 Map<String, BeanDefinition> beanDefinitionMap 里保存
+	 * 根据xml文件的root节点，解析 Document 中的 <bean/> 为 GenericBeanDefinition 实例，以 beanName 为 key，放到 Map<String, BeanDefinition> beanDefinitionMap 里保存
 	 *
 	 * @param root
 	 */
@@ -131,7 +131,7 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 		// 表示当前<beans/>的父<beans/>中的bean定义解析委托类 BeanDefinitionParserDelegate 实例；
 		BeanDefinitionParserDelegate parent = this.delegate;
 
-		// delegate 代表 BeanDefinitionParserDelegate 实例(bean定义的解析委托类),定义了解析XML文件（Doc形式）的一系列方法，是核心解析器
+		// 创建 BeanDefinitionParserDelegate 实例(bean定义的解析委托类),定义了解析XML文件（Doc形式）的一系列方法，是核心解析器
 		// getReaderContext() 返回 XmlReaderContext 实例
 		this.delegate = createDelegate(getReaderContext(), root, parent);
 
@@ -186,7 +186,7 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 	}
 
 	/**
-	 * 根据xml文件的root节点，即<beans/>节点，解析 Document 中的 <bean/> 为 GenericBeanDefinition 实例，以 key 为 beanName，放到 Map<String, BeanDefinition> beanDefinitionMap 里保存
+	 * 根据xml文件的root节点，即<beans/>节点，解析 Document 中的 <bean/> 为 GenericBeanDefinition 实例，以 beanName 为 key，放到 Map<String, BeanDefinition> beanDefinitionMap 里保存
 	 *
 	 * @param root xml 的根节点，即<beans/>
 	 * @param delegate BeanDefinitionParserDelegate 实例(bean定义的解析委托类),定义了解析XML文件（Doc形式）的一系列方法，是核心解析器

@@ -285,7 +285,7 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 
 
 	/**
-	 * 解析 Resource 文件中的 <bean/> 为 GenericBeanDefinition 实例，以 key 为 beanName，放到 Map<String, BeanDefinition> beanDefinitionMap 里保存
+	 * 解析 Resource 文件中的 <bean/> 为 GenericBeanDefinition 实例，以 beanName 为 key，放到 Map<String, BeanDefinition> beanDefinitionMap 里保存
 	 *
 	 * @param resource the resource descriptor for the XML file
 	 * @return the number of bean definitions found
@@ -297,7 +297,7 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 	}
 
 	/**
-	 * 解析 EncodedResource 中的 <bean/> 为 GenericBeanDefinition 实例，以 key 为 beanName，放到 Map<String, BeanDefinition> beanDefinitionMap 里保存；同时包含了解决 <import/> 循环依赖的问题
+	 * 解析 EncodedResource 中的 <bean/> 为 GenericBeanDefinition 实例，以 beanName 为 key，放到 Map<String, BeanDefinition> beanDefinitionMap 里保存；
 	 *
 	 * @param encodedResource XML配置文件的资源实例
 	 * @return the number of bean definitions found
@@ -389,7 +389,7 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 
 
 	/**
-	 * 解析 InputSource 中的 <bean/> 为 GenericBeanDefinition 实例，以 key 为 beanName，放到 Map<String, BeanDefinition> beanDefinitionMap 里保存
+	 * 解析 InputSource 中的 <bean/> 为 GenericBeanDefinition 实例，以 beanName 为 key，放到 Map<String, BeanDefinition> beanDefinitionMap 里保存
 	 *
 	 * @param inputSource 代表xml文件的inputSource实例
 	 * @param resource 代表xml文件的Resource实例
@@ -405,7 +405,7 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 			// 将代表xml文件的inputSource对象解析为document实例
 			Document doc = doLoadDocument(inputSource, resource);
 			// tofix 主线
-			// 解析 Document 中的 <bean/> 为 GenericBeanDefinition 实例，以 key 为 beanName，放到 Map<String, BeanDefinition> beanDefinitionMap 里保存
+			// 解析 Document 中的 <bean/> 为 GenericBeanDefinition 实例，以 beanName 为 key，放到 Map<String, BeanDefinition> beanDefinitionMap 里保存
 			return registerBeanDefinitions(doc, resource);
 		}
 		catch (BeanDefinitionStoreException ex) {
@@ -507,7 +507,7 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 	}
 
 	/**
-	 * 解析 Document 中的 <bean/> 为 GenericBeanDefinition 实例，以 key 为 beanName，放到 Map<String, BeanDefinition> beanDefinitionMap 里保存
+	 * 解析 Document 中的 <bean/> 为 GenericBeanDefinition 实例，以 beanName 为 key，放到 Map<String, BeanDefinition> beanDefinitionMap 里保存
 	 *
 	 * @param doc the DOM document
 	 * @param resource the resource descriptor (for context information)
@@ -524,7 +524,7 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 		int countBefore = getRegistry().getBeanDefinitionCount();
 
 		// tofix 主线
-		// 解析 Document 中的 <bean/> 为 GenericBeanDefinition 实例，以 key 为 beanName，放到 Map<String, BeanDefinition> beanDefinitionMap 里保存
+		// 解析 Document 中的 <bean/> 为 GenericBeanDefinition 实例，以 beanName 为 key，放到 Map<String, BeanDefinition> beanDefinitionMap 里保存
 		// createReaderContext 创建 XmlReaderContext 实例，为了将XmlBeanDefinitionReader实例、代表xml资源的Resource实例等 统一封装到一个对象里（XmlReaderContext即Xml读取器上下文），向后传递使用
 		documentReader.registerBeanDefinitions(doc, createReaderContext(resource));
 

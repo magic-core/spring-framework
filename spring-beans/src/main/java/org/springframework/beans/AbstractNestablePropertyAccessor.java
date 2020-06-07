@@ -459,7 +459,7 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 
 		Object oldValue = null;
 		try {
-			// originalValue 表示`<property/>`指代的值;例：在<property ref="p"/>中就是为Persion对象
+			// originalValue 表示`<property/>`指代的值;例：在<property ref="p"/>中就是为PersionA 对象
 			Object originalValue = pv.getValue();
 			Object valueToApply = originalValue;
 			// 执行本分支

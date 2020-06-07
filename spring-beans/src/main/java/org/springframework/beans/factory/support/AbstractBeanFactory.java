@@ -252,16 +252,16 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 		// 如果beanName开头带有"&",去掉"&"（beanName开头带有"&"，和factory-bean的Bean生成方式有关）
 		final String beanName = transformedBeanName(name);
 
-		// 根据beanName，尝试在bean工厂获取已经保存的单例bean实例,sharedInstance表示单例实例，例：Persion
-		// 执行场景：
+		// 根据beanName，尝试在bean工厂获取已经保存的单例bean实例,sharedInstance表示单例实例，例：PersionA
+		// getSingleton 方法的调用场景：
 		// 1.如果是Spring启动过程中，会调用本方法，获取单例Bean
-		//	1.1.bean没有被实例化过，返回null
-		//	1.2.bean被实例化过，返回实例化的bean（可能会发生属性还没有被注入的情况）
-		// 2.如果是应用系统在Spring启动成功后，想要获取Spring管理的单例Bean（例：在Demo中的`context.getBean("persionA");`），则会直接返回完整的bean实例，例：Persion对象
+		//	1.1.若bean没有被实例化过，会返回null
+		//	1.2.若bean被实例化过，会返回实例化的bean（返回的bean中属性可能还没有被注入值）
+		// 2.如果是应用系统在Spring启动成功后，想要获取Spring管理的单例Bean（例：在Demo中的`context.getBean("persionA");`），则会直接返回完整的bean实例，例：PersionA 对象
 		Object sharedInstance = getSingleton(beanName);
 		Object bean;
 
-		// 从缓存（1级或2级或3级缓存）中获取到了bean实例
+		// 从 getSingleton 方法中获取到bean实例
 		if (sharedInstance != null && args == null) {
 			if (logger.isDebugEnabled()) {
 				if (isSingletonCurrentlyInCreation(beanName)) {
@@ -278,7 +278,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 		}
 
 		// tofix 主线
-		// 从缓存（1级或2级或3级缓存）中没有获取到了bean实例
+		// 从 getSingleton 方法中没有获取到bean实例
 		else {
 			// Fail if we're already creating this bean instance:
 			// We're assumably within a circular reference.
@@ -306,16 +306,16 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 					return parentBeanFactory.getBean(nameToLookup, requiredType);
 				}
 			}
-			/** Demo不涉及-end */
 
 
 			// typeCheckOnly（调用本方法除了为了实例化Bean以外，还会用来检查bean工厂是否注册了实现指定接口的Bean）
 			// true 表示调用本方法是为了检查是否存在实现指定接口的Bean;
 			// false 表示调用本方法为了创建Bean
 			if (!typeCheckOnly) {
-				// 标记当前bean已经进入实例化流程了，将当前beanName存储到 alreadyCreated
+				// 将当前beanName存储到 alreadyCreated，标记当前bean已经被 Spring 创建过了
 				markBeanAsCreated(beanName);
 			}
+			/** Demo不涉及-end */
 
 			try {
 				// 获得beanName的bean定义（RootBeanDefinition实例）；
@@ -1683,7 +1683,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	}
 
 	/**
-	 * 标记当前bean已经进入实例化流程了，将当前beanName存储到 alreadyCreated
+	 * 将当前beanName存储到 alreadyCreated，标记当前bean已经被 Spring 创建过了
 	 * <p>
 	 * Mark the specified bean as already created (or about to be created).
 	 * <p>This allows the bean factory to optimize its caching for repeated

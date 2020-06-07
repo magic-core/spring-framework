@@ -861,7 +861,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 		// 如果没有注册过id为beanName的bean定义
 		else {
 			/** Demo不涉及-start */
-			// 校验 alreadyCreated 集合是否已经存在元素，alreadyCreated 表示 已经被实例化的bean定义集合
+			// 校验 alreadyCreated 集合是否已经存在元素，alreadyCreated 继承自 AbstractBeanFactory,表示已经被 Spring 创建过的beanName集合
 			// 只有当spring在启动并且已经有bean定义被实例化时，又调用了refresh方法（进行刷新bean定义操作）；才会执行当前代码块
 			if (hasBeanCreationStarted()) {
 				// Cannot modify startup-time collection elements anymore (for stable iteration)
@@ -882,12 +882,12 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 
 			// 如果还没有创建过bean，走本分支
 			else {
-				/** 主线-start */
-				// 以键值对的方式{bean标签中的id->BeanDefinition},存放从xml文件中解析出来的bean配置，用于后续逻辑根据beanName获取GenericBeanDefinition实例
+				// tofix 主线-start
+				// 数据结构：{beanName->BeanDefinition},存放从xml文件中解析出来的bean配置，用于后续逻辑根据beanName获取GenericBeanDefinition实例
 				this.beanDefinitionMap.put(beanName, beanDefinition);
-				// beanDefinitionNames 表示通过调用当前方法得到的bean定义的名字（beanName）
+				// beanDefinitionNames 用于存放从 application.xml 文件中解析出来的 beanName（一般为 <bean/>标签中的 id 值），按注册顺序排列
 				this.beanDefinitionNames.add(beanName);
-				/** 主线-end */
+				// tofix 主线-end
 
 				/** Demo不涉及 */
 				// manualSingletonNames 表示通过调用 DefaultListableBeanFactory.registerSingleton(String beanName, Object singletonObject) 方法手动注册的单例bean定义的名字（beanName）,例如：new ClassPathXmlApplicationContext("classpath:applicationContext.xml").getBeanFactory().registerSingleton("testName", new Test());

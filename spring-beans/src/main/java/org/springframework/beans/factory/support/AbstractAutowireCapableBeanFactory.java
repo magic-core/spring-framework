@@ -524,10 +524,10 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		}
 		if (instanceWrapper == null) {
 			// tofix 主线
-			// 实例化Bean真正指代的对象，例：Persion
+			// 实例化Bean真正指代的对象，例：PersionA 对象
 			instanceWrapper = createBeanInstance(beanName, mbd, args);
 		}
-		// bean 表示<bean/>所代表的真正对象，例：Persion对象
+		// bean 表示<bean/>所代表的真正对象，例：PersionA 对象
 		final Object bean = instanceWrapper.getWrappedInstance();
 		// bean表示bean的Class对象
 		Class<?> beanType = instanceWrapper.getWrappedClass();
@@ -552,8 +552,6 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		}
 		/** Demo不涉及-end */
 
-		// Eagerly cache singletons to be able to resolve circular references
-		// even when triggered by lifecycle interfaces like BeanFactoryAware.
 		// true：mbd是单例的 并且 允许循环依赖 并且 当前正在创建本bean，没有结束；否则为false
 		boolean earlySingletonExposure = (mbd.isSingleton() && this.allowCircularReferences &&
 				isSingletonCurrentlyInCreation(beanName));
@@ -590,7 +588,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 		// true：mbd是单例的 并且 允许循环依赖 并且 当前正在创建本bean，没有结束；否则为false
 		if (earlySingletonExposure) {
-			// 尝试依次从一级、二级、三级缓存里获取Persion实例
+			// 尝试依次从一级、二级、三级缓存里获取PersionA 实例
 			Object earlySingletonReference = getSingleton(beanName, false);
 			if (earlySingletonReference != null) {
 				if (exposedObject == bean) {
@@ -1731,7 +1729,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 				} else {
 					resolveNecessary = true;
-					// 将解析后的值（例：Persion对象），在封装成 PropertyValue
+					// 将解析后的值（例：PersionA 对象），在封装成 PropertyValue
 					deepCopy.add(new PropertyValue(pv, convertedValue));
 				}
 			}
